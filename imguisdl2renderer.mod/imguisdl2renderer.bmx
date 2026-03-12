@@ -43,8 +43,8 @@ End Function
 Rem
 bbdoc: Renders the draw data for the SDL2 renderer for ImGui.
 End Rem
-Function ImGui_ImplSDLRenderer2_RenderDrawData(draw_data:Byte Ptr, renderer:TSDLRenderer)
-	_ImGui_ImplSDLRenderer2_RenderDrawData(draw_data, renderer.rendererPtr)
+Function ImGui_ImplSDLRenderer2_RenderDrawData(draw_data:TImDrawData, renderer:TSDLRenderer)
+	_ImGui_ImplSDLRenderer2_RenderDrawData(draw_data.handle, renderer.rendererPtr)
 End Function
 
 Private

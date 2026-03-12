@@ -627,6 +627,42 @@ Type TImGuiIO
 	End Method
 End Type
 
+Type TImGuiListClipper
+	Field handle:Byte Ptr
+	Function _Create:TImGuiListClipper(handle:Byte Ptr)
+		Local this:TImGuiListClipper = New TImGuiListClipper
+		this.handle = handle
+		Return this
+	End Function
+End Type
+
+Type TImGuiPayload
+	Field handle:Byte Ptr
+	Function _Create:TImGuiPayload(handle:Byte Ptr)
+		Local this:TImGuiPayload = New TImGuiPayload
+		this.handle = handle
+		Return this
+	End Function
+End Type
+
+Type TImDrawData
+	Field handle:Byte Ptr
+	Function _Create:TImDrawData(handle:Byte Ptr)
+		Local this:TImDrawData = New TImDrawData
+		this.handle = handle
+		Return this
+	End Function
+End Type
+
+Type TImGuiViewport
+	Field handle:Byte Ptr
+	Function _Create:TImGuiViewport(handle:Byte Ptr)
+		Local this:TImGuiViewport = New TImGuiViewport
+		this.handle = handle
+		Return this
+	End Function
+End Type
+
 
 Struct SImVec2
 	Field x:Float
@@ -755,8 +791,8 @@ End Function
 Rem
 bbdoc:  valid after Render() and until the next call to NewFrame(). this is what you have to render.
 End Rem
-Function ImGui_GetDrawData:Byte Ptr()
-	Return _ImGui_GetDrawData()
+Function ImGui_GetDrawData:TImDrawData()
+	Return TImDrawData._Create(_ImGui_GetDrawData())
 End Function
 
 Rem
@@ -1240,8 +1276,8 @@ End Function
 Rem
 bbdoc:  get current font
 End Rem
-Function ImGui_GetFont:Byte Ptr()
-	Return _ImGui_GetFont()
+Function ImGui_GetFont:TImFont()
+	Return TImFont._Create(_ImGui_GetFont())
 End Function
 
 Rem
@@ -3034,8 +3070,8 @@ End Function
 Rem
 bbdoc:  accept contents of a given type. If ImGuiDragDropFlags_AcceptBeforeDelivery is set you can peek into the payload before the mouse button is released.
 End Rem
-Function ImGui_AcceptDragDropPayload:Byte Ptr(kind:String, flags:EImGuiDragDropFlags)
-	Return _ImGui_AcceptDragDropPayload(kind, flags)
+Function ImGui_AcceptDragDropPayload:TImGuiPayload(kind:String, flags:EImGuiDragDropFlags)
+	Return TImGuiPayload._Create(_ImGui_AcceptDragDropPayload(kind, flags))
 End Function
 
 Rem
@@ -3048,8 +3084,8 @@ End Function
 Rem
 bbdoc:  peek directly into the current payload from anywhere. returns NULL when drag and drop is finished or inactive. use ImGuiPayload::IsDataType() to test for the payload type.
 End Rem
-Function ImGui_GetDragDropPayload:Byte Ptr()
-	Return _ImGui_GetDragDropPayload()
+Function ImGui_GetDragDropPayload:TImGuiPayload()
+	Return TImGuiPayload._Create(_ImGui_GetDragDropPayload())
 End Function
 
 Rem
@@ -3238,8 +3274,8 @@ End Function
 Rem
 bbdoc:  return primary/default viewport. This can never be NULL.
 End Rem
-Function ImGui_GetMainViewport:Byte Ptr()
-	Return _ImGui_GetMainViewport()
+Function ImGui_GetMainViewport:TImGuiViewport()
+	Return TImGuiViewport._Create(_ImGui_GetMainViewport())
 End Function
 
 Rem
@@ -3794,20 +3830,20 @@ Function ImGuiInputTextCallbackData_HasSelection:Int(this:Byte Ptr)
 	Return _ImGuiInputTextCallbackData_HasSelection(this)
 End Function
 
-Function ImGuiPayload_Clear(this:Byte Ptr)
-	_ImGuiPayload_Clear(this)
+Function ImGuiPayload_Clear(this:TImGuiPayload)
+	_ImGuiPayload_Clear(this.handle)
 End Function
 
-Function ImGuiPayload_IsDataType:Int(this:Byte Ptr, kind:String)
-	Return _ImGuiPayload_IsDataType(this, kind)
+Function ImGuiPayload_IsDataType:Int(this:TImGuiPayload, kind:String)
+	Return _ImGuiPayload_IsDataType(this.handle, kind)
 End Function
 
-Function ImGuiPayload_IsPreview:Int(this:Byte Ptr)
-	Return _ImGuiPayload_IsPreview(this)
+Function ImGuiPayload_IsPreview:Int(this:TImGuiPayload)
+	Return _ImGuiPayload_IsPreview(this.handle)
 End Function
 
-Function ImGuiPayload_IsDelivery:Int(this:Byte Ptr)
-	Return _ImGuiPayload_IsDelivery(this)
+Function ImGuiPayload_IsDelivery:Int(this:TImGuiPayload)
+	Return _ImGuiPayload_IsDelivery(this.handle)
 End Function
 
 Function ImGuiTextFilter_ImGuiTextRange_empty:Int(this:Byte Ptr)
@@ -3966,43 +4002,43 @@ Function ImGuiStorage_SetAllInt(this:Byte Ptr, val:Int)
 	_ImGuiStorage_SetAllInt(this, val)
 End Function
 
-Function ImGuiListClipper_Begin(this:Byte Ptr, items_count:Int, items_height:Float)
-	_ImGuiListClipper_Begin(this, items_count, items_height)
+Function ImGuiListClipper_Begin(this:TImGuiListClipper, items_count:Int, items_height:Float)
+	_ImGuiListClipper_Begin(this.handle, items_count, items_height)
 End Function
 
 Rem
 bbdoc:  Automatically called on the last call of Step() that returns false.
 End Rem
-Function ImGuiListClipper_End(this:Byte Ptr)
-	_ImGuiListClipper_End(this)
+Function ImGuiListClipper_End(this:TImGuiListClipper)
+	_ImGuiListClipper_End(this.handle)
 End Function
 
 Rem
 bbdoc:  Call until it returns false. The DisplayStart/DisplayEnd fields will be set and you can process/draw those items.
 End Rem
-Function ImGuiListClipper_Step:Int(this:Byte Ptr)
-	Return _ImGuiListClipper_Step(this)
+Function ImGuiListClipper_Step:Int(this:TImGuiListClipper)
+	Return _ImGuiListClipper_Step(this.handle)
 End Function
 
 Rem
 bbdoc: 
 End Rem
-Function ImGuiListClipper_IncludeItemByIndex(this:Byte Ptr, item_index:Int)
-	_ImGuiListClipper_IncludeItemByIndex(this, item_index)
+Function ImGuiListClipper_IncludeItemByIndex(this:TImGuiListClipper, item_index:Int)
+	_ImGuiListClipper_IncludeItemByIndex(this.handle, item_index)
 End Function
 
 Rem
 bbdoc:  item_end is exclusive e.g. use (42, 42+1) to make item 42 never clipped.
 End Rem
-Function ImGuiListClipper_IncludeItemsByIndex(this:Byte Ptr, item_begin:Int, item_end:Int)
-	_ImGuiListClipper_IncludeItemsByIndex(this, item_begin, item_end)
+Function ImGuiListClipper_IncludeItemsByIndex(this:TImGuiListClipper, item_begin:Int, item_end:Int)
+	_ImGuiListClipper_IncludeItemsByIndex(this.handle, item_begin, item_end)
 End Function
 
 Rem
 bbdoc: 
 End Rem
-Function ImGuiListClipper_SeekCursorForItem(this:Byte Ptr, item_index:Int)
-	_ImGuiListClipper_SeekCursorForItem(this, item_index)
+Function ImGuiListClipper_SeekCursorForItem(this:TImGuiListClipper, item_index:Int)
+	_ImGuiListClipper_SeekCursorForItem(this.handle, item_index)
 End Function
 
 Rem
@@ -4125,12 +4161,12 @@ Function ImDrawList_PopTextureID(this:TImDrawList)
 	_ImDrawList_PopTextureID(this.handle)
 End Function
 
-Function ImDrawList_GetClipRectMin:SImVec2(this:Byte Ptr)
-	Return _ImDrawList_GetClipRectMin(this)
+Function ImDrawList_GetClipRectMin:SImVec2(this:TImDrawList)
+	Return _ImDrawList_GetClipRectMin(this.handle)
 End Function
 
-Function ImDrawList_GetClipRectMax:SImVec2(this:Byte Ptr)
-	Return _ImDrawList_GetClipRectMax(this)
+Function ImDrawList_GetClipRectMax:SImVec2(this:TImDrawList)
+	Return _ImDrawList_GetClipRectMax(this.handle)
 End Function
 
 Rem
@@ -4426,8 +4462,8 @@ End Function
 Rem
 bbdoc:  Create a clone of the CmdBuffer/IdxBuffer/VtxBuffer.
 End Rem
-Function ImDrawList_CloneOutput:TImDrawList(this:Byte Ptr)
-	Return TImDrawList._Create(_ImDrawList_CloneOutput(this))
+Function ImDrawList_CloneOutput:TImDrawList(this:TImDrawList)
+	Return TImDrawList._Create(_ImDrawList_CloneOutput(this.handle))
 End Function
 
 Rem
@@ -4521,8 +4557,8 @@ Function ImDrawList__SetTextureID(this:TImDrawList, texture_id:ULong)
 	_ImDrawList__SetTextureID(this.handle, texture_id)
 End Function
 
-Function ImDrawList__CalcCircleAutoSegmentCount:Int(this:Byte Ptr, radius:Float)
-	Return _ImDrawList__CalcCircleAutoSegmentCount(this, radius)
+Function ImDrawList__CalcCircleAutoSegmentCount:Int(this:TImDrawList, radius:Float)
+	Return _ImDrawList__CalcCircleAutoSegmentCount(this.handle, radius)
 End Function
 
 Function ImDrawList__PathArcToFastEx(this:TImDrawList, center:SImVec2, radius:Float, a_min_sample:Int, a_max_sample:Int, a_step:Int)
@@ -4533,29 +4569,29 @@ Function ImDrawList__PathArcToN(this:TImDrawList, center:SImVec2, radius:Float, 
 	_ImDrawList__PathArcToN(this.handle, center, radius, a_min, a_max, num_segments)
 End Function
 
-Function ImDrawData_Clear(this:Byte Ptr)
-	_ImDrawData_Clear(this)
+Function ImDrawData_Clear(this:TImDrawData)
+	_ImDrawData_Clear(this.handle)
 End Function
 
 Rem
 bbdoc:  Helper to add an external draw list into an existing ImDrawData.
 End Rem
-Function ImDrawData_AddDrawList(this:Byte Ptr, draw_list:TImDrawList)
-	_ImDrawData_AddDrawList(this, draw_list.handle)
+Function ImDrawData_AddDrawList(this:TImDrawData, draw_list:TImDrawList)
+	_ImDrawData_AddDrawList(this.handle, draw_list.handle)
 End Function
 
 Rem
 bbdoc:  Helper to convert all buffers from indexed to non-indexed, in case you cannot render indexed. Note: this is slow and most likely a waste of resources. Always prefer indexed rendering!
 End Rem
-Function ImDrawData_DeIndexAllBuffers(this:Byte Ptr)
-	_ImDrawData_DeIndexAllBuffers(this)
+Function ImDrawData_DeIndexAllBuffers(this:TImDrawData)
+	_ImDrawData_DeIndexAllBuffers(this.handle)
 End Function
 
 Rem
 bbdoc:  Helper to scale the ClipRect field of each ImDrawCmd. Use if your final output buffer is at a different scale than Dear ImGui expects, or if there is a difference between your window resolution and framebuffer resolution.
 End Rem
-Function ImDrawData_ScaleClipRects(this:Byte Ptr, fb_scale:SImVec2)
-	_ImDrawData_ScaleClipRects(this, fb_scale)
+Function ImDrawData_ScaleClipRects(this:TImDrawData, fb_scale:SImVec2)
+	_ImDrawData_ScaleClipRects(this.handle, fb_scale)
 End Function
 
 Function ImFontGlyphRangesBuilder_Clear(this:Byte Ptr)
@@ -4604,37 +4640,37 @@ Function ImFontGlyphRangesBuilder_BuildRanges(this:Byte Ptr, out_ranges:Byte Ptr
 	_ImFontGlyphRangesBuilder_BuildRanges(this, out_ranges)
 End Function
 
-Function ImFontAtlas_AddFont:Byte Ptr(this:TImFontAtlas, font_cfg:Byte Ptr)
-	Return _ImFontAtlas_AddFont(this.handle, font_cfg)
+Function ImFontAtlas_AddFont:TImFont(this:TImFontAtlas, font_cfg:Byte Ptr)
+	Return TImFont._Create(_ImFontAtlas_AddFont(this.handle, font_cfg))
 End Function
 
-Function ImFontAtlas_AddFontDefault:Byte Ptr(this:TImFontAtlas, font_cfg:Byte Ptr)
-	Return _ImFontAtlas_AddFontDefault(this.handle, font_cfg)
+Function ImFontAtlas_AddFontDefault:TImFont(this:TImFontAtlas, font_cfg:Byte Ptr)
+	Return TImFont._Create(_ImFontAtlas_AddFontDefault(this.handle, font_cfg))
 End Function
 
-Function ImFontAtlas_AddFontFromFileTTF:Byte Ptr(this:TImFontAtlas, filename:String, size_pixels:Float, font_cfg:Byte Ptr, glyph_ranges:Byte Ptr)
-	Return _ImFontAtlas_AddFontFromFileTTF(this.handle, filename, size_pixels, font_cfg, glyph_ranges)
+Function ImFontAtlas_AddFontFromFileTTF:TImFont(this:TImFontAtlas, filename:String, size_pixels:Float, font_cfg:Byte Ptr, glyph_ranges:Byte Ptr)
+	Return TImFont._Create(_ImFontAtlas_AddFontFromFileTTF(this.handle, filename, size_pixels, font_cfg, glyph_ranges))
 End Function
 
 Rem
 bbdoc:  Note: Transfer ownership of 'ttf_data' to ImFontAtlas! Will be deleted after destruction of the atlas. Set font_cfg->FontDataOwnedByAtlas=false to keep ownership of your data and it won't be freed.
 End Rem
-Function ImFontAtlas_AddFontFromMemoryTTF:Byte Ptr(this:TImFontAtlas, font_data:Byte Ptr, font_data_size:Int, size_pixels:Float, font_cfg:Byte Ptr, glyph_ranges:Byte Ptr)
-	Return _ImFontAtlas_AddFontFromMemoryTTF(this.handle, font_data, font_data_size, size_pixels, font_cfg, glyph_ranges)
+Function ImFontAtlas_AddFontFromMemoryTTF:TImFont(this:TImFontAtlas, font_data:Byte Ptr, font_data_size:Int, size_pixels:Float, font_cfg:Byte Ptr, glyph_ranges:Byte Ptr)
+	Return TImFont._Create(_ImFontAtlas_AddFontFromMemoryTTF(this.handle, font_data, font_data_size, size_pixels, font_cfg, glyph_ranges))
 End Function
 
 Rem
 bbdoc:  'compressed_font_data' still owned by caller. Compress with binary_to_compressed_c.cpp.
 End Rem
-Function ImFontAtlas_AddFontFromMemoryCompressedTTF:Byte Ptr(this:TImFontAtlas, compressed_font_data:Byte Ptr, compressed_font_data_size:Int, size_pixels:Float, font_cfg:Byte Ptr, glyph_ranges:Byte Ptr)
-	Return _ImFontAtlas_AddFontFromMemoryCompressedTTF(this.handle, compressed_font_data, compressed_font_data_size, size_pixels, font_cfg, glyph_ranges)
+Function ImFontAtlas_AddFontFromMemoryCompressedTTF:TImFont(this:TImFontAtlas, compressed_font_data:Byte Ptr, compressed_font_data_size:Int, size_pixels:Float, font_cfg:Byte Ptr, glyph_ranges:Byte Ptr)
+	Return TImFont._Create(_ImFontAtlas_AddFontFromMemoryCompressedTTF(this.handle, compressed_font_data, compressed_font_data_size, size_pixels, font_cfg, glyph_ranges))
 End Function
 
 Rem
 bbdoc:  'compressed_font_data_base85' still owned by caller. Compress with binary_to_compressed_c.cpp with -base85 parameter.
 End Rem
-Function ImFontAtlas_AddFontFromMemoryCompressedBase85TTF:Byte Ptr(this:TImFontAtlas, compressed_font_data_base85:String, size_pixels:Float, font_cfg:Byte Ptr, glyph_ranges:Byte Ptr)
-	Return _ImFontAtlas_AddFontFromMemoryCompressedBase85TTF(this.handle, compressed_font_data_base85, size_pixels, font_cfg, glyph_ranges)
+Function ImFontAtlas_AddFontFromMemoryCompressedBase85TTF:TImFont(this:TImFontAtlas, compressed_font_data_base85:String, size_pixels:Float, font_cfg:Byte Ptr, glyph_ranges:Byte Ptr)
+	Return TImFont._Create(_ImFontAtlas_AddFontFromMemoryCompressedBase85TTF(this.handle, compressed_font_data_base85, size_pixels, font_cfg, glyph_ranges))
 End Function
 
 Rem
@@ -4689,8 +4725,8 @@ End Function
 Rem
 bbdoc:  Bit ambiguous: used to detect when user didn't build texture but effectively we should check TexID != 0 except that would be backend dependent...
 End Rem
-Function ImFontAtlas_IsBuilt:Int(this:Byte Ptr)
-	Return _ImFontAtlas_IsBuilt(this)
+Function ImFontAtlas_IsBuilt:Int(this:TImFontAtlas)
+	Return _ImFontAtlas_IsBuilt(this.handle)
 End Function
 
 Function ImFontAtlas_SetTexID(this:TImFontAtlas, id:ULong)
@@ -4787,23 +4823,23 @@ Function ImFont_GetCharAdvance:Float(this:TImFont, c:Short)
 	Return _ImFont_GetCharAdvance(this.handle, c)
 End Function
 
-Function ImFont_IsLoaded:Int(this:Byte Ptr)
-	Return _ImFont_IsLoaded(this)
+Function ImFont_IsLoaded:Int(this:TImFont)
+	Return _ImFont_IsLoaded(this.handle)
 End Function
 
-Function ImFont_GetDebugName:String(this:Byte Ptr)
-	Return _ImFont_GetDebugName(this)
+Function ImFont_GetDebugName:String(this:TImFont)
+	Return _ImFont_GetDebugName(this.handle)
 End Function
 
 Rem
 bbdoc: 
 End Rem
-Function ImGuiViewport_GetCenter:SImVec2(this:Byte Ptr)
-	Return _ImGuiViewport_GetCenter(this)
+Function ImGuiViewport_GetCenter:SImVec2(this:TImGuiViewport)
+	Return _ImGuiViewport_GetCenter(this.handle)
 End Function
 
-Function ImGuiViewport_GetWorkCenter:SImVec2(this:Byte Ptr)
-	Return _ImGuiViewport_GetWorkCenter(this)
+Function ImGuiViewport_GetWorkCenter:SImVec2(this:TImGuiViewport)
+	Return _ImGuiViewport_GetWorkCenter(this.handle)
 End Function
 
 

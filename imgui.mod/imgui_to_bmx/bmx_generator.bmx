@@ -3,7 +3,7 @@ SuperStrict
 Framework brl.standardio
 Import text.jconv
 import brl.filesystem
-import brl.collections
+import Collections.TreeMap
 
 Type TIGModel
 	Field defines:TIGDefine[]
@@ -428,9 +428,11 @@ Type TCodeGenerator
 					bmxFunc = True
 				Else If func.return_type.declaration = "ImGuiContext*" Then
 					returnType = ":TImGuiContext"
-				Else If func.return_type.declaration = "ImFontAtlas*" Then
+				Else If func.return_type.declaration = "ImFontAtlas*" Or func.return_type.declaration = "const ImFontAtlas*" Then
 					returnType = ":TImFontAtlas"
-				Else If func.return_type.declaration = "ImDrawList*" Then
+				Else If func.return_type.declaration = "ImFont*" Or func.return_type.declaration = "const ImFont*" Then
+					returnType = ":TImFont"
+				Else If func.return_type.declaration = "ImDrawList*" Or func.return_type.declaration = "const ImDrawList*" Then
 					returnType = ":TImDrawList"
 				Else If func.return_type.declaration = "ImGuiTextFilter*" Or func.return_type.declaration = "const ImGuiTextFilter*" Then
 					returnType = ":TImGuiTextFilter"
@@ -440,6 +442,14 @@ Type TCodeGenerator
 					returnType = ":TImGuiStyle"
 				Else If func.return_type.declaration = "ImGuiIO*" Then
 					returnType = ":TImGuiIO"
+				Else If func.return_type.declaration = "ImGuiListClipper*" Then
+					returnType = ":TImGuiListClipper"
+				Else If func.return_type.declaration = "ImGuiPayload*" Or func.return_type.declaration = "const ImGuiPayload*" Then
+					returnType = ":TImGuiPayload"
+				Else If func.return_type.declaration = "ImDrawData*" Then
+					returnType = ":TImDrawData"
+				Else If func.return_type.declaration = "ImGuiViewport*" Or func.return_type.declaration = "const ImGuiViewport*" Then
+					returnType = ":TImGuiViewport"
 				Else If func.return_type.declaration.EndsWith("*") Then
 					returnType = ":Byte Ptr"
 				Else
@@ -517,11 +527,11 @@ Type TCodeGenerator
 					If arg.arg_type.declaration = "const char*" Then
 						argType = ":String"
 						bmxFunc = True
-					Else If arg.arg_type.declaration = "ImFontAtlas*" Then
+					Else If arg.arg_type.declaration = "ImFontAtlas*" Or arg.arg_type.declaration = "const ImFontAtlas*" Then
 						argType = ":TImFontAtlas"
-					Else If arg.arg_type.declaration = "ImFont*" Then
+					Else If arg.arg_type.declaration = "ImFont*" Or arg.arg_type.declaration = "const ImFont*" Then
 						argType = ":TImFont"
-					Else If arg.arg_type.declaration = "ImDrawList*" Then
+					Else If arg.arg_type.declaration = "ImDrawList*" Or arg.arg_type.declaration = "const ImDrawList*" Then
 						argType = ":TImDrawList"
 					Else If arg.arg_type.declaration = "const ImGuiTextFilter*" Or arg.arg_type.declaration = "ImGuiTextFilter*" Then
 						argType = ":TImGuiTextFilter"
@@ -531,6 +541,14 @@ Type TCodeGenerator
 						argType = ":TImGuiStyle"
 					Else If arg.arg_type.declaration = "ImGuiIO*" Then
 						argType = ":TImGuiIO"
+					Else If arg.arg_type.declaration = "ImGuiListClipper*" Then
+						argType = ":TImGuiListClipper"
+					Else If arg.arg_type.declaration = "ImGuiPayload*" Or arg.arg_type.declaration = "const ImGuiPayload*" Then
+						argType = ":TImGuiPayload"
+					Else If arg.arg_type.declaration = "ImDrawData*" Then
+						argType = ":TImDrawData"
+					Else If arg.arg_type.declaration = "ImGuiViewport*" Or arg.arg_type.declaration = "const ImGuiViewport*" Then
+						argType = ":TImGuiViewport"
 					Else If arg.arg_type.declaration = "bool*" Then
 						argType = ":Int Var"
 					Else If arg.arg_type.declaration = "int*" Then
@@ -649,15 +667,30 @@ Type TCodeGenerator
 				If func.return_type.declaration = "ImGuiContext*" Then
 					stream.WriteString("TImGuiContext._Create(")
 					wrapped = True
-				Else If func.return_type.declaration = "ImDrawList*" Then
-						stream.WriteString("TImDrawList._Create(")
-						wrapped = True
+				Else If func.return_type.declaration = "ImDrawList*" Or func.return_type.declaration = "const ImDrawList*" Then
+					stream.WriteString("TImDrawList._Create(")
+					wrapped = True
 				Else If func.return_type.declaration = "ImGuiStyle*" Then
-						stream.WriteString("TImGuiStyle._Create(")
-						wrapped = True
+					stream.WriteString("TImGuiStyle._Create(")
+					wrapped = True
+				Else If func.return_type.declaration = "ImFont*" Then
+					stream.WriteString("TImFont._Create(")
+					wrapped = True
 				Else If func.return_type.declaration = "ImGuiIO*" Then
-						stream.WriteString("TImGuiIO._Create(")
-						wrapped = True
+					stream.WriteString("TImGuiIO._Create(")
+					wrapped = True
+				Else If func.return_type.declaration = "ImGuiListClipper*" Then
+					stream.WriteString("TImGuiListClipper._Create(")
+					wrapped = True
+				Else If func.return_type.declaration = "ImGuiPayload*" Or func.return_type.declaration = "const ImGuiPayload*" Then
+					stream.WriteString("TImGuiPayload._Create(")
+					wrapped = True
+				Else If func.return_type.declaration = "ImDrawData*" Then
+					stream.WriteString("TImDrawData._Create(")
+					wrapped = True
+				Else If func.return_type.declaration = "ImGuiViewport*" Or func.return_type.declaration = "const ImGuiViewport*" Then
+					stream.WriteString("TImGuiViewport._Create(")
+					wrapped = True
 				End If
 			Else
 				stream.WriteString("~t")
@@ -699,19 +732,27 @@ Type TCodeGenerator
 				If arg.arg_type Then
 					If arg.arg_type.declaration = "ImGuiContext*" Then
 						name = name + ".handle"
-					Else If arg.arg_type.declaration = "ImFontAtlas*" Then
+					Else If arg.arg_type.declaration = "ImFontAtlas*" Or arg.arg_type.declaration = "const ImFontAtlas*" Then
 						name = name + ".handle"
-					Else If arg.arg_type.declaration = "ImFont*" Then
+					Else If arg.arg_type.declaration = "ImFont*" Or arg.arg_type.declaration = "const ImFont*" Then
 						name = name + ".handle"
-					Else If arg.arg_type.declaration = "ImDrawList*" Then
+					Else If arg.arg_type.declaration = "ImDrawList*" Or arg.arg_type.declaration = "const ImDrawList*" Then
 						name = name + ".handle"
 					Else If arg.arg_type.declaration = "ImGuiStyle*" Then
 						name = name + ".handle"
 					Else If arg.arg_type.declaration = "ImGuiIO*" Then
 						name = name + ".handle"
+					Else If arg.arg_type.declaration = "ImGuiListClipper*" Then
+						name = name + ".handle"
+					Else If arg.arg_type.declaration = "ImGuiPayload*" Or arg.arg_type.declaration = "const ImGuiPayload*" Then
+						name = name + ".handle"
 					Else If arg.arg_type.declaration = "ImGuiTextFilter*" Or arg.arg_type.declaration = "const ImGuiTextFilter*" Then
 						name = name + ".handle"
 					Else If arg.arg_type.declaration = "ImGuiTextBuffer*" Or arg.arg_type.declaration = "const ImGuiTextBuffer*" Then
+						name = name + ".handle"
+					Else If arg.arg_type.declaration = "ImDrawData*" Then
+						name = name + ".handle"
+					Else If arg.arg_type.declaration = "ImGuiViewport*" Or arg.arg_type.declaration = "const ImGuiViewport*" Then
 						name = name + ".handle"
 					End If
 				End If
@@ -2298,6 +2339,42 @@ Type TCodeGenerator
 			Method SetKeyRepeatRate(value:Float)
 				bmx_imgui_io_set_key_repeat_rate(handle, value)
 			End Method
+		End Type
+
+		Type TImGuiListClipper
+			Field handle:Byte Ptr
+			Function _Create:TImGuiListClipper(handle:Byte Ptr)
+				Local this:TImGuiListClipper = New TImGuiListClipper
+				this.handle = handle
+				Return this
+			End Function
+		End Type
+
+		Type TImGuiPayload
+			Field handle:Byte Ptr
+			Function _Create:TImGuiPayload(handle:Byte Ptr)
+				Local this:TImGuiPayload = New TImGuiPayload
+				this.handle = handle
+				Return this
+			End Function
+		End Type
+
+		Type TImDrawData
+			Field handle:Byte Ptr
+			Function _Create:TImDrawData(handle:Byte Ptr)
+				Local this:TImDrawData = New TImDrawData
+				this.handle = handle
+				Return this
+			End Function
+		End Type
+
+		Type TImGuiViewport
+			Field handle:Byte Ptr
+			Function _Create:TImGuiViewport(handle:Byte Ptr)
+				Local this:TImGuiViewport = New TImGuiViewport
+				this.handle = handle
+				Return this
+			End Function
 		End Type
 
 		""")
