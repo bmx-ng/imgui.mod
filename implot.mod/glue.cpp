@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2025 Bruce A Henderson
+Copyright (c) 2025-2026 Bruce A Henderson
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -228,578 +228,1228 @@ void ImPlot_SetupAxisFormat(ImAxis axis, BBString * fmt) {
 
 ///////////////////////////////////////////////////////////
 
+typedef struct MaxPlotSpec {
+    MaxVec4 lineColor;
+    float lineWeight;
+    MaxVec4 fillColor;
+    float fillAlpha;
+    ImPlotMarker marker;
+    float markerSize;
+    MaxVec4 markerLineColor;
+    MaxVec4 markerFillColor;
+    float size;
+    int offset;
+    int stride;
+    ImPlotItemFlags flags;
+} MaxPlotSpec;
+
+static inline ::ImPlotSpec ConvertToCPP_MaxPlotSpec(const MaxPlotSpec& src)
+{
+    ::ImPlotSpec dest;
+    dest.LineColor = ConvertToCPP_MaxVec4(src.lineColor);
+    dest.LineWeight = src.lineWeight;
+    dest.FillColor = ConvertToCPP_MaxVec4(src.fillColor);
+    dest.FillAlpha = src.fillAlpha;
+    dest.Marker = src.marker;
+    dest.MarkerSize = src.markerSize;
+    dest.MarkerLineColor = ConvertToCPP_MaxVec4(src.markerLineColor);
+    dest.MarkerFillColor = ConvertToCPP_MaxVec4(src.markerFillColor);
+    dest.Size = src.size;
+    dest.Offset = src.offset;
+    dest.Stride = src.stride;
+    dest.Flags = src.flags;
+    return dest;
+}
+
 // float
-void ImPlot_PlotLineFloat(BBString * label, float * values, int count, double xscale, ImPlotLineFlags flags, int offset, int stride) {
+void ImPlot_PlotLineFloat(BBString * label, float * values, int count, double xscale, double xstart) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotLine(v0, values, count, xscale, flags, offset, stride);
+    ImPlot::PlotLine(v0, values, count, xscale, xstart);
     bbMemFree((void*)v0);
 }
 
-void ImPlot_PlotLineXYFloat(BBString * label, float * xs, float * ys, int count, ImPlotLineFlags flags, int offset, int stride) {
+void ImPlot_PlotLineFloat_Spec(BBString * label, float * values, int count, double xscale, double xstart, MaxPlotSpec spec) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotLine(v0, xs, ys, count, flags, offset, stride);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotLine(v0, values, count, xscale, xstart, cppSpec);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotLineXYFloat(BBString * label, float * xs, float * ys, int count) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    ImPlot::PlotLine(v0, xs, ys, count);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotLineXYFloat_Spec(BBString * label, float * xs, float * ys, int count, MaxPlotSpec spec) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotLine(v0, xs, ys, count, cppSpec);
     bbMemFree((void*)v0);
 }
 
 // double
-void ImPlot_PlotLineDouble(BBString * label, double * values, int count, double xscale, ImPlotLineFlags flags, int offset, int stride) {
+void ImPlot_PlotLineDouble(BBString * label, double * values, int count, double xscale, double xstart) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotLine(v0, values, count, xscale, flags, offset, stride);
+    ImPlot::PlotLine(v0, values, count, xscale, xstart);
     bbMemFree((void*)v0);
 }
-void ImPlot_PlotLineXYDouble(BBString * label, double * xs, double * ys, int count, ImPlotLineFlags flags, int offset, int stride) {
+
+void ImPlot_PlotLineDouble_Spec(BBString * label, double * values, int count, double xscale, double xstart, MaxPlotSpec spec) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotLine(v0, xs, ys, count, flags, offset, stride);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotLine(v0, values, count, xscale, xstart, cppSpec);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotLineXYDouble(BBString * label, double * xs, double * ys, int count) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    ImPlot::PlotLine(v0, xs, ys, count);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotLineXYDouble_Spec(BBString * label, double * xs, double * ys, int count, MaxPlotSpec spec) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotLine(v0, xs, ys, count, cppSpec);
     bbMemFree((void*)v0);
 }
 
 // byte
-void ImPlot_PlotLineByte(BBString * label, ImU8 * values, int count, double xscale, ImPlotLineFlags flags, int offset, int stride) {
+void ImPlot_PlotLineByte(BBString * label, ImU8 * values, int count, double xscale, double xstart) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotLine(v0, values, count, xscale, flags, offset, stride);
+    ImPlot::PlotLine(v0, values, count, xscale, xstart);
     bbMemFree((void*)v0);
 }
 
-void ImPlot_PlotLineXYByte(BBString * label, ImU8 * xs, ImU8 * ys, int count, ImPlotLineFlags flags, int offset, int stride) {
+void ImPlot_PlotLineByte_Spec(BBString * label, ImU8 * values, int count, double xscale, double xstart, MaxPlotSpec spec) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotLine(v0, xs, ys, count, flags, offset, stride);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotLine(v0, values, count, xscale, xstart, cppSpec);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotLineXYByte(BBString * label, ImU8 * xs, ImU8 * ys, int count) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    ImPlot::PlotLine(v0, xs, ys, count);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotLineXYByte_Spec(BBString * label, ImU8 * xs, ImU8 * ys, int count, MaxPlotSpec spec) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotLine(v0, xs, ys, count, cppSpec);
     bbMemFree((void*)v0);
 }
 
 // short
-void ImPlot_PlotLineShort(BBString * label, ImU16 * values, int count, double xscale, ImPlotLineFlags flags, int offset, int stride) {
+void ImPlot_PlotLineShort(BBString * label, ImU16 * values, int count, double xscale, double xstart) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotLine(v0, values, count, xscale, flags, offset, stride);
+    ImPlot::PlotLine(v0, values, count, xscale, xstart);
     bbMemFree((void*)v0);
 }
 
-void ImPlot_PlotLineXYShort(BBString * label, ImU16 * xs, ImU16 * ys, int count, ImPlotLineFlags flags, int offset, int stride) {
+void ImPlot_PlotLineShort_Spec(BBString * label, ImU16 * values, int count, double xscale, double xstart, MaxPlotSpec spec) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotLine(v0, xs, ys, count, flags, offset, stride);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotLine(v0, values, count, xscale, xstart, cppSpec);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotLineXYShort(BBString * label, ImU16 * xs, ImU16 * ys, int count) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    ImPlot::PlotLine(v0, xs, ys, count);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotLineXYShort_Spec(BBString * label, ImU16 * xs, ImU16 * ys, int count, MaxPlotSpec spec) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotLine(v0, xs, ys, count, cppSpec);
     bbMemFree((void*)v0);
 }
 
 // int
-void ImPlot_PlotLineInt(BBString * label, ImS32 * values, int count, double xscale, ImPlotLineFlags flags, int offset, int stride) {
+void ImPlot_PlotLineInt(BBString * label, ImS32 * values, int count, double xscale, double xstart) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotLine(v0, values, count, xscale, flags, offset, stride);
+    ImPlot::PlotLine(v0, values, count, xscale, xstart);
     bbMemFree((void*)v0);
 }
 
-void ImPlot_PlotLineXYInt(BBString * label, ImS32 * xs, ImS32 * ys, int count, ImPlotLineFlags flags, int offset, int stride) {
+void ImPlot_PlotLineInt_Spec(BBString * label, ImS32 * values, int count, double xscale, double xstart, MaxPlotSpec spec) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotLine(v0, xs, ys, count, flags, offset, stride);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotLine(v0, values, count, xscale, xstart, cppSpec);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotLineXYInt(BBString * label, ImS32 * xs, ImS32 * ys, int count) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    ImPlot::PlotLine(v0, xs, ys, count);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotLineXYInt_Spec(BBString * label, ImS32 * xs, ImS32 * ys, int count, MaxPlotSpec spec) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotLine(v0, xs, ys, count, cppSpec);
     bbMemFree((void*)v0);
 }
 
 // long
-void ImPlot_PlotLineLong(BBString * label, ImS64 * values, int count, double xscale, ImPlotLineFlags flags, int offset, int stride) {
+void ImPlot_PlotLineLong(BBString * label, ImS64 * values, int count, double xscale, double xstart) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotLine(v0, values, count, xscale, flags, offset, stride);
+    ImPlot::PlotLine(v0, values, count, xscale, xstart);
     bbMemFree((void*)v0);
 }
 
-void ImPlot_PlotLineXYLong(BBString * label, ImS64 * xs, ImS64 * ys, int count, ImPlotLineFlags flags, int offset, int stride) {
+void ImPlot_PlotLineLong_Spec(BBString * label, ImS64 * values, int count, double xscale, double xstart, MaxPlotSpec spec) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotLine(v0, xs, ys, count, flags, offset, stride);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotLine(v0, values, count, xscale, xstart, cppSpec);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotLineXYLong(BBString * label, ImS64 * xs, ImS64 * ys, int count) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    ImPlot::PlotLine(v0, xs, ys, count);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotLineXYLong_Spec(BBString * label, ImS64 * xs, ImS64 * ys, int count, MaxPlotSpec spec) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotLine(v0, xs, ys, count, cppSpec);
     bbMemFree((void*)v0);
 }
 
 // uint
-void ImPlot_PlotLineUInt(BBString * label, ImU32 * values, int count, double xscale, ImPlotLineFlags flags, int offset, int stride) {
+void ImPlot_PlotLineUInt(BBString * label, ImU32 * values, int count, double xscale, double xstart) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotLine(v0, values, count, xscale, flags, offset, stride);
+    ImPlot::PlotLine(v0, values, count, xscale, xstart);
     bbMemFree((void*)v0);
 }
 
-void ImPlot_PlotLineXYUInt(BBString * label, ImU32 * xs, ImU32 * ys, int count, ImPlotLineFlags flags, int offset, int stride) {
+void ImPlot_PlotLineUInt_Spec(BBString * label, ImU32 * values, int count, double xscale, double xstart, MaxPlotSpec spec) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotLine(v0, xs, ys, count, flags, offset, stride);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotLine(v0, values, count, xscale, xstart, cppSpec);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotLineXYUInt(BBString * label, ImU32 * xs, ImU32 * ys, int count) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    ImPlot::PlotLine(v0, xs, ys, count);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotLineXYUInt_Spec(BBString * label, ImU32 * xs, ImU32 * ys, int count, MaxPlotSpec spec) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotLine(v0, xs, ys, count, cppSpec);
     bbMemFree((void*)v0);
 }
 
 // ulong
-void ImPlot_PlotLineULong(BBString * label, ImU64 * values, int count, double xscale, ImPlotLineFlags flags, int offset, int stride) {
+void ImPlot_PlotLineULong(BBString * label, ImU64 * values, int count, double xscale, double xstart) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotLine(v0, values, count, xscale, flags, offset, stride);
+    ImPlot::PlotLine(v0, values, count, xscale, xstart);
     bbMemFree((void*)v0);
 }
 
-void ImPlot_PlotLineXYULong(BBString * label, ImU64 * xs, ImU64 * ys, int count, ImPlotLineFlags flags, int offset, int stride) {
+void ImPlot_PlotLineULong_Spec(BBString * label, ImU64 * values, int count, double xscale, double xstart, MaxPlotSpec spec) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotLine(v0, xs, ys, count, flags, offset, stride);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotLine(v0, values, count, xscale, xstart, cppSpec);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotLineXYULong(BBString * label, ImU64 * xs, ImU64 * ys, int count) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    ImPlot::PlotLine(v0, xs, ys, count);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotLineXYULong_Spec(BBString * label, ImU64 * xs, ImU64 * ys, int count, MaxPlotSpec spec) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotLine(v0, xs, ys, count, cppSpec);
     bbMemFree((void*)v0);
 }
 
 ///////////////////////////////////////////////////////////
 
 // float
-void ImPlot_PlotScatterFloat(BBString * label, float * values, int count, double xscale, double xstart, ImPlotScatterFlags flags, int offset, int stride) {
+void ImPlot_PlotScatterFloat(BBString * label, float * values, int count, double xscale, double xstart) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotScatter(v0, values, count, xscale, xstart, flags, offset, stride);
+    ImPlot::PlotScatter(v0, values, count, xscale, xstart);
     bbMemFree((void*)v0);
 }
 
-void ImPlot_PlotScatterXYFloat(BBString * label, float * xs, float * ys, int count, ImPlotScatterFlags flags, int offset, int stride) {
+void ImPlot_PlotScatterFloat_Spec(BBString * label, float * values, int count, double xscale, double xstart, MaxPlotSpec spec) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotScatter(v0, xs, ys, count, flags, offset, stride);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotScatter(v0, values, count, xscale, xstart, cppSpec);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotScatterXYFloat(BBString * label, float * xs, float * ys, int count) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    ImPlot::PlotScatter(v0, xs, ys, count);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotScatterXYFloat_Spec(BBString * label, float * xs, float * ys, int count, MaxPlotSpec spec) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotScatter(v0, xs, ys, count, cppSpec);
     bbMemFree((void*)v0);
 }
 
 // double
-void ImPlot_PlotScatterDouble(BBString * label, double * values, int count, double xscale, double xstart, ImPlotScatterFlags flags, int offset, int stride) {
+void ImPlot_PlotScatterDouble(BBString * label, double * values, int count, double xscale, double xstart) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotScatter(v0, values, count, xscale, xstart, flags, offset, stride);
+    ImPlot::PlotScatter(v0, values, count, xscale, xstart);
     bbMemFree((void*)v0);
 }
 
-void ImPlot_PlotScatterXYDouble(BBString * label, double * xs, double * ys, int count, ImPlotScatterFlags flags, int offset, int stride) {
+void ImPlot_PlotScatterDouble_Spec(BBString * label, double * values, int count, double xscale, double xstart, MaxPlotSpec spec) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotScatter(v0, xs, ys, count, flags, offset, stride);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotScatter(v0, values, count, xscale, xstart, cppSpec);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotScatterXYDouble(BBString * label, double * xs, double * ys, int count) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    ImPlot::PlotScatter(v0, xs, ys, count);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotScatterXYDouble_Spec(BBString * label, double * xs, double * ys, int count, MaxPlotSpec spec) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotScatter(v0, xs, ys, count, cppSpec);
     bbMemFree((void*)v0);
 }
 
 // byte
-void ImPlot_PlotScatterByte(BBString * label, ImU8 * values, int count, double xscale, double xstart, ImPlotScatterFlags flags, int offset, int stride) {
+void ImPlot_PlotScatterByte(BBString * label, ImU8 * values, int count, double xscale, double xstart) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotScatter(v0, values, count, xscale, xstart, flags, offset, stride);
+    ImPlot::PlotScatter(v0, values, count, xscale, xstart);
     bbMemFree((void*)v0);
 }
 
-void ImPlot_PlotScatterXYByte(BBString * label, ImU8 * xs, ImU8 * ys, int count, ImPlotScatterFlags flags, int offset, int stride) {
+void ImPlot_PlotScatterByte_Spec(BBString * label, ImU8 * values, int count, double xscale, double xstart, MaxPlotSpec spec) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotScatter(v0, xs, ys, count, flags, offset, stride);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotScatter(v0, values, count, xscale, xstart, cppSpec);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotScatterXYByte(BBString * label, ImU8 * xs, ImU8 * ys, int count) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    ImPlot::PlotScatter(v0, xs, ys, count);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotScatterXYByte_Spec(BBString * label, ImU8 * xs, ImU8 * ys, int count, MaxPlotSpec spec) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotScatter(v0, xs, ys, count, cppSpec);
     bbMemFree((void*)v0);
 }
 
 // short
-void ImPlot_PlotScatterShort(BBString * label, ImU16 * values, int count, double xscale, double xstart, ImPlotScatterFlags flags, int offset, int stride) {
+void ImPlot_PlotScatterShort(BBString * label, ImU16 * values, int count, double xscale, double xstart) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotScatter(v0, values, count, xscale, xstart, flags, offset, stride);
+    ImPlot::PlotScatter(v0, values, count, xscale, xstart);
     bbMemFree((void*)v0);
 }
 
-void ImPlot_PlotScatterXYShort(BBString * label, ImU16 * xs, ImU16 * ys, int count, ImPlotScatterFlags flags, int offset, int stride) {
+void ImPlot_PlotScatterShort_Spec(BBString * label, ImU16 * values, int count, double xscale, double xstart, MaxPlotSpec spec) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotScatter(v0, xs, ys, count, flags, offset, stride);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotScatter(v0, values, count, xscale, xstart, cppSpec);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotScatterXYShort(BBString * label, ImU16 * xs, ImU16 * ys, int count) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    ImPlot::PlotScatter(v0, xs, ys, count);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotScatterXYShort_Spec(BBString * label, ImU16 * xs, ImU16 * ys, int count, MaxPlotSpec spec) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotScatter(v0, xs, ys, count, cppSpec);
     bbMemFree((void*)v0);
 }
 
 // int
-void ImPlot_PlotScatterInt(BBString * label, ImS32 * values, int count, double xscale, double xstart, ImPlotScatterFlags flags, int offset, int stride) {
+void ImPlot_PlotScatterInt(BBString * label, ImS32 * values, int count, double xscale, double xstart) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotScatter(v0, values, count, xscale, xstart, flags, offset, stride);
+    ImPlot::PlotScatter(v0, values, count, xscale, xstart);
     bbMemFree((void*)v0);
 }
 
-void ImPlot_PlotScatterXYInt(BBString * label, ImS32 * xs, ImS32 * ys, int count, ImPlotScatterFlags flags, int offset, int stride) {
+void ImPlot_PlotScatterInt_Spec(BBString * label, ImS32 * values, int count, double xscale, double xstart, MaxPlotSpec spec) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotScatter(v0, xs, ys, count, flags, offset, stride);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotScatter(v0, values, count, xscale, xstart, cppSpec);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotScatterXYInt(BBString * label, ImS32 * xs, ImS32 * ys, int count) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    ImPlot::PlotScatter(v0, xs, ys, count);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotScatterXYInt_Spec(BBString * label, ImS32 * xs, ImS32 * ys, int count, MaxPlotSpec spec) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotScatter(v0, xs, ys, count, cppSpec);
     bbMemFree((void*)v0);
 }
 
 // long
-void ImPlot_PlotScatterLong(BBString * label, ImS64 * values, int count, double xscale, double xstart, ImPlotScatterFlags flags, int offset, int stride) {
+void ImPlot_PlotScatterLong(BBString * label, ImS64 * values, int count, double xscale, double xstart) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotScatter(v0, values, count, xscale, xstart, flags, offset, stride);
+    ImPlot::PlotScatter(v0, values, count, xscale, xstart);
     bbMemFree((void*)v0);
 }
 
-void ImPlot_PlotScatterXYLong(BBString * label, ImS64 * xs, ImS64 * ys, int count, ImPlotScatterFlags flags, int offset, int stride) {
+void ImPlot_PlotScatterLong_Spec(BBString * label, ImS64 * values, int count, double xscale, double xstart, MaxPlotSpec spec) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotScatter(v0, xs, ys, count, flags, offset, stride);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotScatter(v0, values, count, xscale, xstart, cppSpec);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotScatterXYLong(BBString * label, ImS64 * xs, ImS64 * ys, int count) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    ImPlot::PlotScatter(v0, xs, ys, count);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotScatterXYLong_Spec(BBString * label, ImS64 * xs, ImS64 * ys, int count, MaxPlotSpec spec) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotScatter(v0, xs, ys, count, cppSpec);
     bbMemFree((void*)v0);
 }
 
 // uint
-void ImPlot_PlotScatterUInt(BBString * label, ImU32 * values, int count, double xscale, double xstart, ImPlotScatterFlags flags, int offset, int stride) {
+void ImPlot_PlotScatterUInt(BBString * label, ImU32 * values, int count, double xscale, double xstart) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotScatter(v0, values, count, xscale, xstart, flags, offset, stride);
+    ImPlot::PlotScatter(v0, values, count, xscale, xstart);
     bbMemFree((void*)v0);
 }
 
-void ImPlot_PlotScatterXYUInt(BBString * label, ImU32 * xs, ImU32 * ys, int count, ImPlotScatterFlags flags, int offset, int stride) {
+void ImPlot_PlotScatterUInt_Spec(BBString * label, ImU32 * values, int count, double xscale, double xstart, MaxPlotSpec spec) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotScatter(v0, xs, ys, count, flags, offset, stride);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotScatter(v0, values, count, xscale, xstart, cppSpec);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotScatterXYUInt(BBString * label, ImU32 * xs, ImU32 * ys, int count) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    ImPlot::PlotScatter(v0, xs, ys, count);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotScatterXYUInt_Spec(BBString * label, ImU32 * xs, ImU32 * ys, int count, MaxPlotSpec spec) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotScatter(v0, xs, ys, count, cppSpec);
     bbMemFree((void*)v0);
 }
 
 // ulong
-void ImPlot_PlotScatterULong(BBString * label, ImU64 * values, int count, double xscale, double xstart, ImPlotScatterFlags flags, int offset, int stride) {
+void ImPlot_PlotScatterULong(BBString * label, ImU64 * values, int count, double xscale, double xstart) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotScatter(v0, values, count, xscale, xstart, flags, offset, stride);
+    ImPlot::PlotScatter(v0, values, count, xscale, xstart);
     bbMemFree((void*)v0);
 }
 
-void ImPlot_PlotScatterXYULong(BBString * label, ImU64 * xs, ImU64 * ys, int count, ImPlotScatterFlags flags, int offset, int stride) {
+void ImPlot_PlotScatterULong_Spec(BBString * label, ImU64 * values, int count, double xscale, double xstart, MaxPlotSpec spec) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotScatter(v0, xs, ys, count, flags, offset, stride);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotScatter(v0, values, count, xscale, xstart, cppSpec);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotScatterXYULong(BBString * label, ImU64 * xs, ImU64 * ys, int count) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    ImPlot::PlotScatter(v0, xs, ys, count);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotScatterXYULong_Spec(BBString * label, ImU64 * xs, ImU64 * ys, int count, MaxPlotSpec spec) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotScatter(v0, xs, ys, count, cppSpec);
     bbMemFree((void*)v0);
 }
 
 ///////////////////////////////////////////////////////////
 
 // float
-void ImPlot_PlotStairsFloat(BBString * label, float * values, int count, double xscale, double xstart, ImPlotStairsFlags flags, int offset, int stride) {
+void ImPlot_PlotStairsFloat(BBString * label, float * values, int count, double xscale, double xstart) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotStairs(v0, values, count, xscale, xstart, flags, offset, stride);
+    ImPlot::PlotStairs(v0, values, count, xscale, xstart);
     bbMemFree((void*)v0);
 }
 
-void ImPlot_PlotStairsXYFloat(BBString * label, float * xs, float * ys, int count, ImPlotStairsFlags flags, int offset, int stride) {
+void ImPlot_PlotStairsFloat_Spec(BBString * label, float * values, int count, double xscale, double xstart, MaxPlotSpec spec) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotStairs(v0, xs, ys, count, flags, offset, stride);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotStairs(v0, values, count, xscale, xstart, cppSpec);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotStairsXYFloat(BBString * label, float * xs, float * ys, int count) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    ImPlot::PlotStairs(v0, xs, ys, count);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotStairsXYFloat_Spec(BBString * label, float * xs, float * ys, int count, MaxPlotSpec spec) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotStairs(v0, xs, ys, count, cppSpec);
     bbMemFree((void*)v0);
 }
 
 // double
-void ImPlot_PlotStairsDouble(BBString * label, double * values, int count, double xscale, double xstart, ImPlotStairsFlags flags, int offset, int stride) {
+void ImPlot_PlotStairsDouble(BBString * label, double * values, int count, double xscale, double xstart) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotStairs(v0, values, count, xscale, xstart, flags, offset, stride);
+    ImPlot::PlotStairs(v0, values, count, xscale, xstart);
     bbMemFree((void*)v0);
 }
 
-void ImPlot_PlotStairsXYDouble(BBString * label, double * xs, double * ys, int count, ImPlotStairsFlags flags, int offset, int stride) {
+void ImPlot_PlotStairsDouble_Spec(BBString * label, double * values, int count, double xscale, double xstart, MaxPlotSpec spec) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotStairs(v0, xs, ys, count, flags, offset, stride);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotStairs(v0, values, count, xscale, xstart, cppSpec);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotStairsXYDouble(BBString * label, double * xs, double * ys, int count) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    ImPlot::PlotStairs(v0, xs, ys, count);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotStairsXYDouble_Spec(BBString * label, double * xs, double * ys, int count, MaxPlotSpec spec) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotStairs(v0, xs, ys, count, cppSpec);
     bbMemFree((void*)v0);
 }
 
 // byte
-void ImPlot_PlotStairsByte(BBString * label, ImU8 * values, int count, double xscale, double xstart, ImPlotStairsFlags flags, int offset, int stride) {
+void ImPlot_PlotStairsByte(BBString * label, ImU8 * values, int count, double xscale, double xstart) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotStairs(v0, values, count, xscale, xstart, flags, offset, stride);
+    ImPlot::PlotStairs(v0, values, count, xscale, xstart);
     bbMemFree((void*)v0);
 }
 
-void ImPlot_PlotStairsXYByte(BBString * label, ImU8 * xs, ImU8 * ys, int count, ImPlotStairsFlags flags, int offset, int stride) {
+void ImPlot_PlotStairsByte_Spec(BBString * label, ImU8 * values, int count, double xscale, double xstart, MaxPlotSpec spec) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotStairs(v0, xs, ys, count, flags, offset, stride);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotStairs(v0, values, count, xscale, xstart, cppSpec);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotStairsXYByte(BBString * label, ImU8 * xs, ImU8 * ys, int count) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    ImPlot::PlotStairs(v0, xs, ys, count);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotStairsXYByte_Spec(BBString * label, ImU8 * xs, ImU8 * ys, int count, MaxPlotSpec spec) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotStairs(v0, xs, ys, count, cppSpec);
     bbMemFree((void*)v0);
 }
 
 // short
-void ImPlot_PlotStairsShort(BBString * label, ImU16 * values, int count, double xscale, double xstart, ImPlotStairsFlags flags, int offset, int stride) {
+void ImPlot_PlotStairsShort(BBString * label, ImU16 * values, int count, double xscale, double xstart) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotStairs(v0, values, count, xscale, xstart, flags, offset, stride);
+    ImPlot::PlotStairs(v0, values, count, xscale, xstart);
     bbMemFree((void*)v0);
 }
 
-void ImPlot_PlotStairsXYShort(BBString * label, ImU16 * xs, ImU16 * ys, int count, ImPlotStairsFlags flags, int offset, int stride) {
+void ImPlot_PlotStairsShort_Spec(BBString * label, ImU16 * values, int count, double xscale, double xstart, MaxPlotSpec spec) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotStairs(v0, xs, ys, count, flags, offset, stride);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotStairs(v0, values, count, xscale, xstart, cppSpec);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotStairsXYShort(BBString * label, ImU16 * xs, ImU16 * ys, int count) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    ImPlot::PlotStairs(v0, xs, ys, count);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotStairsXYShort_Spec(BBString * label, ImU16 * xs, ImU16 * ys, int count, MaxPlotSpec spec) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotStairs(v0, xs, ys, count, cppSpec);
     bbMemFree((void*)v0);
 }
 
 // int
-void ImPlot_PlotStairsInt(BBString * label, ImS32 * values, int count, double xscale, double xstart, ImPlotStairsFlags flags, int offset, int stride) {
+void ImPlot_PlotStairsInt(BBString * label, ImS32 * values, int count, double xscale, double xstart) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotStairs(v0, values, count, xscale, xstart, flags, offset, stride);
+    ImPlot::PlotStairs(v0, values, count, xscale, xstart);
     bbMemFree((void*)v0);
 }
 
-void ImPlot_PlotStairsXYInt(BBString * label, ImS32 * xs, ImS32 * ys, int count, ImPlotStairsFlags flags, int offset, int stride) {
+void ImPlot_PlotStairsInt_Spec(BBString * label, ImS32 * values, int count, double xscale, double xstart, MaxPlotSpec spec) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotStairs(v0, xs, ys, count, flags, offset, stride);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotStairs(v0, values, count, xscale, xstart, cppSpec);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotStairsXYInt(BBString * label, ImS32 * xs, ImS32 * ys, int count) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    ImPlot::PlotStairs(v0, xs, ys, count);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotStairsXYInt_Spec(BBString * label, ImS32 * xs, ImS32 * ys, int count, MaxPlotSpec spec) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotStairs(v0, xs, ys, count, cppSpec);
     bbMemFree((void*)v0);
 }
 
 // long
-void ImPlot_PlotStairsLong(BBString * label, ImS64 * values, int count, double xscale, double xstart, ImPlotStairsFlags flags, int offset, int stride) {
+void ImPlot_PlotStairsLong(BBString * label, ImS64 * values, int count, double xscale, double xstart) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotStairs(v0, values, count, xscale, xstart, flags, offset, stride);
+    ImPlot::PlotStairs(v0, values, count, xscale, xstart);
     bbMemFree((void*)v0);
 }
 
-void ImPlot_PlotStairsXYLong(BBString * label, ImS64 * xs, ImS64 * ys, int count, ImPlotStairsFlags flags, int offset, int stride) {
+void ImPlot_PlotStairsLong_Spec(BBString * label, ImS64 * values, int count, double xscale, double xstart, MaxPlotSpec spec) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotStairs(v0, xs, ys, count, flags, offset, stride);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotStairs(v0, values, count, xscale, xstart, cppSpec);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotStairsXYLong(BBString * label, ImS64 * xs, ImS64 * ys, int count) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    ImPlot::PlotStairs(v0, xs, ys, count);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotStairsXYLong_Spec(BBString * label, ImS64 * xs, ImS64 * ys, int count, MaxPlotSpec spec) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotStairs(v0, xs, ys, count, cppSpec);
     bbMemFree((void*)v0);
 }
 
 // uint
-void ImPlot_PlotStairsUInt(BBString * label, ImU32 * values, int count, double xscale, double xstart, ImPlotStairsFlags flags, int offset, int stride) {
+void ImPlot_PlotStairsUInt(BBString * label, ImU32 * values, int count, double xscale, double xstart) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotStairs(v0, values, count, xscale, xstart, flags, offset, stride);
+    ImPlot::PlotStairs(v0, values, count, xscale, xstart);
     bbMemFree((void*)v0);
 }
 
-void ImPlot_PlotStairsXYUInt(BBString * label, ImU32 * xs, ImU32 * ys, int count, ImPlotStairsFlags flags, int offset, int stride) {
+void ImPlot_PlotStairsUInt_Spec(BBString * label, ImU32 * values, int count, double xscale, double xstart, MaxPlotSpec spec) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotStairs(v0, xs, ys, count, flags, offset, stride);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotStairs(v0, values, count, xscale, xstart, cppSpec);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotStairsXYUInt(BBString * label, ImU32 * xs, ImU32 * ys, int count) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    ImPlot::PlotStairs(v0, xs, ys, count);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotStairsXYUInt_Spec(BBString * label, ImU32 * xs, ImU32 * ys, int count, MaxPlotSpec spec) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotStairs(v0, xs, ys, count, cppSpec);
     bbMemFree((void*)v0);
 }
 
 // ulong
-void ImPlot_PlotStairsULong(BBString * label, ImU64 * values, int count, double xscale, double xstart, ImPlotStairsFlags flags, int offset, int stride) {
+void ImPlot_PlotStairsULong(BBString * label, ImU64 * values, int count, double xscale, double xstart) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotStairs(v0, values, count, xscale, xstart, flags, offset, stride);
+    ImPlot::PlotStairs(v0, values, count, xscale, xstart);
     bbMemFree((void*)v0);
 }
 
-void ImPlot_PlotStairsXYULong(BBString * label, ImU64 * xs, ImU64 * ys, int count, ImPlotStairsFlags flags, int offset, int stride) {
+void ImPlot_PlotStairsULong_Spec(BBString * label, ImU64 * values, int count, double xscale, double xstart, MaxPlotSpec spec) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotStairs(v0, xs, ys, count, flags, offset, stride);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotStairs(v0, values, count, xscale, xstart, cppSpec);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotStairsXYULong(BBString * label, ImU64 * xs, ImU64 * ys, int count) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    ImPlot::PlotStairs(v0, xs, ys, count);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotStairsXYULong_Spec(BBString * label, ImU64 * xs, ImU64 * ys, int count, MaxPlotSpec spec) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotStairs(v0, xs, ys, count, cppSpec);
     bbMemFree((void*)v0);
 }
 
 ///////////////////////////////////////////////////////////
 
 // float
-void ImPlot_PlotShadedFloat(BBString * label, float * values, int count, double yref, double xscale, double xstart, ImPlotShadedFlags flags, int offset, int stride) {
+void ImPlot_PlotShadedFloat(BBString * label, float * values, int count, double yref, double xscale, double xstart) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotShaded(v0, values, count, yref, xscale, xstart, flags, offset, stride);
+    ImPlot::PlotShaded(v0, values, count, yref, xscale, xstart);
     bbMemFree((void*)v0);
 }
 
-void ImPlot_PlotShadedXYFloat(BBString * label, float * xs, float * ys, int count, double yref, ImPlotShadedFlags flags, int offset, int stride) {
+void ImPlot_PlotShadedFloat_Spec(BBString * label, float * values, int count, double yref, double xscale, double xstart, MaxPlotSpec spec) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotShaded(v0, xs, ys, count, yref, flags, offset, stride);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotShaded(v0, values, count, yref, xscale, xstart, cppSpec);
     bbMemFree((void*)v0);
 }
 
-void ImPlot_PlotShadedXYYFloat(BBString * label, float * xs, float * ys1, float * ys2, int count, ImPlotShadedFlags flags, int offset, int stride) {
+void ImPlot_PlotShadedXYFloat(BBString * label, float * xs, float * ys, int count, double yref) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotShaded(v0, xs, ys1, ys2, count, flags, offset, stride);
+    ImPlot::PlotShaded(v0, xs, ys, count, yref);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotShadedXYFloat_Spec(BBString * label, float * xs, float * ys, int count, double yref, MaxPlotSpec spec) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotShaded(v0, xs, ys, count, yref, cppSpec);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotShadedXYYFloat(BBString * label, float * xs, float * ys1, float * ys2, int count) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    ImPlot::PlotShaded(v0, xs, ys1, ys2, count);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotShadedXYYFloat_Spec(BBString * label, float * xs, float * ys1, float * ys2, int count, MaxPlotSpec spec) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotShaded(v0, xs, ys1, ys2, count, cppSpec);
     bbMemFree((void*)v0);
 }
 
 // double
-void ImPlot_PlotShadedDouble(BBString * label, double * values, int count, double yref, double xscale, double xstart, ImPlotShadedFlags flags, int offset, int stride) {
+void ImPlot_PlotShadedDouble(BBString * label, double * values, int count, double yref, double xscale, double xstart) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotShaded(v0, values, count, yref, xscale, xstart, flags, offset, stride);
+    ImPlot::PlotShaded(v0, values, count, yref, xscale, xstart);
     bbMemFree((void*)v0);
 }
 
-void ImPlot_PlotShadedXYDouble(BBString * label, double * xs, double * ys, int count, double yref, ImPlotShadedFlags flags, int offset, int stride) {
+void ImPlot_PlotShadedDouble_Spec(BBString * label, double * values, int count, double yref, double xscale, double xstart, MaxPlotSpec spec) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotShaded(v0, xs, ys, count, yref, flags, offset, stride);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotShaded(v0, values, count, yref, xscale, xstart, cppSpec);
     bbMemFree((void*)v0);
 }
 
-void ImPlot_PlotShadedXYYDouble(BBString * label, double * xs, double * ys1, double * ys2, int count, ImPlotShadedFlags flags, int offset, int stride) {
+void ImPlot_PlotShadedXYDouble(BBString * label, double * xs, double * ys, int count, double yref) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotShaded(v0, xs, ys1, ys2, count, flags, offset, stride);
+    ImPlot::PlotShaded(v0, xs, ys, count, yref);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotShadedXYDouble_Spec(BBString * label, double * xs, double * ys, int count, double yref, MaxPlotSpec spec) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotShaded(v0, xs, ys, count, yref, cppSpec);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotShadedXYYDouble(BBString * label, double * xs, double * ys1, double * ys2, int count) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    ImPlot::PlotShaded(v0, xs, ys1, ys2, count);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotShadedXYYDouble_Spec(BBString * label, double * xs, double * ys1, double * ys2, int count, MaxPlotSpec spec) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotShaded(v0, xs, ys1, ys2, count, cppSpec);
     bbMemFree((void*)v0);
 }
 
 // byte
-void ImPlot_PlotShadedByte(BBString * label, ImU8 * values, int count, double yref, double xscale, double xstart, ImPlotShadedFlags flags, int offset, int stride) {
+void ImPlot_PlotShadedByte(BBString * label, ImU8 * values, int count, double yref, double xscale, double xstart) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotShaded(v0, values, count, yref, xscale, xstart, flags, offset, stride);
+    ImPlot::PlotShaded(v0, values, count, yref, xscale, xstart);
     bbMemFree((void*)v0);
 }
 
-void ImPlot_PlotShadedXYByte(BBString * label, ImU8 * xs, ImU8 * ys, int count, double yref, ImPlotShadedFlags flags, int offset, int stride) {
+void ImPlot_PlotShadedByte_Spec(BBString * label, ImU8 * values, int count, double yref, double xscale, double xstart, MaxPlotSpec spec) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotShaded(v0, xs, ys, count, yref, flags, offset, stride);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotShaded(v0, values, count, yref, xscale, xstart, cppSpec);
     bbMemFree((void*)v0);
 }
 
-void ImPlot_PlotShadedXYYByte(BBString * label, ImU8 * xs, ImU8 * ys1, ImU8 * ys2, int count, ImPlotShadedFlags flags, int offset, int stride) {
+void ImPlot_PlotShadedXYByte(BBString * label, ImU8 * xs, ImU8 * ys, int count, double yref) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotShaded(v0, xs, ys1, ys2, count, flags, offset, stride);
+    ImPlot::PlotShaded(v0, xs, ys, count, yref);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotShadedXYByte_Spec(BBString * label, ImU8 * xs, ImU8 * ys, int count, double yref, MaxPlotSpec spec) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotShaded(v0, xs, ys, count, yref, cppSpec);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotShadedXYYByte(BBString * label, ImU8 * xs, ImU8 * ys1, ImU8 * ys2, int count) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    ImPlot::PlotShaded(v0, xs, ys1, ys2, count);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotShadedXYYByte_Spec(BBString * label, ImU8 * xs, ImU8 * ys1, ImU8 * ys2, int count, MaxPlotSpec spec) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotShaded(v0, xs, ys1, ys2, count, cppSpec);
     bbMemFree((void*)v0);
 }
 
 // short
-void ImPlot_PlotShadedShort(BBString * label, ImU16 * values, int count, double yref, double xscale, double xstart, ImPlotShadedFlags flags, int offset, int stride) {
+void ImPlot_PlotShadedShort(BBString * label, ImU16 * values, int count, double yref, double xscale, double xstart) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotShaded(v0, values, count, yref, xscale, xstart, flags, offset, stride);
+    ImPlot::PlotShaded(v0, values, count, yref, xscale, xstart);
     bbMemFree((void*)v0);
 }
 
-void ImPlot_PlotShadedXYShort(BBString * label, ImU16 * xs, ImU16 * ys, int count, double yref, ImPlotShadedFlags flags, int offset, int stride) {
+void ImPlot_PlotShadedShort_Spec(BBString * label, ImU16 * values, int count, double yref, double xscale, double xstart, MaxPlotSpec spec) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotShaded(v0, xs, ys, count, yref, flags, offset, stride);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotShaded(v0, values, count, yref, xscale, xstart, cppSpec);
     bbMemFree((void*)v0);
 }
 
-void ImPlot_PlotShadedXYYShort(BBString * label, ImU16 * xs, ImU16 * ys1, ImU16 * ys2, int count, ImPlotShadedFlags flags, int offset, int stride) {
+void ImPlot_PlotShadedXYShort(BBString * label, ImU16 * xs, ImU16 * ys, int count, double yref) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotShaded(v0, xs, ys1, ys2, count, flags, offset, stride);
+    ImPlot::PlotShaded(v0, xs, ys, count, yref);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotShadedXYShort_Spec(BBString * label, ImU16 * xs, ImU16 * ys, int count, double yref, MaxPlotSpec spec) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotShaded(v0, xs, ys, count, yref, cppSpec);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotShadedXYYShort(BBString * label, ImU16 * xs, ImU16 * ys1, ImU16 * ys2, int count) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    ImPlot::PlotShaded(v0, xs, ys1, ys2, count);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotShadedXYYShort_Spec(BBString * label, ImU16 * xs, ImU16 * ys1, ImU16 * ys2, int count, MaxPlotSpec spec) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotShaded(v0, xs, ys1, ys2, count, cppSpec);
     bbMemFree((void*)v0);
 }
 
 // int
-void ImPlot_PlotShadedInt(BBString * label, ImS32 * values, int count, double yref, double xscale, double xstart, ImPlotShadedFlags flags, int offset, int stride) {
+void ImPlot_PlotShadedInt(BBString * label, ImS32 * values, int count, double yref, double xscale, double xstart) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotShaded(v0, values, count, yref, xscale, xstart, flags, offset, stride);
+    ImPlot::PlotShaded(v0, values, count, yref, xscale, xstart);
     bbMemFree((void*)v0);
 }
 
-void ImPlot_PlotShadedXYInt(BBString * label, ImS32 * xs, ImS32 * ys, int count, double yref, ImPlotShadedFlags flags, int offset, int stride) {
+void ImPlot_PlotShadedInt_Spec(BBString * label, ImS32 * values, int count, double yref, double xscale, double xstart, MaxPlotSpec spec) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotShaded(v0, xs, ys, count, yref, flags, offset, stride);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotShaded(v0, values, count, yref, xscale, xstart, cppSpec);
     bbMemFree((void*)v0);
 }
 
-void ImPlot_PlotShadedXYYInt(BBString * label, ImS32 * xs, ImS32 * ys1, ImS32 * ys2, int count, ImPlotShadedFlags flags, int offset, int stride) {
+void ImPlot_PlotShadedXYInt(BBString * label, ImS32 * xs, ImS32 * ys, int count, double yref) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotShaded(v0, xs, ys1, ys2, count, flags, offset, stride);
+    ImPlot::PlotShaded(v0, xs, ys, count, yref);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotShadedXYInt_Spec(BBString * label, ImS32 * xs, ImS32 * ys, int count, double yref, MaxPlotSpec spec) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotShaded(v0, xs, ys, count, yref, cppSpec);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotShadedXYYInt(BBString * label, ImS32 * xs, ImS32 * ys1, ImS32 * ys2, int count) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    ImPlot::PlotShaded(v0, xs, ys1, ys2, count);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotShadedXYYInt_Spec(BBString * label, ImS32 * xs, ImS32 * ys1, ImS32 * ys2, int count, MaxPlotSpec spec) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotShaded(v0, xs, ys1, ys2, count, cppSpec);
     bbMemFree((void*)v0);
 }
 
 // long
-void ImPlot_PlotShadedLong(BBString * label, ImS64 * values, int count, double yref, double xscale, double xstart, ImPlotShadedFlags flags, int offset, int stride) {
+void ImPlot_PlotShadedLong(BBString * label, ImS64 * values, int count, double yref, double xscale, double xstart) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotShaded(v0, values, count, yref, xscale, xstart, flags, offset, stride);
+    ImPlot::PlotShaded(v0, values, count, yref, xscale, xstart);
     bbMemFree((void*)v0);
 }
 
-void ImPlot_PlotShadedXYLong(BBString * label, ImS64 * xs, ImS64 * ys, int count, double yref, ImPlotShadedFlags flags, int offset, int stride) {
+void ImPlot_PlotShadedLong_Spec(BBString * label, ImS64 * values, int count, double yref, double xscale, double xstart, MaxPlotSpec spec) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotShaded(v0, xs, ys, count, yref, flags, offset, stride);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotShaded(v0, values, count, yref, xscale, xstart, cppSpec);
     bbMemFree((void*)v0);
 }
 
-void ImPlot_PlotShadedXYYLong(BBString * label, ImS64 * xs, ImS64 * ys1, ImS64 * ys2, int count, ImPlotShadedFlags flags, int offset, int stride) {
+void ImPlot_PlotShadedXYLong(BBString * label, ImS64 * xs, ImS64 * ys, int count, double yref) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotShaded(v0, xs, ys1, ys2, count, flags, offset, stride);
+    ImPlot::PlotShaded(v0, xs, ys, count, yref);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotShadedXYLong_Spec(BBString * label, ImS64 * xs, ImS64 * ys, int count, double yref, MaxPlotSpec spec) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotShaded(v0, xs, ys, count, yref, cppSpec);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotShadedXYYLong(BBString * label, ImS64 * xs, ImS64 * ys1, ImS64 * ys2, int count) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    ImPlot::PlotShaded(v0, xs, ys1, ys2, count);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotShadedXYYLong_Spec(BBString * label, ImS64 * xs, ImS64 * ys1, ImS64 * ys2, int count, MaxPlotSpec spec) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotShaded(v0, xs, ys1, ys2, count, cppSpec);
     bbMemFree((void*)v0);
 }
 
 // uint
-void ImPlot_PlotShadedUInt(BBString * label, ImU32 * values, int count, double yref, double xscale, double xstart, ImPlotShadedFlags flags, int offset, int stride) {
+void ImPlot_PlotShadedUInt(BBString * label, ImU32 * values, int count, double yref, double xscale, double xstart) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotShaded(v0, values, count, yref, xscale, xstart, flags, offset, stride);
+    ImPlot::PlotShaded(v0, values, count, yref, xscale, xstart);
     bbMemFree((void*)v0);
 }
 
-void ImPlot_PlotShadedXYUInt(BBString * label, ImU32 * xs, ImU32 * ys, int count, double yref, ImPlotShadedFlags flags, int offset, int stride) {
+void ImPlot_PlotShadedUInt_Spec(BBString * label, ImU32 * values, int count, double yref, double xscale, double xstart, MaxPlotSpec spec) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotShaded(v0, xs, ys, count, yref, flags, offset, stride);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotShaded(v0, values, count, yref, xscale, xstart, cppSpec);
     bbMemFree((void*)v0);
 }
 
-void ImPlot_PlotShadedXYYUInt(BBString * label, ImU32 * xs, ImU32 * ys1, ImU32 * ys2, int count, ImPlotShadedFlags flags, int offset, int stride) {
+void ImPlot_PlotShadedXYUInt(BBString * label, ImU32 * xs, ImU32 * ys, int count, double yref) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotShaded(v0, xs, ys1, ys2, count, flags, offset, stride);
+    ImPlot::PlotShaded(v0, xs, ys, count, yref);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotShadedXYUInt_Spec(BBString * label, ImU32 * xs, ImU32 * ys, int count, double yref, MaxPlotSpec spec) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotShaded(v0, xs, ys, count, yref, cppSpec);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotShadedXYYUInt(BBString * label, ImU32 * xs, ImU32 * ys1, ImU32 * ys2, int count) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    ImPlot::PlotShaded(v0, xs, ys1, ys2, count);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotShadedXYYUInt_Spec(BBString * label, ImU32 * xs, ImU32 * ys1, ImU32 * ys2, int count, MaxPlotSpec spec) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotShaded(v0, xs, ys1, ys2, count, cppSpec);
     bbMemFree((void*)v0);
 }
 
 // ulong
-void ImPlot_PlotShadedULong(BBString * label, ImU64 * values, int count, double yref, double xscale, double xstart, ImPlotShadedFlags flags, int offset, int stride) {
+void ImPlot_PlotShadedULong(BBString * label, ImU64 * values, int count, double yref, double xscale, double xstart) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotShaded(v0, values, count, yref, xscale, xstart, flags, offset, stride);
+    ImPlot::PlotShaded(v0, values, count, yref, xscale, xstart);
     bbMemFree((void*)v0);
 }
 
-void ImPlot_PlotShadedXYULong(BBString * label, ImU64 * xs, ImU64 * ys, int count, double yref, ImPlotShadedFlags flags, int offset, int stride) {
+void ImPlot_PlotShadedULong_Spec(BBString * label, ImU64 * values, int count, double yref, double xscale, double xstart, MaxPlotSpec spec) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotShaded(v0, xs, ys, count, yref, flags, offset, stride);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotShaded(v0, values, count, yref, xscale, xstart, cppSpec);
     bbMemFree((void*)v0);
 }
 
-void ImPlot_PlotShadedXYYULong(BBString * label, ImU64 * xs, ImU64 * ys1, ImU64 * ys2, int count, ImPlotShadedFlags flags, int offset, int stride) {
+void ImPlot_PlotShadedXYULong(BBString * label, ImU64 * xs, ImU64 * ys, int count, double yref) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotShaded(v0, xs, ys1, ys2, count, flags, offset, stride);
+    ImPlot::PlotShaded(v0, xs, ys, count, yref);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotShadedXYULong_Spec(BBString * label, ImU64 * xs, ImU64 * ys, int count, double yref, MaxPlotSpec spec) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotShaded(v0, xs, ys, count, yref, cppSpec);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotShadedXYYULong(BBString * label, ImU64 * xs, ImU64 * ys1, ImU64 * ys2, int count) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    ImPlot::PlotShaded(v0, xs, ys1, ys2, count);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotShadedXYYULong_Spec(BBString * label, ImU64 * xs, ImU64 * ys1, ImU64 * ys2, int count, MaxPlotSpec spec) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotShaded(v0, xs, ys1, ys2, count, cppSpec);
     bbMemFree((void*)v0);
 }
 
 ///////////////////////////////////////////////////////////
 
 // float
-void ImPlot_PlotBarsFloat(BBString * label, float * values, int count, double bar_size, double shift, ImPlotBarsFlags flags, int offset, int stride) {
+void ImPlot_PlotBarsFloat(BBString * label, float * values, int count, double bar_size, double shift) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotBars(v0, values, count, bar_size, shift, flags, offset, stride);
+    ImPlot::PlotBars(v0, values, count, bar_size, shift);
     bbMemFree((void*)v0);
 }
 
-void ImPlot_PlotBarsXYFloat(BBString * label, float * xs, float * ys, int count, double bar_size, ImPlotBarsFlags flags, int offset, int stride) {
+void ImPlot_PlotBarsFloat_Spec(BBString * label, float * values, int count, double bar_size, double shift, MaxPlotSpec spec) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotBars(v0, xs, ys, count, bar_size, flags, offset, stride);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotBars(v0, values, count, bar_size, shift, cppSpec);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotBarsXYFloat(BBString * label, float * xs, float * ys, int count, double bar_size) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    ImPlot::PlotBars(v0, xs, ys, count, bar_size);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotBarsXYFloat_Spec(BBString * label, float * xs, float * ys, int count, double bar_size, MaxPlotSpec spec) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotBars(v0, xs, ys, count, bar_size, cppSpec);
     bbMemFree((void*)v0);
 }
 
 // double
-void ImPlot_PlotBarsDouble(BBString * label, double * values, int count, double bar_size, double shift, ImPlotBarsFlags flags, int offset, int stride) {
+void ImPlot_PlotBarsDouble(BBString * label, double * values, int count, double bar_size, double shift) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotBars(v0, values, count, bar_size, shift, flags, offset, stride);
+    ImPlot::PlotBars(v0, values, count, bar_size, shift);
     bbMemFree((void*)v0);
 }
 
-void ImPlot_PlotBarsXYDouble(BBString * label, double * xs, double * ys, int count, double bar_size, ImPlotBarsFlags flags, int offset, int stride) {
+void ImPlot_PlotBarsDouble_Spec(BBString * label, double * values, int count, double bar_size, double shift, MaxPlotSpec spec) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotBars(v0, xs, ys, count, bar_size, flags, offset, stride);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotBars(v0, values, count, bar_size, shift, cppSpec);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotBarsXYDouble(BBString * label, double * xs, double * ys, int count, double bar_size) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    ImPlot::PlotBars(v0, xs, ys, count, bar_size);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotBarsXYDouble_Spec(BBString * label, double * xs, double * ys, int count, double bar_size, MaxPlotSpec spec) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotBars(v0, xs, ys, count, bar_size, cppSpec);
     bbMemFree((void*)v0);
 }
 
 // byte
-void ImPlot_PlotBarsByte(BBString * label, ImU8 * values, int count, double bar_size, double shift, ImPlotBarsFlags flags, int offset, int stride) {
+void ImPlot_PlotBarsByte(BBString * label, ImU8 * values, int count, double bar_size, double shift) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotBars(v0, values, count, bar_size, shift, flags, offset, stride);
+    ImPlot::PlotBars(v0, values, count, bar_size, shift);
     bbMemFree((void*)v0);
 }
 
-void ImPlot_PlotBarsXYByte(BBString * label, ImU8 * xs, ImU8 * ys, int count, double bar_size, ImPlotBarsFlags flags, int offset, int stride) {
+void ImPlot_PlotBarsByte_Spec(BBString * label, ImU8 * values, int count, double bar_size, double shift, MaxPlotSpec spec) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotBars(v0, xs, ys, count, bar_size, flags, offset, stride);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotBars(v0, values, count, bar_size, shift, cppSpec);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotBarsXYByte(BBString * label, ImU8 * xs, ImU8 * ys, int count, double bar_size) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    ImPlot::PlotBars(v0, xs, ys, count, bar_size);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotBarsXYByte_Spec(BBString * label, ImU8 * xs, ImU8 * ys, int count, double bar_size, MaxPlotSpec spec) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotBars(v0, xs, ys, count, bar_size, cppSpec);
     bbMemFree((void*)v0);
 }
 
 // short
-void ImPlot_PlotBarsShort(BBString * label, ImU16 * values, int count, double bar_size, double shift, ImPlotBarsFlags flags, int offset, int stride) {
+void ImPlot_PlotBarsShort(BBString * label, ImU16 * values, int count, double bar_size, double shift) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotBars(v0, values, count, bar_size, shift, flags, offset, stride);
+    ImPlot::PlotBars(v0, values, count, bar_size, shift);
     bbMemFree((void*)v0);
 }
 
-void ImPlot_PlotBarsXYShort(BBString * label, ImU16 * xs, ImU16 * ys, int count, double bar_size, ImPlotBarsFlags flags, int offset, int stride) {
+void ImPlot_PlotBarsShort_Spec(BBString * label, ImU16 * values, int count, double bar_size, double shift, MaxPlotSpec spec) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotBars(v0, xs, ys, count, bar_size, flags, offset, stride);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotBars(v0, values, count, bar_size, shift, cppSpec);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotBarsXYShort(BBString * label, ImU16 * xs, ImU16 * ys, int count, double bar_size) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    ImPlot::PlotBars(v0, xs, ys, count, bar_size);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotBarsXYShort_Spec(BBString * label, ImU16 * xs, ImU16 * ys, int count, double bar_size, MaxPlotSpec spec) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotBars(v0, xs, ys, count, bar_size, cppSpec);
     bbMemFree((void*)v0);
 }
 
 // int
-void ImPlot_PlotBarsInt(BBString * label, ImS32 * values, int count, double bar_size, double shift, ImPlotBarsFlags flags, int offset, int stride) {
+void ImPlot_PlotBarsInt(BBString * label, ImS32 * values, int count, double bar_size, double shift) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotBars(v0, values, count, bar_size, shift, flags, offset, stride);
+    ImPlot::PlotBars(v0, values, count, bar_size, shift);
     bbMemFree((void*)v0);
 }
 
-void ImPlot_PlotBarsXYInt(BBString * label, ImS32 * xs, ImS32 * ys, int count, double bar_size, ImPlotBarsFlags flags, int offset, int stride) {
+void ImPlot_PlotBarsInt_Spec(BBString * label, ImS32 * values, int count, double bar_size, double shift, MaxPlotSpec spec) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotBars(v0, xs, ys, count, bar_size, flags, offset, stride);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotBars(v0, values, count, bar_size, shift, cppSpec);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotBarsXYInt(BBString * label, ImS32 * xs, ImS32 * ys, int count, double bar_size) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    ImPlot::PlotBars(v0, xs, ys, count, bar_size);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotBarsXYInt_Spec(BBString * label, ImS32 * xs, ImS32 * ys, int count, double bar_size, MaxPlotSpec spec) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotBars(v0, xs, ys, count, bar_size, cppSpec);
     bbMemFree((void*)v0);
 }
 
 // long
-void ImPlot_PlotBarsLong(BBString * label, ImS64 * values, int count, double bar_size, double shift, ImPlotBarsFlags flags, int offset, int stride) {
+void ImPlot_PlotBarsLong(BBString * label, ImS64 * values, int count, double bar_size, double shift) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotBars(v0, values, count, bar_size, shift, flags, offset, stride);
+    ImPlot::PlotBars(v0, values, count, bar_size, shift);
     bbMemFree((void*)v0);
 }
 
-void ImPlot_PlotBarsXYLong(BBString * label, ImS64 * xs, ImS64 * ys, int count, double bar_size, ImPlotBarsFlags flags, int offset, int stride) {
+void ImPlot_PlotBarsLong_Spec(BBString * label, ImS64 * values, int count, double bar_size, double shift, MaxPlotSpec spec) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotBars(v0, xs, ys, count, bar_size, flags, offset, stride);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotBars(v0, values, count, bar_size, shift, cppSpec);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotBarsXYLong(BBString * label, ImS64 * xs, ImS64 * ys, int count, double bar_size) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    ImPlot::PlotBars(v0, xs, ys, count, bar_size);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotBarsXYLong_Spec(BBString * label, ImS64 * xs, ImS64 * ys, int count, double bar_size, MaxPlotSpec spec) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotBars(v0, xs, ys, count, bar_size, cppSpec);
     bbMemFree((void*)v0);
 }
 
 // uint
-void ImPlot_PlotBarsUInt(BBString * label, ImU32 * values, int count, double bar_size, double shift, ImPlotBarsFlags flags, int offset, int stride) {
+void ImPlot_PlotBarsUInt(BBString * label, ImU32 * values, int count, double bar_size, double shift) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotBars(v0, values, count, bar_size, shift, flags, offset, stride);
+    ImPlot::PlotBars(v0, values, count, bar_size, shift);
     bbMemFree((void*)v0);
 }
 
-void ImPlot_PlotBarsXYUInt(BBString * label, ImU32 * xs, ImU32 * ys, int count, double bar_size, ImPlotBarsFlags flags, int offset, int stride) {
+void ImPlot_PlotBarsUInt_Spec(BBString * label, ImU32 * values, int count, double bar_size, double shift, MaxPlotSpec spec) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotBars(v0, xs, ys, count, bar_size, flags, offset, stride);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotBars(v0, values, count, bar_size, shift, cppSpec);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotBarsXYUInt(BBString * label, ImU32 * xs, ImU32 * ys, int count, double bar_size) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    ImPlot::PlotBars(v0, xs, ys, count, bar_size);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotBarsXYUInt_Spec(BBString * label, ImU32 * xs, ImU32 * ys, int count, double bar_size, MaxPlotSpec spec) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotBars(v0, xs, ys, count, bar_size, cppSpec);
     bbMemFree((void*)v0);
 }
 
 // ulong
-void ImPlot_PlotBarsULong(BBString * label, ImU64 * values, int count, double bar_size, double shift, ImPlotBarsFlags flags, int offset, int stride) {
+void ImPlot_PlotBarsULong(BBString * label, ImU64 * values, int count, double bar_size, double shift) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotBars(v0, values, count, bar_size, shift, flags, offset, stride);
+    ImPlot::PlotBars(v0, values, count, bar_size, shift);
     bbMemFree((void*)v0);
 }
 
-void ImPlot_PlotBarsXYULong(BBString * label, ImU64 * xs, ImU64 * ys, int count, double bar_size, ImPlotBarsFlags flags, int offset, int stride) {
+void ImPlot_PlotBarsULong_Spec(BBString * label, ImU64 * values, int count, double bar_size, double shift, MaxPlotSpec spec) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotBars(v0, xs, ys, count, bar_size, flags, offset, stride);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotBars(v0, values, count, bar_size, shift, cppSpec);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotBarsXYULong(BBString * label, ImU64 * xs, ImU64 * ys, int count, double bar_size) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    ImPlot::PlotBars(v0, xs, ys, count, bar_size);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotBarsXYULong_Spec(BBString * label, ImU64 * xs, ImU64 * ys, int count, double bar_size, MaxPlotSpec spec) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotBars(v0, xs, ys, count, bar_size, cppSpec);
     bbMemFree((void*)v0);
 }
 
@@ -817,9 +1467,19 @@ char** bmx_bbStringArrayToUTF8StringArray(BBArray * arr) {
 }
 
 // float
-void ImPlot_PlotBarGroupsFloat(BBArray * label_ids, float * values, int item_count, int group_count, double group_size, double shift, ImPlotBarGroupsFlags flags) {
+void ImPlot_PlotBarGroupsFloat(BBArray * label_ids, float * values, int item_count, int group_count, double group_size, double shift) {
     char ** v0 = bmx_bbStringArrayToUTF8StringArray(label_ids);
-    ImPlot::PlotBarGroups(v0, values, item_count, group_count, group_size, shift, flags);
+    ImPlot::PlotBarGroups(v0, values, item_count, group_count, group_size, shift);
+    for (int i = 0; i < label_ids->scales[0]; i++) {
+        bbMemFree((void*)v0[i]);
+    }
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotBarGroupsFloat_Spec(BBArray * label_ids, float * values, int item_count, int group_count, double group_size, double shift, MaxPlotSpec spec) {
+    char ** v0 = bmx_bbStringArrayToUTF8StringArray(label_ids);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotBarGroups(v0, values, item_count, group_count, group_size, shift, cppSpec);
     for (int i = 0; i < label_ids->scales[0]; i++) {
         bbMemFree((void*)v0[i]);
     }
@@ -827,9 +1487,19 @@ void ImPlot_PlotBarGroupsFloat(BBArray * label_ids, float * values, int item_cou
 }
 
 // double
-void ImPlot_PlotBarGroupsDouble(BBArray * label_ids, double * values, int item_count, int group_count, double group_size, double shift, ImPlotBarGroupsFlags flags) {
+void ImPlot_PlotBarGroupsDouble(BBArray * label_ids, double * values, int item_count, int group_count, double group_size, double shift) {
     char ** v0 = bmx_bbStringArrayToUTF8StringArray(label_ids);
-    ImPlot::PlotBarGroups(v0, values, item_count, group_count, group_size, shift, flags);
+    ImPlot::PlotBarGroups(v0, values, item_count, group_count, group_size, shift);
+    for (int i = 0; i < label_ids->scales[0]; i++) {
+        bbMemFree((void*)v0[i]);
+    }
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotBarGroupsDouble_Spec(BBArray * label_ids, double * values, int item_count, int group_count, double group_size, double shift, MaxPlotSpec spec) {
+    char ** v0 = bmx_bbStringArrayToUTF8StringArray(label_ids);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotBarGroups(v0, values, item_count, group_count, group_size, shift, cppSpec);
     for (int i = 0; i < label_ids->scales[0]; i++) {
         bbMemFree((void*)v0[i]);
     }
@@ -837,9 +1507,19 @@ void ImPlot_PlotBarGroupsDouble(BBArray * label_ids, double * values, int item_c
 }
 
 // byte
-void ImPlot_PlotBarGroupsByte(BBArray * label_ids, ImU8 * values, int item_count, int group_count, double group_size, double shift, ImPlotBarGroupsFlags flags) {
+void ImPlot_PlotBarGroupsByte(BBArray * label_ids, ImU8 * values, int item_count, int group_count, double group_size, double shift) {
     char ** v0 = bmx_bbStringArrayToUTF8StringArray(label_ids);
-    ImPlot::PlotBarGroups(v0, values, item_count, group_count, group_size, shift, flags);
+    ImPlot::PlotBarGroups(v0, values, item_count, group_count, group_size, shift);
+    for (int i = 0; i < label_ids->scales[0]; i++) {
+        bbMemFree((void*)v0[i]);
+    }
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotBarGroupsByte_Spec(BBArray * label_ids, ImU8 * values, int item_count, int group_count, double group_size, double shift, MaxPlotSpec spec) {
+    char ** v0 = bmx_bbStringArrayToUTF8StringArray(label_ids);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotBarGroups(v0, values, item_count, group_count, group_size, shift, cppSpec);
     for (int i = 0; i < label_ids->scales[0]; i++) {
         bbMemFree((void*)v0[i]);
     }
@@ -847,9 +1527,19 @@ void ImPlot_PlotBarGroupsByte(BBArray * label_ids, ImU8 * values, int item_count
 }
 
 // short
-void ImPlot_PlotBarGroupsShort(BBArray * label_ids, ImU16 * values, int item_count, int group_count, double group_size, double shift, ImPlotBarGroupsFlags flags) {
+void ImPlot_PlotBarGroupsShort(BBArray * label_ids, ImU16 * values, int item_count, int group_count, double group_size, double shift) {
     char ** v0 = bmx_bbStringArrayToUTF8StringArray(label_ids);
-    ImPlot::PlotBarGroups(v0, values, item_count, group_count, group_size, shift, flags);
+    ImPlot::PlotBarGroups(v0, values, item_count, group_count, group_size, shift);
+    for (int i = 0; i < label_ids->scales[0]; i++) {
+        bbMemFree((void*)v0[i]);
+    }
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotBarGroupsShort_Spec(BBArray * label_ids, ImU16 * values, int item_count, int group_count, double group_size, double shift, MaxPlotSpec spec) {
+    char ** v0 = bmx_bbStringArrayToUTF8StringArray(label_ids);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotBarGroups(v0, values, item_count, group_count, group_size, shift, cppSpec);
     for (int i = 0; i < label_ids->scales[0]; i++) {
         bbMemFree((void*)v0[i]);
     }
@@ -857,9 +1547,19 @@ void ImPlot_PlotBarGroupsShort(BBArray * label_ids, ImU16 * values, int item_cou
 }
 
 // int
-void ImPlot_PlotBarGroupsInt(BBArray * label_ids, ImS32 * values, int item_count, int group_count, double group_size, double shift, ImPlotBarGroupsFlags flags) {
+void ImPlot_PlotBarGroupsInt(BBArray * label_ids, ImS32 * values, int item_count, int group_count, double group_size, double shift) {
     char ** v0 = bmx_bbStringArrayToUTF8StringArray(label_ids);
-    ImPlot::PlotBarGroups(v0, values, item_count, group_count, group_size, shift, flags);
+    ImPlot::PlotBarGroups(v0, values, item_count, group_count, group_size, shift);
+    for (int i = 0; i < label_ids->scales[0]; i++) {
+        bbMemFree((void*)v0[i]);
+    }
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotBarGroupsInt_Spec(BBArray * label_ids, ImS32 * values, int item_count, int group_count, double group_size, double shift, MaxPlotSpec spec) {
+    char ** v0 = bmx_bbStringArrayToUTF8StringArray(label_ids);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotBarGroups(v0, values, item_count, group_count, group_size, shift, cppSpec);
     for (int i = 0; i < label_ids->scales[0]; i++) {
         bbMemFree((void*)v0[i]);
     }
@@ -867,9 +1567,19 @@ void ImPlot_PlotBarGroupsInt(BBArray * label_ids, ImS32 * values, int item_count
 }
 
 // long
-void ImPlot_PlotBarGroupsLong(BBArray * label_ids, ImS64 * values, int item_count, int group_count, double group_size, double shift, ImPlotBarGroupsFlags flags) {
+void ImPlot_PlotBarGroupsLong(BBArray * label_ids, ImS64 * values, int item_count, int group_count, double group_size, double shift) {
     char ** v0 = bmx_bbStringArrayToUTF8StringArray(label_ids);
-    ImPlot::PlotBarGroups(v0, values, item_count, group_count, group_size, shift, flags);
+    ImPlot::PlotBarGroups(v0, values, item_count, group_count, group_size, shift);
+    for (int i = 0; i < label_ids->scales[0]; i++) {
+        bbMemFree((void*)v0[i]);
+    }
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotBarGroupsLong_Spec(BBArray * label_ids, ImS64 * values, int item_count, int group_count, double group_size, double shift, MaxPlotSpec spec) {
+    char ** v0 = bmx_bbStringArrayToUTF8StringArray(label_ids);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotBarGroups(v0, values, item_count, group_count, group_size, shift, cppSpec);
     for (int i = 0; i < label_ids->scales[0]; i++) {
         bbMemFree((void*)v0[i]);
     }
@@ -877,9 +1587,19 @@ void ImPlot_PlotBarGroupsLong(BBArray * label_ids, ImS64 * values, int item_coun
 }
 
 // uint
-void ImPlot_PlotBarGroupsUInt(BBArray * label_ids, ImU32 * values, int item_count, int group_count, double group_size, double shift, ImPlotBarGroupsFlags flags) {
+void ImPlot_PlotBarGroupsUInt(BBArray * label_ids, ImU32 * values, int item_count, int group_count, double group_size, double shift) {
     char ** v0 = bmx_bbStringArrayToUTF8StringArray(label_ids);
-    ImPlot::PlotBarGroups(v0, values, item_count, group_count, group_size, shift, flags);
+    ImPlot::PlotBarGroups(v0, values, item_count, group_count, group_size, shift);
+    for (int i = 0; i < label_ids->scales[0]; i++) {
+        bbMemFree((void*)v0[i]);
+    }
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotBarGroupsUInt_Spec(BBArray * label_ids, ImU32 * values, int item_count, int group_count, double group_size, double shift, MaxPlotSpec spec) {
+    char ** v0 = bmx_bbStringArrayToUTF8StringArray(label_ids);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotBarGroups(v0, values, item_count, group_count, group_size, shift, cppSpec);
     for (int i = 0; i < label_ids->scales[0]; i++) {
         bbMemFree((void*)v0[i]);
     }
@@ -887,292 +1607,594 @@ void ImPlot_PlotBarGroupsUInt(BBArray * label_ids, ImU32 * values, int item_coun
 }
 
 // ulong
-void ImPlot_PlotBarGroupsULong(BBArray * label_ids, ImU64 * values, int item_count, int group_count, double group_size, double shift, ImPlotBarGroupsFlags flags) {
+void ImPlot_PlotBarGroupsULong(BBArray * label_ids, ImU64 * values, int item_count, int group_count, double group_size, double shift) {
     char ** v0 = bmx_bbStringArrayToUTF8StringArray(label_ids);
-    ImPlot::PlotBarGroups(v0, values, item_count, group_count, group_size, shift, flags);
+    ImPlot::PlotBarGroups(v0, values, item_count, group_count, group_size, shift);
     for (int i = 0; i < label_ids->scales[0]; i++) {
         bbMemFree((void*)v0[i]);
     }
     bbMemFree((void*)v0);
 }
-    
-///////////////////////////////////////////////////////////
 
-// float
-void ImPlot_PlotErrorBarsFloat(BBString * label, float * xs, float * ys, float * err, int count, ImPlotErrorBarsFlags flags, int offset, int stride) {
-    const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotErrorBars(v0, xs, ys, err, count, flags, offset, stride);
-    bbMemFree((void*)v0);
-}
-
-void ImPlot_PlotErrorBarsNPFloat(BBString * label, float * xs, float * ys, float * neg, float * pos, int count, ImPlotErrorBarsFlags flags, int offset, int stride) {
-    const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotErrorBars(v0, xs, ys, neg, pos, count, flags, offset, stride);
-    bbMemFree((void*)v0);
-}
-
-// double
-void ImPlot_PlotErrorBarsDouble(BBString * label, double * xs, double * ys, double * err, int count, ImPlotErrorBarsFlags flags, int offset, int stride) {
-    const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotErrorBars(v0, xs, ys, err, count, flags, offset, stride);
-    bbMemFree((void*)v0);
-}
-
-void ImPlot_PlotErrorBarsNPDouble(BBString * label, double * xs, double * ys, double * neg, double * pos, int count, ImPlotErrorBarsFlags flags, int offset, int stride) {
-    const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotErrorBars(v0, xs, ys, neg, pos, count, flags, offset, stride);
-    bbMemFree((void*)v0);
-}
-
-// byte
-void ImPlot_PlotErrorBarsByte(BBString * label, ImU8 * xs, ImU8 * ys, ImU8 * err, int count, ImPlotErrorBarsFlags flags, int offset, int stride) {
-    const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotErrorBars(v0, xs, ys, err, count, flags, offset, stride);
-    bbMemFree((void*)v0);
-}
-
-void ImPlot_PlotErrorBarsNPByte(BBString * label, ImU8 * xs, ImU8 * ys, ImU8 * neg, ImU8 * pos, int count, ImPlotErrorBarsFlags flags, int offset, int stride) {
-    const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotErrorBars(v0, xs, ys, neg, pos, count, flags, offset, stride);
-    bbMemFree((void*)v0);
-}
-
-// short
-void ImPlot_PlotErrorBarsShort(BBString * label, ImU16 * xs, ImU16 * ys, ImU16 * err, int count, ImPlotErrorBarsFlags flags, int offset, int stride) {
-    const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotErrorBars(v0, xs, ys, err, count, flags, offset, stride);
-    bbMemFree((void*)v0);
-}
-
-void ImPlot_PlotErrorBarsNPShort(BBString * label, ImU16 * xs, ImU16 * ys, ImU16 * neg, ImU16 * pos, int count, ImPlotErrorBarsFlags flags, int offset, int stride) {
-    const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotErrorBars(v0, xs, ys, neg, pos, count, flags, offset, stride);
-    bbMemFree((void*)v0);
-}
-
-// int
-void ImPlot_PlotErrorBarsInt(BBString * label, ImS32 * xs, ImS32 * ys, ImS32 * err, int count, ImPlotErrorBarsFlags flags, int offset, int stride) {
-    const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotErrorBars(v0, xs, ys, err, count, flags, offset, stride);
-    bbMemFree((void*)v0);
-}
-
-void ImPlot_PlotErrorBarsNPInt(BBString * label, ImS32 * xs, ImS32 * ys, ImS32 * neg, ImS32 * pos, int count, ImPlotErrorBarsFlags flags, int offset, int stride) {
-    const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotErrorBars(v0, xs, ys, neg, pos, count, flags, offset, stride);
-    bbMemFree((void*)v0);
-}
-
-// long
-void ImPlot_PlotErrorBarsLong(BBString * label, ImS64 * xs, ImS64 * ys, ImS64 * err, int count, ImPlotErrorBarsFlags flags, int offset, int stride) {
-    const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotErrorBars(v0, xs, ys, err, count, flags, offset, stride);
-    bbMemFree((void*)v0);
-}
-
-void ImPlot_PlotErrorBarsNPLong(BBString * label, ImS64 * xs, ImS64 * ys, ImS64 * neg, ImS64 * pos, int count, ImPlotErrorBarsFlags flags, int offset, int stride) {
-    const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotErrorBars(v0, xs, ys, neg, pos, count, flags, offset, stride);
-    bbMemFree((void*)v0);
-}
-
-// uint
-void ImPlot_PlotErrorBarsUInt(BBString * label, ImU32 * xs, ImU32 * ys, ImU32 * err, int count, ImPlotErrorBarsFlags flags, int offset, int stride) {
-    const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotErrorBars(v0, xs, ys, err, count, flags, offset, stride);
-    bbMemFree((void*)v0);
-}
-
-void ImPlot_PlotErrorBarsNPUInt(BBString * label, ImU32 * xs, ImU32 * ys, ImU32 * neg, ImU32 * pos, int count, ImPlotErrorBarsFlags flags, int offset, int stride) {
-    const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotErrorBars(v0, xs, ys, neg, pos, count, flags, offset, stride);
-    bbMemFree((void*)v0);
-}
-
-// ulong
-void ImPlot_PlotErrorBarsULong(BBString * label, ImU64 * xs, ImU64 * ys, ImU64 * err, int count, ImPlotErrorBarsFlags flags, int offset, int stride) {
-    const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotErrorBars(v0, xs, ys, err, count, flags, offset, stride);
-    bbMemFree((void*)v0);
-}
-
-void ImPlot_PlotErrorBarsNPULong(BBString * label, ImU64 * xs, ImU64 * ys, ImU64 * neg, ImU64 * pos, int count, ImPlotErrorBarsFlags flags, int offset, int stride) {
-    const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotErrorBars(v0, xs, ys, neg, pos, count, flags, offset, stride);
+void ImPlot_PlotBarGroupsULong_Spec(BBArray * label_ids, ImU64 * values, int item_count, int group_count, double group_size, double shift, MaxPlotSpec spec) {
+    char ** v0 = bmx_bbStringArrayToUTF8StringArray(label_ids);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotBarGroups(v0, values, item_count, group_count, group_size, shift, cppSpec);
+    for (int i = 0; i < label_ids->scales[0]; i++) {
+        bbMemFree((void*)v0[i]);
+    }
     bbMemFree((void*)v0);
 }
 
 ///////////////////////////////////////////////////////////
 
 // float
-void ImPlot_PlotStemsFloat(BBString * label, float * values, int count, double ref, double xscale, double xstart, ImPlotStemsFlags flags, int offset, int stride) {
+void ImPlot_PlotErrorBarsFloat(BBString * label, float * xs, float * ys, float * err, int count) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotStems(v0, values, count, ref, xscale, xstart, flags, offset, stride);
+    ImPlot::PlotErrorBars(v0, xs, ys, err, count);
     bbMemFree((void*)v0);
 }
 
-void ImPlot_PlotStemsXYFloat(BBString * label, float * xs, float * ys, int count, double ref, ImPlotStemsFlags flags, int offset, int stride) {
+void ImPlot_PlotErrorBarsFloat_Spec(BBString * label, float * xs, float * ys, float * err, int count, MaxPlotSpec spec) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotStems(v0, xs, ys, count, ref, flags, offset, stride);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotErrorBars(v0, xs, ys, err, count, cppSpec);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotErrorBarsNPFloat(BBString * label, float * xs, float * ys, float * neg, float * pos, int count) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    ImPlot::PlotErrorBars(v0, xs, ys, neg, pos, count);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotErrorBarsNPFloat_Spec(BBString * label, float * xs, float * ys, float * neg, float * pos, int count, MaxPlotSpec spec) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotErrorBars(v0, xs, ys, neg, pos, count, cppSpec);
     bbMemFree((void*)v0);
 }
 
 // double
-void ImPlot_PlotStemsDouble(BBString * label, double * values, int count, double ref, double xscale, double xstart, ImPlotStemsFlags flags, int offset, int stride) {
+void ImPlot_PlotErrorBarsDouble(BBString * label, double * xs, double * ys, double * err, int count) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotStems(v0, values, count, ref, xscale, xstart, flags, offset, stride);
+    ImPlot::PlotErrorBars(v0, xs, ys, err, count);
     bbMemFree((void*)v0);
 }
 
-void ImPlot_PlotStemsXYDouble(BBString * label, double * xs, double * ys, int count, double ref, ImPlotStemsFlags flags, int offset, int stride) {
+void ImPlot_PlotErrorBarsDouble_Spec(BBString * label, double * xs, double * ys, double * err, int count, MaxPlotSpec spec) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotStems(v0, xs, ys, count, ref, flags, offset, stride);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotErrorBars(v0, xs, ys, err, count, cppSpec);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotErrorBarsNPDouble(BBString * label, double * xs, double * ys, double * neg, double * pos, int count) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    ImPlot::PlotErrorBars(v0, xs, ys, neg, pos, count);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotErrorBarsNPDouble_Spec(BBString * label, double * xs, double * ys, double * neg, double * pos, int count, MaxPlotSpec spec) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotErrorBars(v0, xs, ys, neg, pos, count, cppSpec);
     bbMemFree((void*)v0);
 }
 
 // byte
-void ImPlot_PlotStemsByte(BBString * label, ImU8 * values, int count, double ref, double xscale, double xstart, ImPlotStemsFlags flags, int offset, int stride) {
+void ImPlot_PlotErrorBarsByte(BBString * label, ImU8 * xs, ImU8 * ys, ImU8 * err, int count) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotStems(v0, values, count, ref, xscale, xstart, flags, offset, stride);
+    ImPlot::PlotErrorBars(v0, xs, ys, err, count);
     bbMemFree((void*)v0);
 }
 
-void ImPlot_PlotStemsXYByte(BBString * label, ImU8 * xs, ImU8 * ys, int count, double ref, ImPlotStemsFlags flags, int offset, int stride) {
+void ImPlot_PlotErrorBarsByte_Spec(BBString * label, ImU8 * xs, ImU8 * ys, ImU8 * err, int count, MaxPlotSpec spec) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotStems(v0, xs, ys, count, ref, flags, offset, stride);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotErrorBars(v0, xs, ys, err, count, cppSpec);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotErrorBarsNPByte(BBString * label, ImU8 * xs, ImU8 * ys, ImU8 * neg, ImU8 * pos, int count) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    ImPlot::PlotErrorBars(v0, xs, ys, neg, pos, count);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotErrorBarsNPByte_Spec(BBString * label, ImU8 * xs, ImU8 * ys, ImU8 * neg, ImU8 * pos, int count, MaxPlotSpec spec) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotErrorBars(v0, xs, ys, neg, pos, count, cppSpec);
     bbMemFree((void*)v0);
 }
 
 // short
-void ImPlot_PlotStemsShort(BBString * label, ImU16 * values, int count, double ref, double xscale, double xstart, ImPlotStemsFlags flags, int offset, int stride) {
+void ImPlot_PlotErrorBarsShort(BBString * label, ImU16 * xs, ImU16 * ys, ImU16 * err, int count) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotStems(v0, values, count, ref, xscale, xstart, flags, offset, stride);
+    ImPlot::PlotErrorBars(v0, xs, ys, err, count);
     bbMemFree((void*)v0);
 }
 
-void ImPlot_PlotStemsXYShort(BBString * label, ImU16 * xs, ImU16 * ys, int count, double ref, ImPlotStemsFlags flags, int offset, int stride) {
+void ImPlot_PlotErrorBarsShort_Spec(BBString * label, ImU16 * xs, ImU16 * ys, ImU16 * err, int count, MaxPlotSpec spec) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotStems(v0, xs, ys, count, ref, flags, offset, stride);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotErrorBars(v0, xs, ys, err, count, cppSpec);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotErrorBarsNPShort(BBString * label, ImU16 * xs, ImU16 * ys, ImU16 * neg, ImU16 * pos, int count) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    ImPlot::PlotErrorBars(v0, xs, ys, neg, pos, count);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotErrorBarsNPShort_Spec(BBString * label, ImU16 * xs, ImU16 * ys, ImU16 * neg, ImU16 * pos, int count, MaxPlotSpec spec) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotErrorBars(v0, xs, ys, neg, pos, count, cppSpec);
     bbMemFree((void*)v0);
 }
 
 // int
-void ImPlot_PlotStemsInt(BBString * label, ImS32 * values, int count, double ref, double xscale, double xstart, ImPlotStemsFlags flags, int offset, int stride) {
+void ImPlot_PlotErrorBarsInt(BBString * label, ImS32 * xs, ImS32 * ys, ImS32 * err, int count) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotStems(v0, values, count, ref, xscale, xstart, flags, offset, stride);
+    ImPlot::PlotErrorBars(v0, xs, ys, err, count);
     bbMemFree((void*)v0);
 }
 
-void ImPlot_PlotStemsXYInt(BBString * label, ImS32 * xs, ImS32 * ys, int count, double ref, ImPlotStemsFlags flags, int offset, int stride) {
+void ImPlot_PlotErrorBarsInt_Spec(BBString * label, ImS32 * xs, ImS32 * ys, ImS32 * err, int count, MaxPlotSpec spec) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotStems(v0, xs, ys, count, ref, flags, offset, stride);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotErrorBars(v0, xs, ys, err, count, cppSpec);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotErrorBarsNPInt(BBString * label, ImS32 * xs, ImS32 * ys, ImS32 * neg, ImS32 * pos, int count) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    ImPlot::PlotErrorBars(v0, xs, ys, neg, pos, count);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotErrorBarsNPInt_Spec(BBString * label, ImS32 * xs, ImS32 * ys, ImS32 * neg, ImS32 * pos, int count, MaxPlotSpec spec) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotErrorBars(v0, xs, ys, neg, pos, count, cppSpec);
     bbMemFree((void*)v0);
 }
 
 // long
-void ImPlot_PlotStemsLong(BBString * label, ImS64 * values, int count, double ref, double xscale, double xstart, ImPlotStemsFlags flags, int offset, int stride) {
+void ImPlot_PlotErrorBarsLong(BBString * label, ImS64 * xs, ImS64 * ys, ImS64 * err, int count) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotStems(v0, values, count, ref, xscale, xstart, flags, offset, stride);
+    ImPlot::PlotErrorBars(v0, xs, ys, err, count);
     bbMemFree((void*)v0);
 }
 
-void ImPlot_PlotStemsXYLong(BBString * label, ImS64 * xs, ImS64 * ys, int count, double ref, ImPlotStemsFlags flags, int offset, int stride) {
+void ImPlot_PlotErrorBarsLong_Spec(BBString * label, ImS64 * xs, ImS64 * ys, ImS64 * err, int count, MaxPlotSpec spec) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotStems(v0, xs, ys, count, ref, flags, offset, stride);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotErrorBars(v0, xs, ys, err, count, cppSpec);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotErrorBarsNPLong(BBString * label, ImS64 * xs, ImS64 * ys, ImS64 * neg, ImS64 * pos, int count) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    ImPlot::PlotErrorBars(v0, xs, ys, neg, pos, count);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotErrorBarsNPLong_Spec(BBString * label, ImS64 * xs, ImS64 * ys, ImS64 * neg, ImS64 * pos, int count, MaxPlotSpec spec) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotErrorBars(v0, xs, ys, neg, pos, count, cppSpec);
     bbMemFree((void*)v0);
 }
 
 // uint
-void ImPlot_PlotStemsUInt(BBString * label, ImU32 * values, int count, double ref, double xscale, double xstart, ImPlotStemsFlags flags, int offset, int stride) {
+void ImPlot_PlotErrorBarsUInt(BBString * label, ImU32 * xs, ImU32 * ys, ImU32 * err, int count) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotStems(v0, values, count, ref, xscale, xstart, flags, offset, stride);
+    ImPlot::PlotErrorBars(v0, xs, ys, err, count);
     bbMemFree((void*)v0);
 }
 
-void ImPlot_PlotStemsXYUInt(BBString * label, ImU32 * xs, ImU32 * ys, int count, double ref, ImPlotStemsFlags flags, int offset, int stride) {
+void ImPlot_PlotErrorBarsUInt_Spec(BBString * label, ImU32 * xs, ImU32 * ys, ImU32 * err, int count, MaxPlotSpec spec) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotStems(v0, xs, ys, count, ref, flags, offset, stride);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotErrorBars(v0, xs, ys, err, count, cppSpec);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotErrorBarsNPUInt(BBString * label, ImU32 * xs, ImU32 * ys, ImU32 * neg, ImU32 * pos, int count) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    ImPlot::PlotErrorBars(v0, xs, ys, neg, pos, count);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotErrorBarsNPUInt_Spec(BBString * label, ImU32 * xs, ImU32 * ys, ImU32 * neg, ImU32 * pos, int count, MaxPlotSpec spec) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotErrorBars(v0, xs, ys, neg, pos, count, cppSpec);
     bbMemFree((void*)v0);
 }
 
 // ulong
-void ImPlot_PlotStemsULong(BBString * label, ImU64 * values, int count, double ref, double xscale, double xstart, ImPlotStemsFlags flags, int offset, int stride) {
+void ImPlot_PlotErrorBarsULong(BBString * label, ImU64 * xs, ImU64 * ys, ImU64 * err, int count) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotStems(v0, values, count, ref, xscale, xstart, flags, offset, stride);
+    ImPlot::PlotErrorBars(v0, xs, ys, err, count);
     bbMemFree((void*)v0);
 }
 
-void ImPlot_PlotStemsXYULong(BBString * label, ImU64 * xs, ImU64 * ys, int count, double ref, ImPlotStemsFlags flags, int offset, int stride) {
+void ImPlot_PlotErrorBarsULong_Spec(BBString * label, ImU64 * xs, ImU64 * ys, ImU64 * err, int count, MaxPlotSpec spec) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotStems(v0, xs, ys, count, ref, flags, offset, stride);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotErrorBars(v0, xs, ys, err, count, cppSpec);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotErrorBarsNPULong(BBString * label, ImU64 * xs, ImU64 * ys, ImU64 * neg, ImU64 * pos, int count) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    ImPlot::PlotErrorBars(v0, xs, ys, neg, pos, count);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotErrorBarsNPULong_Spec(BBString * label, ImU64 * xs, ImU64 * ys, ImU64 * neg, ImU64 * pos, int count, MaxPlotSpec spec) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotErrorBars(v0, xs, ys, neg, pos, count, cppSpec);
     bbMemFree((void*)v0);
 }
 
 ///////////////////////////////////////////////////////////
 
 // float
-void ImPlot_PlotInfLinesFloat(BBString * label, float * values, int count, ImPlotInfLinesFlags flags, int offset, int stride) {
+void ImPlot_PlotStemsFloat(BBString * label, float * values, int count, double ref, double xscale, double xstart) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotInfLines(v0, values, count, flags, offset, stride);
+    ImPlot::PlotStems(v0, values, count, ref, xscale, xstart);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotStemsFloat_Spec(BBString * label, float * values, int count, double ref, double xscale, double xstart, MaxPlotSpec spec) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotStems(v0, values, count, ref, xscale, xstart, cppSpec);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotStemsXYFloat(BBString * label, float * xs, float * ys, int count, double ref) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    ImPlot::PlotStems(v0, xs, ys, count, ref);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotStemsXYFloat_Spec(BBString * label, float * xs, float * ys, int count, double ref, MaxPlotSpec spec) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotStems(v0, xs, ys, count, ref, cppSpec);
     bbMemFree((void*)v0);
 }
 
 // double
-void ImPlot_PlotInfLinesDouble(BBString * label, double * values, int count, ImPlotInfLinesFlags flags, int offset, int stride) {
+void ImPlot_PlotStemsDouble(BBString * label, double * values, int count, double ref, double xscale, double xstart) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotInfLines(v0, values, count, flags, offset, stride);
+    ImPlot::PlotStems(v0, values, count, ref, xscale, xstart);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotStemsDouble_Spec(BBString * label, double * values, int count, double ref, double xscale, double xstart, MaxPlotSpec spec) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotStems(v0, values, count, ref, xscale, xstart, cppSpec);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotStemsXYDouble(BBString * label, double * xs, double * ys, int count, double ref) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    ImPlot::PlotStems(v0, xs, ys, count, ref);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotStemsXYDouble_Spec(BBString * label, double * xs, double * ys, int count, double ref, MaxPlotSpec spec) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotStems(v0, xs, ys, count, ref, cppSpec);
     bbMemFree((void*)v0);
 }
 
 // byte
-void ImPlot_PlotInfLinesByte(BBString * label, ImU8 * values, int count, ImPlotInfLinesFlags flags, int offset, int stride) {
+void ImPlot_PlotStemsByte(BBString * label, ImU8 * values, int count, double ref, double xscale, double xstart) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotInfLines(v0, values, count, flags, offset, stride);
+    ImPlot::PlotStems(v0, values, count, ref, xscale, xstart);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotStemsByte_Spec(BBString * label, ImU8 * values, int count, double ref, double xscale, double xstart, MaxPlotSpec spec) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotStems(v0, values, count, ref, xscale, xstart, cppSpec);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotStemsXYByte(BBString * label, ImU8 * xs, ImU8 * ys, int count, double ref) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    ImPlot::PlotStems(v0, xs, ys, count, ref);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotStemsXYByte_Spec(BBString * label, ImU8 * xs, ImU8 * ys, int count, double ref, MaxPlotSpec spec) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotStems(v0, xs, ys, count, ref, cppSpec);
     bbMemFree((void*)v0);
 }
 
 // short
-void ImPlot_PlotInfLinesShort(BBString * label, ImU16 * values, int count, ImPlotInfLinesFlags flags, int offset, int stride) {
+void ImPlot_PlotStemsShort(BBString * label, ImU16 * values, int count, double ref, double xscale, double xstart) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotInfLines(v0, values, count, flags, offset, stride);
+    ImPlot::PlotStems(v0, values, count, ref, xscale, xstart);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotStemsShort_Spec(BBString * label, ImU16 * values, int count, double ref, double xscale, double xstart, MaxPlotSpec spec) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotStems(v0, values, count, ref, xscale, xstart, cppSpec);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotStemsXYShort(BBString * label, ImU16 * xs, ImU16 * ys, int count, double ref) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    ImPlot::PlotStems(v0, xs, ys, count, ref);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotStemsXYShort_Spec(BBString * label, ImU16 * xs, ImU16 * ys, int count, double ref, MaxPlotSpec spec) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotStems(v0, xs, ys, count, ref, cppSpec);
     bbMemFree((void*)v0);
 }
 
 // int
-void ImPlot_PlotInfLinesInt(BBString * label, ImS32 * values, int count, ImPlotInfLinesFlags flags, int offset, int stride) {
+void ImPlot_PlotStemsInt(BBString * label, ImS32 * values, int count, double ref, double xscale, double xstart) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotInfLines(v0, values, count, flags, offset, stride);
+    ImPlot::PlotStems(v0, values, count, ref, xscale, xstart);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotStemsInt_Spec(BBString * label, ImS32 * values, int count, double ref, double xscale, double xstart, MaxPlotSpec spec) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotStems(v0, values, count, ref, xscale, xstart, cppSpec);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotStemsXYInt(BBString * label, ImS32 * xs, ImS32 * ys, int count, double ref) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    ImPlot::PlotStems(v0, xs, ys, count, ref);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotStemsXYInt_Spec(BBString * label, ImS32 * xs, ImS32 * ys, int count, double ref, MaxPlotSpec spec) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotStems(v0, xs, ys, count, ref, cppSpec);
     bbMemFree((void*)v0);
 }
 
 // long
-void ImPlot_PlotInfLinesLong(BBString * label, ImS64 * values, int count, ImPlotInfLinesFlags flags, int offset, int stride) {
+void ImPlot_PlotStemsLong(BBString * label, ImS64 * values, int count, double ref, double xscale, double xstart) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotInfLines(v0, values, count, flags, offset, stride);
+    ImPlot::PlotStems(v0, values, count, ref, xscale, xstart);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotStemsLong_Spec(BBString * label, ImS64 * values, int count, double ref, double xscale, double xstart, MaxPlotSpec spec) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotStems(v0, values, count, ref, xscale, xstart, cppSpec);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotStemsXYLong(BBString * label, ImS64 * xs, ImS64 * ys, int count, double ref) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    ImPlot::PlotStems(v0, xs, ys, count, ref);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotStemsXYLong_Spec(BBString * label, ImS64 * xs, ImS64 * ys, int count, double ref, MaxPlotSpec spec) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotStems(v0, xs, ys, count, ref, cppSpec);
     bbMemFree((void*)v0);
 }
 
 // uint
-void ImPlot_PlotInfLinesUInt(BBString * label, ImU32 * values, int count, ImPlotInfLinesFlags flags, int offset, int stride) {
+void ImPlot_PlotStemsUInt(BBString * label, ImU32 * values, int count, double ref, double xscale, double xstart) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotInfLines(v0, values, count, flags, offset, stride);
+    ImPlot::PlotStems(v0, values, count, ref, xscale, xstart);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotStemsUInt_Spec(BBString * label, ImU32 * values, int count, double ref, double xscale, double xstart, MaxPlotSpec spec) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotStems(v0, values, count, ref, xscale, xstart, cppSpec);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotStemsXYUInt(BBString * label, ImU32 * xs, ImU32 * ys, int count, double ref) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    ImPlot::PlotStems(v0, xs, ys, count, ref);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotStemsXYUInt_Spec(BBString * label, ImU32 * xs, ImU32 * ys, int count, double ref, MaxPlotSpec spec) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotStems(v0, xs, ys, count, ref, cppSpec);
     bbMemFree((void*)v0);
 }
 
 // ulong
-void ImPlot_PlotInfLinesULong(BBString * label, ImU64 * values, int count, ImPlotInfLinesFlags flags, int offset, int stride) {
+void ImPlot_PlotStemsULong(BBString * label, ImU64 * values, int count, double ref, double xscale, double xstart) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotInfLines(v0, values, count, flags, offset, stride);
+    ImPlot::PlotStems(v0, values, count, ref, xscale, xstart);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotStemsULong_Spec(BBString * label, ImU64 * values, int count, double ref, double xscale, double xstart, MaxPlotSpec spec) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotStems(v0, values, count, ref, xscale, xstart, cppSpec);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotStemsXYULong(BBString * label, ImU64 * xs, ImU64 * ys, int count, double ref) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    ImPlot::PlotStems(v0, xs, ys, count, ref);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotStemsXYULong_Spec(BBString * label, ImU64 * xs, ImU64 * ys, int count, double ref, MaxPlotSpec spec) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotStems(v0, xs, ys, count, ref, cppSpec);
     bbMemFree((void*)v0);
 }
 
 ///////////////////////////////////////////////////////////
 
 // float
-void ImPlot_PlotPieChartFloat(BBArray * label_ids, float * values, int count, double x, double y, double radius, BBString * label_fmt, double angle0, ImPlotPieChartFlags flags) {
+void ImPlot_PlotInfLinesFloat(BBString * label, float * values, int count) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    ImPlot::PlotInfLines(v0, values, count);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotInfLinesFloat_Spec(BBString * label, float * values, int count, MaxPlotSpec spec) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotInfLines(v0, values, count, cppSpec);
+    bbMemFree((void*)v0);
+}
+
+// double
+void ImPlot_PlotInfLinesDouble(BBString * label, double * values, int count) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    ImPlot::PlotInfLines(v0, values, count);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotInfLinesDouble_Spec(BBString * label, double * values, int count, MaxPlotSpec spec) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotInfLines(v0, values, count, cppSpec);
+    bbMemFree((void*)v0);
+}
+
+// byte
+void ImPlot_PlotInfLinesByte(BBString * label, ImU8 * values, int count) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    ImPlot::PlotInfLines(v0, values, count);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotInfLinesByte_Spec(BBString * label, ImU8 * values, int count, MaxPlotSpec spec) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotInfLines(v0, values, count, cppSpec);
+    bbMemFree((void*)v0);
+}
+
+// short
+void ImPlot_PlotInfLinesShort(BBString * label, ImU16 * values, int count) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    ImPlot::PlotInfLines(v0, values, count);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotInfLinesShort_Spec(BBString * label, ImU16 * values, int count, MaxPlotSpec spec) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotInfLines(v0, values, count, cppSpec);
+    bbMemFree((void*)v0);
+}
+
+// int
+void ImPlot_PlotInfLinesInt(BBString * label, ImS32 * values, int count) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    ImPlot::PlotInfLines(v0, values, count);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotInfLinesInt_Spec(BBString * label, ImS32 * values, int count, MaxPlotSpec spec) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotInfLines(v0, values, count, cppSpec);
+    bbMemFree((void*)v0);
+}
+
+// long
+void ImPlot_PlotInfLinesLong(BBString * label, ImS64 * values, int count) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    ImPlot::PlotInfLines(v0, values, count);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotInfLinesLong_Spec(BBString * label, ImS64 * values, int count, MaxPlotSpec spec) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotInfLines(v0, values, count, cppSpec);
+    bbMemFree((void*)v0);
+}
+
+// uint
+void ImPlot_PlotInfLinesUInt(BBString * label, ImU32 * values, int count) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    ImPlot::PlotInfLines(v0, values, count);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotInfLinesUInt_Spec(BBString * label, ImU32 * values, int count, MaxPlotSpec spec) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotInfLines(v0, values, count, cppSpec);
+    bbMemFree((void*)v0);
+}
+
+// ulong
+void ImPlot_PlotInfLinesULong(BBString * label, ImU64 * values, int count) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    ImPlot::PlotInfLines(v0, values, count);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotInfLinesULong_Spec(BBString * label, ImU64 * values, int count, MaxPlotSpec spec) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotInfLines(v0, values, count, cppSpec);
+    bbMemFree((void*)v0);
+}
+
+///////////////////////////////////////////////////////////
+
+// float
+void ImPlot_PlotPieChartFloat(BBArray * label_ids, float * values, int count, double x, double y, double radius, BBString * label_fmt, double angle0) {
     char ** v0 = bmx_bbStringArrayToUTF8StringArray(label_ids);
     const char * v1 = label_fmt == &bbEmptyString ? nullptr : (const char *)bbStringToUTF8String(label_fmt);
-    ImPlot::PlotPieChart(v0, values, count, x, y, radius, v1, angle0, flags);
+    ImPlot::PlotPieChart(v0, values, count, x, y, radius, v1, angle0);
+    for (int i = 0; i < label_ids->scales[0]; i++) {
+        bbMemFree((void*)v0[i]);
+    }
+    bbMemFree((void*)v0);
+    bbMemFree((void*)v1);
+}
+
+void ImPlot_PlotPieChartFloat_Spec(BBArray * label_ids, float * values, int count, double x, double y, double radius, BBString * label_fmt, double angle0, MaxPlotSpec spec) {
+    char ** v0 = bmx_bbStringArrayToUTF8StringArray(label_ids);
+    const char * v1 = label_fmt == &bbEmptyString ? nullptr : (const char *)bbStringToUTF8String(label_fmt);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotPieChart(v0, values, count, x, y, radius, v1, angle0, cppSpec);
     for (int i = 0; i < label_ids->scales[0]; i++) {
         bbMemFree((void*)v0[i]);
     }
@@ -1181,10 +2203,22 @@ void ImPlot_PlotPieChartFloat(BBArray * label_ids, float * values, int count, do
 }
 
 // double
-void ImPlot_PlotPieChartDouble(BBArray * label_ids, double * values, int count, double x, double y, double radius, BBString * label_fmt, double angle0, ImPlotPieChartFlags flags) {
+void ImPlot_PlotPieChartDouble(BBArray * label_ids, double * values, int count, double x, double y, double radius, BBString * label_fmt, double angle0) {
     char ** v0 = bmx_bbStringArrayToUTF8StringArray(label_ids);
     const char * v1 = label_fmt == &bbEmptyString ? nullptr : (const char *)bbStringToUTF8String(label_fmt);
-    ImPlot::PlotPieChart(v0, values, count, x, y, radius, v1, angle0, flags);
+    ImPlot::PlotPieChart(v0, values, count, x, y, radius, v1, angle0);
+    for (int i = 0; i < label_ids->scales[0]; i++) {
+        bbMemFree((void*)v0[i]);
+    }
+    bbMemFree((void*)v0);
+    bbMemFree((void*)v1);
+}
+
+void ImPlot_PlotPieChartDouble_Spec(BBArray * label_ids, double * values, int count, double x, double y, double radius, BBString * label_fmt, double angle0, MaxPlotSpec spec) {
+    char ** v0 = bmx_bbStringArrayToUTF8StringArray(label_ids);
+    const char * v1 = label_fmt == &bbEmptyString ? nullptr : (const char *)bbStringToUTF8String(label_fmt);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotPieChart(v0, values, count, x, y, radius, v1, angle0, cppSpec);
     for (int i = 0; i < label_ids->scales[0]; i++) {
         bbMemFree((void*)v0[i]);
     }
@@ -1193,10 +2227,22 @@ void ImPlot_PlotPieChartDouble(BBArray * label_ids, double * values, int count, 
 }
 
 // byte
-void ImPlot_PlotPieChartByte(BBArray * label_ids, ImU8 * values, int count, double x, double y, double radius, BBString * label_fmt, double angle0, ImPlotPieChartFlags flags) {
+void ImPlot_PlotPieChartByte(BBArray * label_ids, ImU8 * values, int count, double x, double y, double radius, BBString * label_fmt, double angle0) {
     char ** v0 = bmx_bbStringArrayToUTF8StringArray(label_ids);
     const char * v1 = label_fmt == &bbEmptyString ? nullptr : (const char *)bbStringToUTF8String(label_fmt);
-    ImPlot::PlotPieChart(v0, values, count, x, y, radius, v1, angle0, flags);
+    ImPlot::PlotPieChart(v0, values, count, x, y, radius, v1, angle0);
+    for (int i = 0; i < label_ids->scales[0]; i++) {
+        bbMemFree((void*)v0[i]);
+    }
+    bbMemFree((void*)v0);
+    bbMemFree((void*)v1);
+}
+
+void ImPlot_PlotPieChartByte_Spec(BBArray * label_ids, ImU8 * values, int count, double x, double y, double radius, BBString * label_fmt, double angle0, MaxPlotSpec spec) {
+    char ** v0 = bmx_bbStringArrayToUTF8StringArray(label_ids);
+    const char * v1 = label_fmt == &bbEmptyString ? nullptr : (const char *)bbStringToUTF8String(label_fmt);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotPieChart(v0, values, count, x, y, radius, v1, angle0, cppSpec);
     for (int i = 0; i < label_ids->scales[0]; i++) {
         bbMemFree((void*)v0[i]);
     }
@@ -1205,10 +2251,22 @@ void ImPlot_PlotPieChartByte(BBArray * label_ids, ImU8 * values, int count, doub
 }
 
 // short
-void ImPlot_PlotPieChartShort(BBArray * label_ids, ImU16 * values, int count, double x, double y, double radius, BBString * label_fmt, double angle0, ImPlotPieChartFlags flags) {
+void ImPlot_PlotPieChartShort(BBArray * label_ids, ImU16 * values, int count, double x, double y, double radius, BBString * label_fmt, double angle0) {
     char ** v0 = bmx_bbStringArrayToUTF8StringArray(label_ids);
     const char * v1 = label_fmt == &bbEmptyString ? nullptr : (const char *)bbStringToUTF8String(label_fmt);
-    ImPlot::PlotPieChart(v0, values, count, x, y, radius, v1, angle0, flags);
+    ImPlot::PlotPieChart(v0, values, count, x, y, radius, v1, angle0);
+    for (int i = 0; i < label_ids->scales[0]; i++) {
+        bbMemFree((void*)v0[i]);
+    }
+    bbMemFree((void*)v0);
+    bbMemFree((void*)v1);
+}
+
+void ImPlot_PlotPieChartShort_Spec(BBArray * label_ids, ImU16 * values, int count, double x, double y, double radius, BBString * label_fmt, double angle0, MaxPlotSpec spec) {
+    char ** v0 = bmx_bbStringArrayToUTF8StringArray(label_ids);
+    const char * v1 = label_fmt == &bbEmptyString ? nullptr : (const char *)bbStringToUTF8String(label_fmt);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotPieChart(v0, values, count, x, y, radius, v1, angle0, cppSpec);
     for (int i = 0; i < label_ids->scales[0]; i++) {
         bbMemFree((void*)v0[i]);
     }
@@ -1217,10 +2275,22 @@ void ImPlot_PlotPieChartShort(BBArray * label_ids, ImU16 * values, int count, do
 }
 
 // int
-void ImPlot_PlotPieChartInt(BBArray * label_ids, ImS32 * values, int count, double x, double y, double radius, BBString * label_fmt, double angle0, ImPlotPieChartFlags flags) {
+void ImPlot_PlotPieChartInt(BBArray * label_ids, ImS32 * values, int count, double x, double y, double radius, BBString * label_fmt, double angle0) {
     char ** v0 = bmx_bbStringArrayToUTF8StringArray(label_ids);
     const char * v1 = label_fmt == &bbEmptyString ? nullptr : (const char *)bbStringToUTF8String(label_fmt);
-    ImPlot::PlotPieChart(v0, values, count, x, y, radius, v1, angle0, flags);
+    ImPlot::PlotPieChart(v0, values, count, x, y, radius, v1, angle0);
+    for (int i = 0; i < label_ids->scales[0]; i++) {
+        bbMemFree((void*)v0[i]);
+    }
+    bbMemFree((void*)v0);
+    bbMemFree((void*)v1);
+}
+
+void ImPlot_PlotPieChartInt_Spec(BBArray * label_ids, ImS32 * values, int count, double x, double y, double radius, BBString * label_fmt, double angle0, MaxPlotSpec spec) {
+    char ** v0 = bmx_bbStringArrayToUTF8StringArray(label_ids);
+    const char * v1 = label_fmt == &bbEmptyString ? nullptr : (const char *)bbStringToUTF8String(label_fmt);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotPieChart(v0, values, count, x, y, radius, v1, angle0, cppSpec);
     for (int i = 0; i < label_ids->scales[0]; i++) {
         bbMemFree((void*)v0[i]);
     }
@@ -1229,10 +2299,22 @@ void ImPlot_PlotPieChartInt(BBArray * label_ids, ImS32 * values, int count, doub
 }
 
 // long
-void ImPlot_PlotPieChartLong(BBArray * label_ids, ImS64 * values, int count, double x, double y, double radius, BBString * label_fmt, double angle0, ImPlotPieChartFlags flags) {
+void ImPlot_PlotPieChartLong(BBArray * label_ids, ImS64 * values, int count, double x, double y, double radius, BBString * label_fmt, double angle0) {
     char ** v0 = bmx_bbStringArrayToUTF8StringArray(label_ids);
     const char * v1 = label_fmt == &bbEmptyString ? nullptr : (const char *)bbStringToUTF8String(label_fmt);
-    ImPlot::PlotPieChart(v0, values, count, x, y, radius, v1, angle0, flags);
+    ImPlot::PlotPieChart(v0, values, count, x, y, radius, v1, angle0);
+    for (int i = 0; i < label_ids->scales[0]; i++) {
+        bbMemFree((void*)v0[i]);
+    }
+    bbMemFree((void*)v0);
+    bbMemFree((void*)v1);
+}
+
+void ImPlot_PlotPieChartLong_Spec(BBArray * label_ids, ImS64 * values, int count, double x, double y, double radius, BBString * label_fmt, double angle0, MaxPlotSpec spec) {
+    char ** v0 = bmx_bbStringArrayToUTF8StringArray(label_ids);
+    const char * v1 = label_fmt == &bbEmptyString ? nullptr : (const char *)bbStringToUTF8String(label_fmt);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotPieChart(v0, values, count, x, y, radius, v1, angle0, cppSpec);
     for (int i = 0; i < label_ids->scales[0]; i++) {
         bbMemFree((void*)v0[i]);
     }
@@ -1241,10 +2323,22 @@ void ImPlot_PlotPieChartLong(BBArray * label_ids, ImS64 * values, int count, dou
 }
 
 // uint
-void ImPlot_PlotPieChartUInt(BBArray * label_ids, ImU32 * values, int count, double x, double y, double radius, BBString * label_fmt, double angle0, ImPlotPieChartFlags flags) {
+void ImPlot_PlotPieChartUInt(BBArray * label_ids, ImU32 * values, int count, double x, double y, double radius, BBString * label_fmt, double angle0) {
     char ** v0 = bmx_bbStringArrayToUTF8StringArray(label_ids);
     const char * v1 = label_fmt == &bbEmptyString ? nullptr : (const char *)bbStringToUTF8String(label_fmt);
-    ImPlot::PlotPieChart(v0, values, count, x, y, radius, v1, angle0, flags);
+    ImPlot::PlotPieChart(v0, values, count, x, y, radius, v1, angle0);
+    for (int i = 0; i < label_ids->scales[0]; i++) {
+        bbMemFree((void*)v0[i]);
+    }
+    bbMemFree((void*)v0);
+    bbMemFree((void*)v1);
+}
+
+void ImPlot_PlotPieChartUInt_Spec(BBArray * label_ids, ImU32 * values, int count, double x, double y, double radius, BBString * label_fmt, double angle0, MaxPlotSpec spec) {
+    char ** v0 = bmx_bbStringArrayToUTF8StringArray(label_ids);
+    const char * v1 = label_fmt == &bbEmptyString ? nullptr : (const char *)bbStringToUTF8String(label_fmt);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotPieChart(v0, values, count, x, y, radius, v1, angle0, cppSpec);
     for (int i = 0; i < label_ids->scales[0]; i++) {
         bbMemFree((void*)v0[i]);
     }
@@ -1253,10 +2347,22 @@ void ImPlot_PlotPieChartUInt(BBArray * label_ids, ImU32 * values, int count, dou
 }
 
 // ulong
-void ImPlot_PlotPieChartULong(BBArray * label_ids, ImU64 * values, int count, double x, double y, double radius, BBString * label_fmt, double angle0, ImPlotPieChartFlags flags) {
+void ImPlot_PlotPieChartULong(BBArray * label_ids, ImU64 * values, int count, double x, double y, double radius, BBString * label_fmt, double angle0) {
     char ** v0 = bmx_bbStringArrayToUTF8StringArray(label_ids);
     const char * v1 = label_fmt == &bbEmptyString ? nullptr : (const char *)bbStringToUTF8String(label_fmt);
-    ImPlot::PlotPieChart(v0, values, count, x, y, radius, v1, angle0, flags);
+    ImPlot::PlotPieChart(v0, values, count, x, y, radius, v1, angle0);
+    for (int i = 0; i < label_ids->scales[0]; i++) {
+        bbMemFree((void*)v0[i]);
+    }
+    bbMemFree((void*)v0);
+    bbMemFree((void*)v1);
+}
+
+void ImPlot_PlotPieChartULong_Spec(BBArray * label_ids, ImU64 * values, int count, double x, double y, double radius, BBString * label_fmt, double angle0, MaxPlotSpec spec) {
+    char ** v0 = bmx_bbStringArrayToUTF8StringArray(label_ids);
+    const char * v1 = label_fmt == &bbEmptyString ? nullptr : (const char *)bbStringToUTF8String(label_fmt);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotPieChart(v0, values, count, x, y, radius, v1, angle0, cppSpec);
     for (int i = 0; i < label_ids->scales[0]; i++) {
         bbMemFree((void*)v0[i]);
     }
@@ -1267,73 +2373,145 @@ void ImPlot_PlotPieChartULong(BBArray * label_ids, ImU64 * values, int count, do
 ///////////////////////////////////////////////////////////
 
 // float
-void ImPlot_PlotHeatmapFloat(BBString * label, float * values, int rows, int cols, double scale_min, double scale_max, BBString * label_fmt, MaxPlotPoint & bounds_min, MaxPlotPoint & bounds_max, ImPlotHeatmapFlags flags) {
+void ImPlot_PlotHeatmapFloat(BBString * label, float * values, int rows, int cols, double scale_min, double scale_max, BBString * label_fmt, MaxPlotPoint & bounds_min, MaxPlotPoint & bounds_max) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
     const char * v1 = label_fmt == &bbEmptyString ? nullptr : (const char *)bbStringToUTF8String(label_fmt);
-    ImPlot::PlotHeatmap(v0, values, rows, cols, scale_min, scale_max, v1, ConvertToCPP_MaxPlotPoint(bounds_min), ConvertToCPP_MaxPlotPoint(bounds_max), flags);
+    ImPlot::PlotHeatmap(v0, values, rows, cols, scale_min, scale_max, v1, ConvertToCPP_MaxPlotPoint(bounds_min), ConvertToCPP_MaxPlotPoint(bounds_max));
+    bbMemFree((void*)v0);
+    bbMemFree((void*)v1);
+}
+
+void ImPlot_PlotHeatmapFloat_Spec(BBString * label, float * values, int rows, int cols, double scale_min, double scale_max, BBString * label_fmt, MaxPlotPoint & bounds_min, MaxPlotPoint & bounds_max, MaxPlotSpec spec) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    const char * v1 = label_fmt == &bbEmptyString ? nullptr : (const char *)bbStringToUTF8String(label_fmt);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotHeatmap(v0, values, rows, cols, scale_min, scale_max, v1, ConvertToCPP_MaxPlotPoint(bounds_min), ConvertToCPP_MaxPlotPoint(bounds_max), cppSpec);
     bbMemFree((void*)v0);
     bbMemFree((void*)v1);
 }
 
 // double
-void ImPlot_PlotHeatmapDouble(BBString * label, double * values, int rows, int cols, double scale_min, double scale_max, BBString * label_fmt, MaxPlotPoint & bounds_min, MaxPlotPoint & bounds_max, ImPlotHeatmapFlags flags) {
+void ImPlot_PlotHeatmapDouble(BBString * label, double * values, int rows, int cols, double scale_min, double scale_max, BBString * label_fmt, MaxPlotPoint & bounds_min, MaxPlotPoint & bounds_max) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
     const char * v1 = label_fmt == &bbEmptyString ? nullptr : (const char *)bbStringToUTF8String(label_fmt);
-    ImPlot::PlotHeatmap(v0, values, rows, cols, scale_min, scale_max, v1, ConvertToCPP_MaxPlotPoint(bounds_min), ConvertToCPP_MaxPlotPoint(bounds_max), flags);
+    ImPlot::PlotHeatmap(v0, values, rows, cols, scale_min, scale_max, v1, ConvertToCPP_MaxPlotPoint(bounds_min), ConvertToCPP_MaxPlotPoint(bounds_max));
+    bbMemFree((void*)v0);
+    bbMemFree((void*)v1);
+}
+
+void ImPlot_PlotHeatmapDouble_Spec(BBString * label, double * values, int rows, int cols, double scale_min, double scale_max, BBString * label_fmt, MaxPlotPoint & bounds_min, MaxPlotPoint & bounds_max, MaxPlotSpec spec) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    const char * v1 = label_fmt == &bbEmptyString ? nullptr : (const char *)bbStringToUTF8String(label_fmt);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotHeatmap(v0, values, rows, cols, scale_min, scale_max, v1, ConvertToCPP_MaxPlotPoint(bounds_min), ConvertToCPP_MaxPlotPoint(bounds_max), cppSpec);
     bbMemFree((void*)v0);
     bbMemFree((void*)v1);
 }
 
 // byte
-void ImPlot_PlotHeatmapByte(BBString * label, ImU8 * values, int rows, int cols, double scale_min, double scale_max, BBString * label_fmt, MaxPlotPoint & bounds_min, MaxPlotPoint & bounds_max, ImPlotHeatmapFlags flags) {
+void ImPlot_PlotHeatmapByte(BBString * label, ImU8 * values, int rows, int cols, double scale_min, double scale_max, BBString * label_fmt, MaxPlotPoint & bounds_min, MaxPlotPoint & bounds_max) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
     const char * v1 = label_fmt == &bbEmptyString ? nullptr : (const char *)bbStringToUTF8String(label_fmt);
-    ImPlot::PlotHeatmap(v0, values, rows, cols, scale_min, scale_max, v1, ConvertToCPP_MaxPlotPoint(bounds_min), ConvertToCPP_MaxPlotPoint(bounds_max), flags);
+    ImPlot::PlotHeatmap(v0, values, rows, cols, scale_min, scale_max, v1, ConvertToCPP_MaxPlotPoint(bounds_min), ConvertToCPP_MaxPlotPoint(bounds_max));
+    bbMemFree((void*)v0);
+    bbMemFree((void*)v1);
+}
+
+void ImPlot_PlotHeatmapByte_Spec(BBString * label, ImU8 * values, int rows, int cols, double scale_min, double scale_max, BBString * label_fmt, MaxPlotPoint & bounds_min, MaxPlotPoint & bounds_max, MaxPlotSpec spec) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    const char * v1 = label_fmt == &bbEmptyString ? nullptr : (const char *)bbStringToUTF8String(label_fmt);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotHeatmap(v0, values, rows, cols, scale_min, scale_max, v1, ConvertToCPP_MaxPlotPoint(bounds_min), ConvertToCPP_MaxPlotPoint(bounds_max), cppSpec);
     bbMemFree((void*)v0);
     bbMemFree((void*)v1);
 }
 
 // short
-void ImPlot_PlotHeatmapShort(BBString * label, ImU16 * values, int rows, int cols, double scale_min, double scale_max, BBString * label_fmt, MaxPlotPoint & bounds_min, MaxPlotPoint & bounds_max, ImPlotHeatmapFlags flags) {
+void ImPlot_PlotHeatmapShort(BBString * label, ImU16 * values, int rows, int cols, double scale_min, double scale_max, BBString * label_fmt, MaxPlotPoint & bounds_min, MaxPlotPoint & bounds_max) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
     const char * v1 = label_fmt == &bbEmptyString ? nullptr : (const char *)bbStringToUTF8String(label_fmt);
-    ImPlot::PlotHeatmap(v0, values, rows, cols, scale_min, scale_max, v1, ConvertToCPP_MaxPlotPoint(bounds_min), ConvertToCPP_MaxPlotPoint(bounds_max), flags);
+    ImPlot::PlotHeatmap(v0, values, rows, cols, scale_min, scale_max, v1, ConvertToCPP_MaxPlotPoint(bounds_min), ConvertToCPP_MaxPlotPoint(bounds_max));
+    bbMemFree((void*)v0);
+    bbMemFree((void*)v1);
+}
+
+void ImPlot_PlotHeatmapShort_Spec(BBString * label, ImU16 * values, int rows, int cols, double scale_min, double scale_max, BBString * label_fmt, MaxPlotPoint & bounds_min, MaxPlotPoint & bounds_max, MaxPlotSpec spec) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    const char * v1 = label_fmt == &bbEmptyString ? nullptr : (const char *)bbStringToUTF8String(label_fmt);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotHeatmap(v0, values, rows, cols, scale_min, scale_max, v1, ConvertToCPP_MaxPlotPoint(bounds_min), ConvertToCPP_MaxPlotPoint(bounds_max), cppSpec);
     bbMemFree((void*)v0);
     bbMemFree((void*)v1);
 }
 
 // int
-void ImPlot_PlotHeatmapInt(BBString * label, ImS32 * values, int rows, int cols, double scale_min, double scale_max, BBString * label_fmt, MaxPlotPoint & bounds_min, MaxPlotPoint & bounds_max, ImPlotHeatmapFlags flags) {
+void ImPlot_PlotHeatmapInt(BBString * label, ImS32 * values, int rows, int cols, double scale_min, double scale_max, BBString * label_fmt, MaxPlotPoint & bounds_min, MaxPlotPoint & bounds_max) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
     const char * v1 = label_fmt == &bbEmptyString ? nullptr : (const char *)bbStringToUTF8String(label_fmt);
-    ImPlot::PlotHeatmap(v0, values, rows, cols, scale_min, scale_max, v1, ConvertToCPP_MaxPlotPoint(bounds_min), ConvertToCPP_MaxPlotPoint(bounds_max), flags);
+    ImPlot::PlotHeatmap(v0, values, rows, cols, scale_min, scale_max, v1, ConvertToCPP_MaxPlotPoint(bounds_min), ConvertToCPP_MaxPlotPoint(bounds_max));
+    bbMemFree((void*)v0);
+    bbMemFree((void*)v1);
+}
+
+void ImPlot_PlotHeatmapInt_Spec(BBString * label, ImS32 * values, int rows, int cols, double scale_min, double scale_max, BBString * label_fmt, MaxPlotPoint & bounds_min, MaxPlotPoint & bounds_max, MaxPlotSpec spec) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    const char * v1 = label_fmt == &bbEmptyString ? nullptr : (const char *)bbStringToUTF8String(label_fmt);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotHeatmap(v0, values, rows, cols, scale_min, scale_max, v1, ConvertToCPP_MaxPlotPoint(bounds_min), ConvertToCPP_MaxPlotPoint(bounds_max), cppSpec);
     bbMemFree((void*)v0);
     bbMemFree((void*)v1);
 }
 
 // long
-void ImPlot_PlotHeatmapLong(BBString * label, ImS64 * values, int rows, int cols, double scale_min, double scale_max, BBString * label_fmt, MaxPlotPoint & bounds_min, MaxPlotPoint & bounds_max, ImPlotHeatmapFlags flags) {
+void ImPlot_PlotHeatmapLong(BBString * label, ImS64 * values, int rows, int cols, double scale_min, double scale_max, BBString * label_fmt, MaxPlotPoint & bounds_min, MaxPlotPoint & bounds_max) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
     const char * v1 = label_fmt == &bbEmptyString ? nullptr : (const char *)bbStringToUTF8String(label_fmt);
-    ImPlot::PlotHeatmap(v0, values, rows, cols, scale_min, scale_max, v1, ConvertToCPP_MaxPlotPoint(bounds_min), ConvertToCPP_MaxPlotPoint(bounds_max), flags);
+    ImPlot::PlotHeatmap(v0, values, rows, cols, scale_min, scale_max, v1, ConvertToCPP_MaxPlotPoint(bounds_min), ConvertToCPP_MaxPlotPoint(bounds_max));
+    bbMemFree((void*)v0);
+    bbMemFree((void*)v1);
+}
+
+void ImPlot_PlotHeatmapLong_Spec(BBString * label, ImS64 * values, int rows, int cols, double scale_min, double scale_max, BBString * label_fmt, MaxPlotPoint & bounds_min, MaxPlotPoint & bounds_max, MaxPlotSpec spec) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    const char * v1 = label_fmt == &bbEmptyString ? nullptr : (const char *)bbStringToUTF8String(label_fmt);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotHeatmap(v0, values, rows, cols, scale_min, scale_max, v1, ConvertToCPP_MaxPlotPoint(bounds_min), ConvertToCPP_MaxPlotPoint(bounds_max), cppSpec);
     bbMemFree((void*)v0);
     bbMemFree((void*)v1);
 }
 
 // uint
-void ImPlot_PlotHeatmapUInt(BBString * label, ImU32 * values, int rows, int cols, double scale_min, double scale_max, BBString * label_fmt, MaxPlotPoint & bounds_min, MaxPlotPoint & bounds_max, ImPlotHeatmapFlags flags) {
+void ImPlot_PlotHeatmapUInt(BBString * label, ImU32 * values, int rows, int cols, double scale_min, double scale_max, BBString * label_fmt, MaxPlotPoint & bounds_min, MaxPlotPoint & bounds_max) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
     const char * v1 = label_fmt == &bbEmptyString ? nullptr : (const char *)bbStringToUTF8String(label_fmt);
-    ImPlot::PlotHeatmap(v0, values, rows, cols, scale_min, scale_max, v1, ConvertToCPP_MaxPlotPoint(bounds_min), ConvertToCPP_MaxPlotPoint(bounds_max), flags);
+    ImPlot::PlotHeatmap(v0, values, rows, cols, scale_min, scale_max, v1, ConvertToCPP_MaxPlotPoint(bounds_min), ConvertToCPP_MaxPlotPoint(bounds_max));
+    bbMemFree((void*)v0);
+    bbMemFree((void*)v1);
+}
+
+void ImPlot_PlotHeatmapUInt_Spec(BBString * label, ImU32 * values, int rows, int cols, double scale_min, double scale_max, BBString * label_fmt, MaxPlotPoint & bounds_min, MaxPlotPoint & bounds_max, MaxPlotSpec spec) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    const char * v1 = label_fmt == &bbEmptyString ? nullptr : (const char *)bbStringToUTF8String(label_fmt);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotHeatmap(v0, values, rows, cols, scale_min, scale_max, v1, ConvertToCPP_MaxPlotPoint(bounds_min), ConvertToCPP_MaxPlotPoint(bounds_max), cppSpec);
     bbMemFree((void*)v0);
     bbMemFree((void*)v1);
 }
 
 // ulong
-void ImPlot_PlotHeatmapULong(BBString * label, ImU64 * values, int rows, int cols, double scale_min, double scale_max, BBString * label_fmt, MaxPlotPoint & bounds_min, MaxPlotPoint & bounds_max, ImPlotHeatmapFlags flags) {
+void ImPlot_PlotHeatmapULong(BBString * label, ImU64 * values, int rows, int cols, double scale_min, double scale_max, BBString * label_fmt, MaxPlotPoint & bounds_min, MaxPlotPoint & bounds_max) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
     const char * v1 = label_fmt == &bbEmptyString ? nullptr : (const char *)bbStringToUTF8String(label_fmt);
-    ImPlot::PlotHeatmap(v0, values, rows, cols, scale_min, scale_max, v1, ConvertToCPP_MaxPlotPoint(bounds_min), ConvertToCPP_MaxPlotPoint(bounds_max), flags);
+    ImPlot::PlotHeatmap(v0, values, rows, cols, scale_min, scale_max, v1, ConvertToCPP_MaxPlotPoint(bounds_min), ConvertToCPP_MaxPlotPoint(bounds_max));
+    bbMemFree((void*)v0);
+    bbMemFree((void*)v1);
+}
+
+void ImPlot_PlotHeatmapULong_Spec(BBString * label, ImU64 * values, int rows, int cols, double scale_min, double scale_max, BBString * label_fmt, MaxPlotPoint & bounds_min, MaxPlotPoint & bounds_max, MaxPlotSpec spec) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    const char * v1 = label_fmt == &bbEmptyString ? nullptr : (const char *)bbStringToUTF8String(label_fmt);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotHeatmap(v0, values, rows, cols, scale_min, scale_max, v1, ConvertToCPP_MaxPlotPoint(bounds_min), ConvertToCPP_MaxPlotPoint(bounds_max), cppSpec);
     bbMemFree((void*)v0);
     bbMemFree((void*)v1);
 }
@@ -1341,65 +2519,129 @@ void ImPlot_PlotHeatmapULong(BBString * label, ImU64 * values, int rows, int col
 ///////////////////////////////////////////////////////////
 
 // float
-double ImPlot_PlotHistogramFloat(BBString * label, float * values, int count, int bins, double bar_scale, MaxPlotRange range, ImPlotHistogramFlags flags) {
+double ImPlot_PlotHistogramFloat(BBString * label, float * values, int count, int bins, double bar_scale, MaxPlotRange range) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    double result = ImPlot::PlotHistogram(v0, values, count, bins, bar_scale, ConvertToCPP_MaxPlotRange(range), flags);
+    double result = ImPlot::PlotHistogram(v0, values, count, bins, bar_scale, ConvertToCPP_MaxPlotRange(range));
+    bbMemFree((void*)v0);
+    return result;
+}
+
+double ImPlot_PlotHistogramFloat_Spec(BBString * label, float * values, int count, int bins, double bar_scale, MaxPlotRange range, MaxPlotSpec spec) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    double result = ImPlot::PlotHistogram(v0, values, count, bins, bar_scale, ConvertToCPP_MaxPlotRange(range), cppSpec);
     bbMemFree((void*)v0);
     return result;
 }
 
 // double
-double ImPlot_PlotHistogramDouble(BBString * label, double * values, int count, int bins, double bar_scale, MaxPlotRange range, ImPlotHistogramFlags flags) {
+double ImPlot_PlotHistogramDouble(BBString * label, double * values, int count, int bins, double bar_scale, MaxPlotRange range) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    double result = ImPlot::PlotHistogram(v0, values, count, bins, bar_scale, ConvertToCPP_MaxPlotRange(range), flags);
+    double result = ImPlot::PlotHistogram(v0, values, count, bins, bar_scale, ConvertToCPP_MaxPlotRange(range));
+    bbMemFree((void*)v0);
+    return result;
+}
+
+double ImPlot_PlotHistogramDouble_Spec(BBString * label, double * values, int count, int bins, double bar_scale, MaxPlotRange range, MaxPlotSpec spec) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    double result = ImPlot::PlotHistogram(v0, values, count, bins, bar_scale, ConvertToCPP_MaxPlotRange(range), cppSpec);
     bbMemFree((void*)v0);
     return result;
 }
 
 // byte
-double ImPlot_PlotHistogramByte(BBString * label, ImU8 * values, int count, int bins, double bar_scale, MaxPlotRange range, ImPlotHistogramFlags flags) {
+double ImPlot_PlotHistogramByte(BBString * label, ImU8 * values, int count, int bins, double bar_scale, MaxPlotRange range) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    double result = ImPlot::PlotHistogram(v0, values, count, bins, bar_scale, ConvertToCPP_MaxPlotRange(range), flags);
+    double result = ImPlot::PlotHistogram(v0, values, count, bins, bar_scale, ConvertToCPP_MaxPlotRange(range));
+    bbMemFree((void*)v0);
+    return result;
+}
+
+double ImPlot_PlotHistogramByte_Spec(BBString * label, ImU8 * values, int count, int bins, double bar_scale, MaxPlotRange range, MaxPlotSpec spec) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    double result = ImPlot::PlotHistogram(v0, values, count, bins, bar_scale, ConvertToCPP_MaxPlotRange(range), cppSpec);
     bbMemFree((void*)v0);
     return result;
 }
 
 // short
-double ImPlot_PlotHistogramShort(BBString * label, ImU16 * values, int count, int bins, double bar_scale, MaxPlotRange range, ImPlotHistogramFlags flags) {
+double ImPlot_PlotHistogramShort(BBString * label, ImU16 * values, int count, int bins, double bar_scale, MaxPlotRange range) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    double result = ImPlot::PlotHistogram(v0, values, count, bins, bar_scale, ConvertToCPP_MaxPlotRange(range), flags);
+    double result = ImPlot::PlotHistogram(v0, values, count, bins, bar_scale, ConvertToCPP_MaxPlotRange(range));
+    bbMemFree((void*)v0);
+    return result;
+}
+
+double ImPlot_PlotHistogramShort_Spec(BBString * label, ImU16 * values, int count, int bins, double bar_scale, MaxPlotRange range, MaxPlotSpec spec) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    double result = ImPlot::PlotHistogram(v0, values, count, bins, bar_scale, ConvertToCPP_MaxPlotRange(range), cppSpec);
     bbMemFree((void*)v0);
     return result;
 }
 
 // int
-double ImPlot_PlotHistogramInt(BBString * label, ImS32 * values, int count, int bins, double bar_scale, MaxPlotRange range, ImPlotHistogramFlags flags) {
+double ImPlot_PlotHistogramInt(BBString * label, ImS32 * values, int count, int bins, double bar_scale, MaxPlotRange range) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    double result = ImPlot::PlotHistogram(v0, values, count, bins, bar_scale, ConvertToCPP_MaxPlotRange(range), flags);
+    double result = ImPlot::PlotHistogram(v0, values, count, bins, bar_scale, ConvertToCPP_MaxPlotRange(range));
+    bbMemFree((void*)v0);
+    return result;
+}
+
+double ImPlot_PlotHistogramInt_Spec(BBString * label, ImS32 * values, int count, int bins, double bar_scale, MaxPlotRange range, MaxPlotSpec spec) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    double result = ImPlot::PlotHistogram(v0, values, count, bins, bar_scale, ConvertToCPP_MaxPlotRange(range), cppSpec);
     bbMemFree((void*)v0);
     return result;
 }
 
 // long
-double ImPlot_PlotHistogramLong(BBString * label, ImS64 * values, int count, int bins, double bar_scale, MaxPlotRange range, ImPlotHistogramFlags flags) {
+double ImPlot_PlotHistogramLong(BBString * label, ImS64 * values, int count, int bins, double bar_scale, MaxPlotRange range) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    double result = ImPlot::PlotHistogram(v0, values, count, bins, bar_scale, ConvertToCPP_MaxPlotRange(range), flags);
+    double result = ImPlot::PlotHistogram(v0, values, count, bins, bar_scale, ConvertToCPP_MaxPlotRange(range));
+    bbMemFree((void*)v0);
+    return result;
+}
+
+double ImPlot_PlotHistogramLong_Spec(BBString * label, ImS64 * values, int count, int bins, double bar_scale, MaxPlotRange range, MaxPlotSpec spec) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    double result = ImPlot::PlotHistogram(v0, values, count, bins, bar_scale, ConvertToCPP_MaxPlotRange(range), cppSpec);
     bbMemFree((void*)v0);
     return result;
 }
 
 // uint
-double ImPlot_PlotHistogramUInt(BBString * label, ImU32 * values, int count, int bins, double bar_scale, MaxPlotRange range, ImPlotHistogramFlags flags) {
+double ImPlot_PlotHistogramUInt(BBString * label, ImU32 * values, int count, int bins, double bar_scale, MaxPlotRange range) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    double result = ImPlot::PlotHistogram(v0, values, count, bins, bar_scale, ConvertToCPP_MaxPlotRange(range), flags);
+    double result = ImPlot::PlotHistogram(v0, values, count, bins, bar_scale, ConvertToCPP_MaxPlotRange(range));
+    bbMemFree((void*)v0);
+    return result;
+}
+
+double ImPlot_PlotHistogramUInt_Spec(BBString * label, ImU32 * values, int count, int bins, double bar_scale, MaxPlotRange range, MaxPlotSpec spec) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    double result = ImPlot::PlotHistogram(v0, values, count, bins, bar_scale, ConvertToCPP_MaxPlotRange(range), cppSpec);
     bbMemFree((void*)v0);
     return result;
 }
 
 // ulong
-double ImPlot_PlotHistogramULong(BBString * label, ImU64 * values, int count, int bins, double bar_scale, MaxPlotRange range, ImPlotHistogramFlags flags) {
+double ImPlot_PlotHistogramULong(BBString * label, ImU64 * values, int count, int bins, double bar_scale, MaxPlotRange range) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    double result = ImPlot::PlotHistogram(v0, values, count, bins, bar_scale, ConvertToCPP_MaxPlotRange(range), flags);
+    double result = ImPlot::PlotHistogram(v0, values, count, bins, bar_scale, ConvertToCPP_MaxPlotRange(range));
+    bbMemFree((void*)v0);
+    return result;
+}
+
+double ImPlot_PlotHistogramULong_Spec(BBString * label, ImU64 * values, int count, int bins, double bar_scale, MaxPlotRange range, MaxPlotSpec spec) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    double result = ImPlot::PlotHistogram(v0, values, count, bins, bar_scale, ConvertToCPP_MaxPlotRange(range), cppSpec);
     bbMemFree((void*)v0);
     return result;
 }
@@ -1407,65 +2649,129 @@ double ImPlot_PlotHistogramULong(BBString * label, ImU64 * values, int count, in
 ///////////////////////////////////////////////////////////
 
 // float
-double ImPlot_PlotHistogram2DFloat(BBString * label, float * xs, float * ys, int count, int x_bins, int y_bins, MaxPlotRect range, ImPlotHistogramFlags flags) {
+double ImPlot_PlotHistogram2DFloat(BBString * label, float * xs, float * ys, int count, int x_bins, int y_bins, MaxPlotRect range) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    double result = ImPlot::PlotHistogram2D(v0, xs, ys, count, x_bins, y_bins, ConvertToCPP_MaxPlotRect(range), flags);
+    double result = ImPlot::PlotHistogram2D(v0, xs, ys, count, x_bins, y_bins, ConvertToCPP_MaxPlotRect(range));
+    bbMemFree((void*)v0);
+    return result;
+}
+
+double ImPlot_PlotHistogram2DFloat_Spec(BBString * label, float * xs, float * ys, int count, int x_bins, int y_bins, MaxPlotRect range, MaxPlotSpec spec) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    double result = ImPlot::PlotHistogram2D(v0, xs, ys, count, x_bins, y_bins, ConvertToCPP_MaxPlotRect(range), cppSpec);
     bbMemFree((void*)v0);
     return result;
 }
 
 // double
-double ImPlot_PlotHistogram2DDouble(BBString * label, double * xs, double * ys, int count, int x_bins, int y_bins, MaxPlotRect range, ImPlotHistogramFlags flags) {
+double ImPlot_PlotHistogram2DDouble(BBString * label, double * xs, double * ys, int count, int x_bins, int y_bins, MaxPlotRect range) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    double result = ImPlot::PlotHistogram2D(v0, xs, ys, count, x_bins, y_bins, ConvertToCPP_MaxPlotRect(range), flags);
+    double result = ImPlot::PlotHistogram2D(v0, xs, ys, count, x_bins, y_bins, ConvertToCPP_MaxPlotRect(range));
+    bbMemFree((void*)v0);
+    return result;
+}
+
+double ImPlot_PlotHistogram2DDouble_Spec(BBString * label, double * xs, double * ys, int count, int x_bins, int y_bins, MaxPlotRect range, MaxPlotSpec spec) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    double result = ImPlot::PlotHistogram2D(v0, xs, ys, count, x_bins, y_bins, ConvertToCPP_MaxPlotRect(range), cppSpec);
     bbMemFree((void*)v0);
     return result;
 }
 
 // byte
-double ImPlot_PlotHistogram2DByte(BBString * label, ImU8 * xs, ImU8 * ys, int count, int x_bins, int y_bins, MaxPlotRect range, ImPlotHistogramFlags flags) {
+double ImPlot_PlotHistogram2DByte(BBString * label, ImU8 * xs, ImU8 * ys, int count, int x_bins, int y_bins, MaxPlotRect range) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    double result = ImPlot::PlotHistogram2D(v0, xs, ys, count, x_bins, y_bins, ConvertToCPP_MaxPlotRect(range), flags);
+    double result = ImPlot::PlotHistogram2D(v0, xs, ys, count, x_bins, y_bins, ConvertToCPP_MaxPlotRect(range));
+    bbMemFree((void*)v0);
+    return result;
+}
+
+double ImPlot_PlotHistogram2DByte_Spec(BBString * label, ImU8 * xs, ImU8 * ys, int count, int x_bins, int y_bins, MaxPlotRect range, MaxPlotSpec spec) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    double result = ImPlot::PlotHistogram2D(v0, xs, ys, count, x_bins, y_bins, ConvertToCPP_MaxPlotRect(range), cppSpec);
     bbMemFree((void*)v0);
     return result;
 }
 
 // short
-double ImPlot_PlotHistogram2DShort(BBString * label, ImU16 * xs, ImU16 * ys, int count, int x_bins, int y_bins, MaxPlotRect range, ImPlotHistogramFlags flags) {
+double ImPlot_PlotHistogram2DShort(BBString * label, ImU16 * xs, ImU16 * ys, int count, int x_bins, int y_bins, MaxPlotRect range) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    double result = ImPlot::PlotHistogram2D(v0, xs, ys, count, x_bins, y_bins, ConvertToCPP_MaxPlotRect(range), flags);
+    double result = ImPlot::PlotHistogram2D(v0, xs, ys, count, x_bins, y_bins, ConvertToCPP_MaxPlotRect(range));
+    bbMemFree((void*)v0);
+    return result;
+}
+
+double ImPlot_PlotHistogram2DShort_Spec(BBString * label, ImU16 * xs, ImU16 * ys, int count, int x_bins, int y_bins, MaxPlotRect range, MaxPlotSpec spec) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    double result = ImPlot::PlotHistogram2D(v0, xs, ys, count, x_bins, y_bins, ConvertToCPP_MaxPlotRect(range), cppSpec);
     bbMemFree((void*)v0);
     return result;
 }
 
 // int
-double ImPlot_PlotHistogram2DInt(BBString * label, ImS32 * xs, ImS32 * ys, int count, int x_bins, int y_bins, MaxPlotRect range, ImPlotHistogramFlags flags) {
+double ImPlot_PlotHistogram2DInt(BBString * label, ImS32 * xs, ImS32 * ys, int count, int x_bins, int y_bins, MaxPlotRect range) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    double result = ImPlot::PlotHistogram2D(v0, xs, ys, count, x_bins, y_bins, ConvertToCPP_MaxPlotRect(range), flags);
+    double result = ImPlot::PlotHistogram2D(v0, xs, ys, count, x_bins, y_bins, ConvertToCPP_MaxPlotRect(range));
+    bbMemFree((void*)v0);
+    return result;
+}
+
+double ImPlot_PlotHistogram2DInt_Spec(BBString * label, ImS32 * xs, ImS32 * ys, int count, int x_bins, int y_bins, MaxPlotRect range, MaxPlotSpec spec) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    double result = ImPlot::PlotHistogram2D(v0, xs, ys, count, x_bins, y_bins, ConvertToCPP_MaxPlotRect(range), cppSpec);
     bbMemFree((void*)v0);
     return result;
 }
 
 // long
-double ImPlot_PlotHistogram2DLong(BBString * label, ImS64 * xs, ImS64 * ys, int count, int x_bins, int y_bins, MaxPlotRect range, ImPlotHistogramFlags flags) {
+double ImPlot_PlotHistogram2DLong(BBString * label, ImS64 * xs, ImS64 * ys, int count, int x_bins, int y_bins, MaxPlotRect range) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    double result = ImPlot::PlotHistogram2D(v0, xs, ys, count, x_bins, y_bins, ConvertToCPP_MaxPlotRect(range), flags);
+    double result = ImPlot::PlotHistogram2D(v0, xs, ys, count, x_bins, y_bins, ConvertToCPP_MaxPlotRect(range));
+    bbMemFree((void*)v0);
+    return result;
+}
+
+double ImPlot_PlotHistogram2DLong_Spec(BBString * label, ImS64 * xs, ImS64 * ys, int count, int x_bins, int y_bins, MaxPlotRect range, MaxPlotSpec spec) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    double result = ImPlot::PlotHistogram2D(v0, xs, ys, count, x_bins, y_bins, ConvertToCPP_MaxPlotRect(range), cppSpec);
     bbMemFree((void*)v0);
     return result;
 }
 
 // uint
-double ImPlot_PlotHistogram2DUInt(BBString * label, ImU32 * xs, ImU32 * ys, int count, int x_bins, int y_bins, MaxPlotRect range, ImPlotHistogramFlags flags) {
+double ImPlot_PlotHistogram2DUInt(BBString * label, ImU32 * xs, ImU32 * ys, int count, int x_bins, int y_bins, MaxPlotRect range) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    double result = ImPlot::PlotHistogram2D(v0, xs, ys, count, x_bins, y_bins, ConvertToCPP_MaxPlotRect(range), flags);
+    double result = ImPlot::PlotHistogram2D(v0, xs, ys, count, x_bins, y_bins, ConvertToCPP_MaxPlotRect(range));
+    bbMemFree((void*)v0);
+    return result;
+}
+
+double ImPlot_PlotHistogram2DUInt_Spec(BBString * label, ImU32 * xs, ImU32 * ys, int count, int x_bins, int y_bins, MaxPlotRect range, MaxPlotSpec spec) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    double result = ImPlot::PlotHistogram2D(v0, xs, ys, count, x_bins, y_bins, ConvertToCPP_MaxPlotRect(range), cppSpec);
     bbMemFree((void*)v0);
     return result;
 }
 
 // ulong
-double ImPlot_PlotHistogram2DULong(BBString * label, ImU64 * xs, ImU64 * ys, int count, int x_bins, int y_bins, MaxPlotRect range, ImPlotHistogramFlags flags) {
+double ImPlot_PlotHistogram2DULong(BBString * label, ImU64 * xs, ImU64 * ys, int count, int x_bins, int y_bins, MaxPlotRect range) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    double result = ImPlot::PlotHistogram2D(v0, xs, ys, count, x_bins, y_bins, ConvertToCPP_MaxPlotRect(range), flags);
+    double result = ImPlot::PlotHistogram2D(v0, xs, ys, count, x_bins, y_bins, ConvertToCPP_MaxPlotRect(range));
+    bbMemFree((void*)v0);
+    return result;
+}
+
+double ImPlot_PlotHistogram2DULong_Spec(BBString * label, ImU64 * xs, ImU64 * ys, int count, int x_bins, int y_bins, MaxPlotRect range, MaxPlotSpec spec) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    double result = ImPlot::PlotHistogram2D(v0, xs, ys, count, x_bins, y_bins, ConvertToCPP_MaxPlotRect(range), cppSpec);
     bbMemFree((void*)v0);
     return result;
 }
@@ -1473,72 +2779,142 @@ double ImPlot_PlotHistogram2DULong(BBString * label, ImU64 * xs, ImU64 * ys, int
 ///////////////////////////////////////////////////////////
 
 // float
-void ImPlot_PlotDigitalFloat(BBString * label, float * xs, float * ys, int count, ImPlotDigitalFlags flags, int offset, int stride) {
+void ImPlot_PlotDigitalFloat(BBString * label, float * xs, float * ys, int count) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotDigital(v0, xs, ys, count, flags, offset, stride);
+    ImPlot::PlotDigital(v0, xs, ys, count);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotDigitalFloat_Spec(BBString * label, float * xs, float * ys, int count, MaxPlotSpec spec) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotDigital(v0, xs, ys, count, cppSpec);
     bbMemFree((void*)v0);
 }
 
 // double
-void ImPlot_PlotDigitalDouble(BBString * label, double * xs, double * ys, int count, ImPlotDigitalFlags flags, int offset, int stride) {
+void ImPlot_PlotDigitalDouble(BBString * label, double * xs, double * ys, int count) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotDigital(v0, xs, ys, count, flags, offset, stride);
+    ImPlot::PlotDigital(v0, xs, ys, count);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotDigitalDouble_Spec(BBString * label, double * xs, double * ys, int count, MaxPlotSpec spec) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotDigital(v0, xs, ys, count, cppSpec);
     bbMemFree((void*)v0);
 }
 
 // byte
-void ImPlot_PlotDigitalByte(BBString * label, ImU8 * xs, ImU8 * ys, int count, ImPlotDigitalFlags flags, int offset, int stride) {
+void ImPlot_PlotDigitalByte(BBString * label, ImU8 * xs, ImU8 * ys, int count) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotDigital(v0, xs, ys, count, flags, offset, stride);
+    ImPlot::PlotDigital(v0, xs, ys, count);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotDigitalByte_Spec(BBString * label, ImU8 * xs, ImU8 * ys, int count, MaxPlotSpec spec) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotDigital(v0, xs, ys, count, cppSpec);
     bbMemFree((void*)v0);
 }
 
 // short
-void ImPlot_PlotDigitalShort(BBString * label, ImU16 * xs, ImU16 * ys, int count, ImPlotDigitalFlags flags, int offset, int stride) {
+void ImPlot_PlotDigitalShort(BBString * label, ImU16 * xs, ImU16 * ys, int count) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotDigital(v0, xs, ys, count, flags, offset, stride);
+    ImPlot::PlotDigital(v0, xs, ys, count);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotDigitalShort_Spec(BBString * label, ImU16 * xs, ImU16 * ys, int count, MaxPlotSpec spec) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotDigital(v0, xs, ys, count, cppSpec);
     bbMemFree((void*)v0);
 }
 
 // int
-void ImPlot_PlotDigitalInt(BBString * label, ImS32 * xs, ImS32 * ys, int count, ImPlotDigitalFlags flags, int offset, int stride) {
+void ImPlot_PlotDigitalInt(BBString * label, ImS32 * xs, ImS32 * ys, int count) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotDigital(v0, xs, ys, count, flags, offset, stride);
+    ImPlot::PlotDigital(v0, xs, ys, count);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotDigitalInt_Spec(BBString * label, ImS32 * xs, ImS32 * ys, int count, MaxPlotSpec spec) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotDigital(v0, xs, ys, count, cppSpec);
     bbMemFree((void*)v0);
 }
 
 // long
-void ImPlot_PlotDigitalLong(BBString * label, ImS64 * xs, ImS64 * ys, int count, ImPlotDigitalFlags flags, int offset, int stride) {
+void ImPlot_PlotDigitalLong(BBString * label, ImS64 * xs, ImS64 * ys, int count) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotDigital(v0, xs, ys, count, flags, offset, stride);
+    ImPlot::PlotDigital(v0, xs, ys, count);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotDigitalLong_Spec(BBString * label, ImS64 * xs, ImS64 * ys, int count, MaxPlotSpec spec) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotDigital(v0, xs, ys, count, cppSpec);
     bbMemFree((void*)v0);
 }
 
 // uint
-void ImPlot_PlotDigitalUInt(BBString * label, ImU32 * xs, ImU32 * ys, int count, ImPlotDigitalFlags flags, int offset, int stride) {
+void ImPlot_PlotDigitalUInt(BBString * label, ImU32 * xs, ImU32 * ys, int count) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotDigital(v0, xs, ys, count, flags, offset, stride);
+    ImPlot::PlotDigital(v0, xs, ys, count);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotDigitalUInt_Spec(BBString * label, ImU32 * xs, ImU32 * ys, int count, MaxPlotSpec spec) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotDigital(v0, xs, ys, count, cppSpec);
     bbMemFree((void*)v0);
 }
 
 // ulong
-void ImPlot_PlotDigitalULong(BBString * label, ImU64 * xs, ImU64 * ys, int count, ImPlotDigitalFlags flags, int offset, int stride) {
+void ImPlot_PlotDigitalULong(BBString * label, ImU64 * xs, ImU64 * ys, int count) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotDigital(v0, xs, ys, count, flags, offset, stride);
+    ImPlot::PlotDigital(v0, xs, ys, count);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotDigitalULong_Spec(BBString * label, ImU64 * xs, ImU64 * ys, int count, MaxPlotSpec spec) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotDigital(v0, xs, ys, count, cppSpec);
     bbMemFree((void*)v0);
 }
 
 ///////////////////////////////////////////////////////////
 
-void ImPlot_PlotText(BBString * text, double x, double y, MaxVec2 pix_offset, ImPlotTextFlags flags) {
+void ImPlot_PlotText(BBString * text, double x, double y, MaxVec2 pix_offset) {
     const char * v0 = (const char *)bbStringToUTF8String(text);
-    ImPlot::PlotText(v0, x, y, ConvertToCPP_MaxVec2(pix_offset), flags);
+    ImPlot::PlotText(v0, x, y, ConvertToCPP_MaxVec2(pix_offset));
     bbMemFree((void*)v0);
 }
 
-void ImPlot_PlotDummy(BBString * label, ImPlotDummyFlags flags) {
+void ImPlot_PlotText_Spec(BBString * text, double x, double y, MaxVec2 pix_offset, MaxPlotSpec spec) {
+    const char * v0 = (const char *)bbStringToUTF8String(text);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotText(v0, x, y, ConvertToCPP_MaxVec2(pix_offset), cppSpec);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotDummy(BBString * label) {
     const char * v0 = (const char *)bbStringToUTF8String(label);
-    ImPlot::PlotDummy(v0, flags);
+    ImPlot::PlotDummy(v0);
+    bbMemFree((void*)v0);
+}
+
+void ImPlot_PlotDummy_Spec(BBString * label, MaxPlotSpec spec) {
+    const char * v0 = (const char *)bbStringToUTF8String(label);
+    const ::ImPlotSpec cppSpec = ConvertToCPP_MaxPlotSpec(spec);
+    ImPlot::PlotDummy(v0, cppSpec);
     bbMemFree((void*)v0);
 }
 
@@ -1760,78 +3136,6 @@ ImPlotStyle * bmx_implot_style_create() {
 
 void bmx_implot_style_delete(ImPlotStyle * style) {
     delete style;
-}
-
-float bmx_implot_style_get_line_weight(ImPlotStyle * style) {
-    return style->LineWeight;
-}
-
-void bmx_implot_style_set_line_weight(ImPlotStyle * style, float line_weight) {
-    style->LineWeight = line_weight;
-}
-
-int bmx_implot_style_get_marker(ImPlotStyle * style) {
-    return style->Marker;
-}
-
-void bmx_implot_style_set_marker(ImPlotStyle * style, int marker) {
-    style->Marker = marker;
-}
-
-float bmx_implot_style_get_marker_size(ImPlotStyle * style) {
-    return style->MarkerSize;
-}
-
-void bmx_implot_style_set_marker_size(ImPlotStyle * style, float marker_size) {
-    style->MarkerSize = marker_size;
-}
-
-float bmx_implot_style_get_marker_weight(ImPlotStyle * style) {
-    return style->MarkerWeight;
-}
-
-void bmx_implot_style_set_marker_weight(ImPlotStyle * style, float marker_weight) {
-    style->MarkerWeight = marker_weight;
-}
-
-float bmx_implot_style_get_fill_alpha(ImPlotStyle * style) {
-    return style->FillAlpha;
-}
-
-void bmx_implot_style_set_fill_alpha(ImPlotStyle * style, float fill_alpha) {
-    style->FillAlpha = fill_alpha;
-}
-
-float bmx_implot_style_get_error_bar_size(ImPlotStyle * style) {
-    return style->ErrorBarSize;
-}
-
-void bmx_implot_style_set_error_bar_size(ImPlotStyle * style, float error_bar_size) {
-    style->ErrorBarSize = error_bar_size;
-}
-
-void bmx_implot_style_set_error_bar_weight(ImPlotStyle * style, float error_bar_weight) {
-    style->ErrorBarWeight = error_bar_weight;
-}
-
-float bmx_implot_style_get_error_bar_weight(ImPlotStyle * style) {
-    return style->ErrorBarWeight;
-}
-
-void bmx_implot_style_set_digital_bit_height(ImPlotStyle * style, float digital_bit_height) {
-    style->DigitalBitHeight = digital_bit_height;
-}
-
-float bmx_implot_style_get_digital_bit_height(ImPlotStyle * style) {
-    return style->DigitalBitHeight;
-}
-
-void bmx_implot_style_set_digital_bit_gap(ImPlotStyle * style, float digital_bit_gap) {
-    style->DigitalBitGap = digital_bit_gap;
-}
-
-float bmx_implot_style_get_digital_bit_gap(ImPlotStyle * style) {
-    return style->DigitalBitGap;
 }
 
 float bmx_implot_style_get_plot_border_size(ImPlotStyle * style) {
@@ -2069,22 +3373,6 @@ void ImPlot_PopStyleVar(int count) {
     ImPlot::PopStyleVar(count);
 }
 
-void ImPlot_SetNextLineStyle(MaxVec4 col, float weight) {
-    ImPlot::SetNextLineStyle(ConvertToCPP_MaxVec4(col), weight);
-}
-
-void ImPlot_SetNextFillStyle(MaxVec4 col, float alpha_mod) {
-    ImPlot::SetNextFillStyle(ConvertToCPP_MaxVec4(col), alpha_mod);
-}
-
-void ImPlot_SetNextMarkerStyle(int marker, float size, MaxVec4 fill, float weight, MaxVec4 outline) {
-    ImPlot::SetNextMarkerStyle(marker, size, ConvertToCPP_MaxVec4(fill), weight, ConvertToCPP_MaxVec4(outline));
-}
-
-void ImPlot_SetNextErrorBarStyle(MaxVec4 col, float size, float weight) {
-    ImPlot::SetNextErrorBarStyle(ConvertToCPP_MaxVec4(col), size, weight);
-}
-
 MaxVec4 ImPlot_GetLastItemColor() {
     return ConvertFromCPP_MaxVec4(ImPlot::GetLastItemColor());
 }
@@ -2099,6 +3387,10 @@ BBString * ImPlot_GetMarkerName(ImPlotMarker idx) {
     const char * name = ImPlot::GetMarkerName(idx);
     BBString * result = bbStringFromUTF8String((unsigned char*)name);
     return result;
+}
+
+int ImPlot_NextMarker() {
+    return ImPlot::NextMarker();
 }
 
 ///////////////////////////////////////////////////////////

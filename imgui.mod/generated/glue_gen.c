@@ -1,6 +1,6 @@
 //
 // This file is generated. Do not modify it manually.
-// Generated from ImGui 1.91.9b header file.
+// Generated from ImGui 1.92.6 header file.
 //
 
 #include "dcimgui.h"
@@ -584,30 +584,32 @@ int bmx_ImGui_TextLink(BBString * label) {
 	return result;
 }
 
-void bmx_ImGui_TextLinkOpenURL(BBString * label) {
+int bmx_ImGui_TextLinkOpenURL(BBString * label) {
 	const char * v0 = (const char *)bbStringToUTF8String(label);
-	ImGui_TextLinkOpenURL(v0);
-	bbMemFree(v0);
-}
-
-void bmx_ImGui_TextLinkOpenURLEx(BBString * label, BBString * url) {
-	const char * v0 = (const char *)bbStringToUTF8String(label);
-	const char * v1 = (const char *)bbStringToUTF8String(url);
-	ImGui_TextLinkOpenURLEx(v0, v1);
-	bbMemFree(v0);
-	bbMemFree(v1);
-}
-
-int bmx_ImGui_ImageButton(BBString * str_id, ImTextureID user_texture_id, ImVec2 image_size) {
-	const char * v0 = (const char *)bbStringToUTF8String(str_id);
-	int result = ImGui_ImageButton(v0, user_texture_id, image_size);
+	int result = ImGui_TextLinkOpenURL(v0);
 	bbMemFree(v0);
 	return result;
 }
 
-int bmx_ImGui_ImageButtonEx(BBString * str_id, ImTextureID user_texture_id, ImVec2 image_size, ImVec2 uv0, ImVec2 uv1, ImVec4 bg_col, ImVec4 tint_col) {
+int bmx_ImGui_TextLinkOpenURLEx(BBString * label, BBString * url) {
+	const char * v0 = (const char *)bbStringToUTF8String(label);
+	const char * v1 = (const char *)bbStringToUTF8String(url);
+	int result = ImGui_TextLinkOpenURLEx(v0, v1);
+	bbMemFree(v0);
+	bbMemFree(v1);
+	return result;
+}
+
+int bmx_ImGui_ImageButton(BBString * str_id, ImTextureRef tex_ref, ImVec2 image_size) {
 	const char * v0 = (const char *)bbStringToUTF8String(str_id);
-	int result = ImGui_ImageButtonEx(v0, user_texture_id, image_size, uv0, uv1, bg_col, tint_col);
+	int result = ImGui_ImageButton(v0, tex_ref, image_size);
+	bbMemFree(v0);
+	return result;
+}
+
+int bmx_ImGui_ImageButtonEx(BBString * str_id, ImTextureRef tex_ref, ImVec2 image_size, ImVec2 uv0, ImVec2 uv1, ImVec4 bg_col, ImVec4 tint_col) {
+	const char * v0 = (const char *)bbStringToUTF8String(str_id);
+	int result = ImGui_ImageButtonEx(v0, tex_ref, image_size, uv0, uv1, bg_col, tint_col);
 	bbMemFree(v0);
 	return result;
 }
@@ -1948,11 +1950,6 @@ ImFont* bmx_ImFontAtlas_AddFontFromMemoryCompressedBase85TTF(ImFontAtlas* this, 
 	const char * v1 = (const char *)bbStringToUTF8String(compressed_font_data_base85);
 	ImFont* result = ImFontAtlas_AddFontFromMemoryCompressedBase85TTF(this, v1, size_pixels, font_cfg, glyph_ranges);
 	bbMemFree(v1);
-	return result;
-}
-
-BBString * bmx_ImFont_GetDebugName(const ImFont* this) {
-	BBString * result = bbStringFromUTF8String((const unsigned char *)ImFont_GetDebugName(this));
 	return result;
 }
 

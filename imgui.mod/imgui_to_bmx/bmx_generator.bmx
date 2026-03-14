@@ -328,6 +328,11 @@ Type TCodeGenerator
 				Self.w = w
 			End Method
 		End Struct
+
+		Struct SImTextureRef
+			Field _TexData:Byte Ptr
+			Field _TexID:ULong
+		End Struct
 		~n~n
 		""")
 
@@ -486,6 +491,10 @@ Type TCodeGenerator
 							returnType = ":ULong"
 						Case "ImColor"
 							returnType = ":UInt"
+						Case "ImTextureRef"
+							returnType = ":SImTextureRef"
+						Case "ImFontAtlasRectId"
+							returnType = ":Int"
 						Default
 							If enumMap.ContainsKey(func.return_type.declaration) Then
 								returnType = ":" + enumMap[func.return_type.declaration]
@@ -576,6 +585,8 @@ Type TCodeGenerator
 						argType = ":Byte Ptr"
 					Else If arg.arg_type.declaration = "ImGuiMemFreeFunc" Then
 						argType = ":Byte Ptr"
+					Else If arg.arg_type.declaration = "ImTextureRef" Then
+						argType = ":SImTextureRef"
 					Else If arg.arg_type.declaration.EndsWith("*") Then
 						argType = ":Byte Ptr"
 					Else
@@ -620,6 +631,8 @@ Type TCodeGenerator
 								argType = ":Short"
 							Case "ImWchar"
 								argType = ":Short"
+							Case "ImFontAtlasRectId"
+								argType = ":Int"
 							Default
 								If enumMap.ContainsKey(arg.arg_type.declaration) Then
 									argType = ":" + enumMap[arg.arg_type.declaration]
@@ -943,6 +956,10 @@ Type TCodeGenerator
 							returnType = ":ULong"
 						Case "ImColor"
 							returnType = ":UInt"
+						Case "ImTextureRef"
+							returnType = ":SImTextureRef"
+						case "ImFontAtlasRectId"
+							returnType = ":Int"
 						Default
 							If enumMap.ContainsKey(func.return_type.declaration) Then
 								returnType = ":" + enumMap[func.return_type.declaration]
@@ -1051,6 +1068,10 @@ Type TCodeGenerator
 								argType = ":Short"
 							Case "ImWchar"
 								argType = ":Short"
+							Case "ImTextureRef"
+								argType = ":SImTextureRef"
+							Case "ImFontAtlasRectId"
+								argType = ":Int"
 							Default
 								If enumMap.ContainsKey(arg.arg_type.declaration) Then
 									argType = ":" + enumMap[arg.arg_type.declaration]

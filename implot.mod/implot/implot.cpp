@@ -1,6 +1,7 @@
 // MIT License
 
-// Copyright (c) 2023 Evan Pezent
+// Copyright (c) 2020-2024 Evan Pezent
+// Copyright (c) 2025-2026 Breno Cunha Queiroz
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,7 +21,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-// ImPlot v0.17
+// ImPlot v0.18 WIP
 
 /*
 
@@ -31,6 +32,68 @@ Below is a change-log of API breaking changes only. If you are using one of the 
 When you are not sure about a old symbol or function name, try using the Search/Find function of your IDE to look for comments or references in all implot files.
 You can read releases logs https://github.com/epezent/implot/releases for more details.
 
+- 2026/02/12 (0.18) - ImPlotSpec replaces the SetNextXXX style functions. The guide below shows show to migrate from SetNextXXX to ImPlotSpec.
+                        - `SetNextLineStyle` has been removed, styling should be set via ImPlotSpec.
+                          ```
+                          // Before
+                          ImPlot::SetNextLineStyle(line_color, line_weight);
+                          ImPlot::PlotLine("Line", xs, ys, count);
+
+                          // After
+                          ImPlotSpec spec;
+                          spec.LineColor = line_color;
+                          spec.LineWeight = line_weight;
+                          ImPlot::PlotLine("Line", xs, ys, count, spec);
+                          ```
+                        - `SetNextFillStyle` has been removed, styling should be set via ImPlotSpec.
+                          ```
+                          // Before
+                          ImPlot::SetNextFillStyle(fill_color, fill_alpha);
+                          ImPlot::PlotLine("Shaded", xs, ys, count, ImPlotLineFlags_Shaded);
+
+                          // After
+                          ImPlotSpec spec;
+                          spec.FillColor = fill_color;
+                          spec.FillAlpha = fill_alpha;
+                          spec.Flags = ImPlotLineFlags_Shaded;
+                          ImPlot::PlotTLine("Shaded", xs, ys, count, spec);
+                          ```
+                        - SetNextMarkerStyle has been removed, styling should be set via ImPlotSpec.
+                           ```
+                           // Before
+                           ImPlot::SetNextMarkerStyle(marker, marker_size, fill_color, line_weight, marker_outline_color);
+                           ImPlot::PlotScatter("Scatter", xs, ys, count);
+
+                           // After
+                           ImPlotSpec spec;
+                           spec.LineWeight = line_weight;
+                           spec.Marker = marker;
+                           spec.MarkerSize = marker_size;
+                           spec.MarkerLineColor = marker_outline_color;
+                           spec.MarkerFillColor = fill_color;
+                           ImPlot::PlotScatter("Scatter", xs, ys, count, spec);
+                           ```
+                        - SetNextErrorBarStyle has been removed, styling should be set via ImPlotSpec.
+                           ```
+                           // Before
+                           ImPlot::SetNextErrorBarStyle(color, size, weight);
+                           ImPlot::PlotErrorBars("ErrorBar", xs, ys, err, count);
+
+                           // After
+                           ImPlotSpec spec;
+                           spec.LineColor = color;
+                           spec.Size = size;
+                           spec.LineWeight = weight;
+                           ImPlot::PlotErrorBars("ErrorBar", xs, ys, err, count, spec);
+                           ```
+                        - Flags, Offset and Stride should also be set via ImPlotSpec now.
+- 2023/10/02 (0.18) - ImPlotSpec was made the default and _only_ way of styling plot items. Therefore the following features were removed:
+                      - ImPlotCol_Line, ImPlotCol_Fill, ImPlotCol_MarkerOutline, ImPlotCol_MarkerFill, ImPlotCol_ErrorBar have been removed and thus are no longer supported by PushStyleColor.
+                        You can use a common ImPlotSpec instance across multiple PlotX calls to emulate PushStyleColor behavior.
+                      - ImPlotStyleVar_LineWeight, ImPlotStyleVar_Marker, ImPlotStyleVar_MarkerSize, ImPlotStyleVar_MarkerWeight, ImPlotStyleVar_FillAlpha, ImPlotStyleVar_ErrorBarSize, and ImPlotStyleVar_ErrorBarWeight
+                        have been removed and thus are no longer supported by PushStyleVar. You can use a common ImPlotSpec instance across multiple PlotX calls to emulate PushStyleVar behavior.
+                      - ImPlotStyle/ImPlotStyleVar_ DigitalBitGap was renamed to DigitalSpacing; DigitalBitHeight was removed (use ImPlotSpec::Size); DigitalPadding was added for padding from bottom.
+                      - PlotX offset, stride, and flags parameters are now incorporated into ImPlotSpec; specify these variables in the ImPlotSpec passed to PlotX.
 - 2023/08/20 (0.17) - ImPlotFlags_NoChild was removed as child windows are no longer needed to capture scroll. You can safely remove this flag if you were using it.
 - 2023/06/26 (0.15) - Various build fixes related to updates in Dear ImGui internals.
 - 2022/11/25 (0.15) - Make PlotText honor ImPlotItemFlags_NoFit.
@@ -96,7 +159,7 @@ You can read releases logs https://github.com/epezent/implot/releases for more d
 - 2020/09/07 (0.8)  - Plotting functions which accept a custom getter function pointer have been post-fixed with a G (e.g. PlotLineG)
 - 2020/09/06 (0.7)  - Several flags under ImPlotFlags and ImPlotAxisFlags were inverted (e.g. ImPlotFlags_Legend -> ImPlotFlags_NoLegend) so that the default flagset
                       is simply 0. This more closely matches ImGui's style and makes it easier to enable non-default but commonly used flags (e.g. ImPlotAxisFlags_Time).
-- 2020/08/28 (0.5)  - ImPlotMarker_ can no longer be combined with bitwise OR, |. This features caused unecessary slow-down, and almost no one used it.
+- 2020/08/28 (0.5)  - ImPlotMarker_ can no longer be combined with bitwise OR, |. This features caused unnecessary slow-down, and almost no one used it.
 - 2020/08/25 (0.5)  - ImPlotAxisFlags_Scientific was removed. Logarithmic axes automatically uses scientific notation.
 - 2020/08/17 (0.5)  - PlotText was changed so that text is centered horizontally and vertically about the desired point.
 - 2020/08/16 (0.5)  - An ImPlotContext must be explicitly created and destroyed now with `CreateContext` and `DestroyContext`. Previously, the context was statically initialized in this source file.
@@ -170,17 +233,8 @@ ImPlotInputMap::ImPlotInputMap() {
 }
 
 ImPlotStyle::ImPlotStyle() {
-
-    LineWeight         = 1;
-    Marker             = ImPlotMarker_None;
-    MarkerSize         = 4;
-    MarkerWeight       = 1;
-    FillAlpha          = 1;
-    ErrorBarSize       = 5;
-    ErrorBarWeight     = 1.5f;
-    DigitalBitHeight   = 8;
-    DigitalBitGap      = 4;
-
+    PlotDefaultSize    = ImVec2(400,300);
+    PlotMinSize        = ImVec2(200,150);
     PlotBorderSize     = 1;
     MinorAlpha         = 0.25f;
     MajorTickLen       = ImVec2(10,10);
@@ -197,9 +251,9 @@ ImPlotStyle::ImPlotStyle() {
     MousePosPadding    = ImVec2(10,10);
     AnnotationPadding  = ImVec2(2,2);
     FitPadding         = ImVec2(0,0);
-    PlotDefaultSize    = ImVec2(400,300);
-    PlotMinSize        = ImVec2(200,150);
-
+    DigitalPadding     = 20;
+    DigitalSpacing     = 4;
+    
     ImPlot::StyleColorsAuto(this);
 
     Colormap = ImPlotColormap_Deep;
@@ -217,11 +271,6 @@ namespace ImPlot {
 
 const char* GetStyleColorName(ImPlotCol col) {
     static const char* col_names[ImPlotCol_COUNT] = {
-        "Line",
-        "Fill",
-        "MarkerOutline",
-        "MarkerFill",
-        "ErrorBar",
         "FrameBg",
         "PlotBg",
         "PlotBorder",
@@ -245,6 +294,7 @@ const char* GetStyleColorName(ImPlotCol col) {
 const char* GetMarkerName(ImPlotMarker marker) {
     switch (marker) {
         case ImPlotMarker_None:     return "None";
+        case ImPlotMarker_Auto:     return "Auto";
         case ImPlotMarker_Circle:   return "Circle";
         case ImPlotMarker_Square:   return "Square";
         case ImPlotMarker_Diamond:  return "Diamond";
@@ -262,11 +312,6 @@ const char* GetMarkerName(ImPlotMarker marker) {
 ImVec4 GetAutoColor(ImPlotCol idx) {
     ImVec4 col(0,0,0,1);
     switch(idx) {
-        case ImPlotCol_Line:          return col; // these are plot dependent!
-        case ImPlotCol_Fill:          return col; // these are plot dependent!
-        case ImPlotCol_MarkerOutline: return col; // these are plot dependent!
-        case ImPlotCol_MarkerFill:    return col; // these are plot dependent!
-        case ImPlotCol_ErrorBar:      return ImGui::GetStyleColorVec4(ImGuiCol_Text);
         case ImPlotCol_FrameBg:       return ImGui::GetStyleColorVec4(ImGuiCol_FrameBg);
         case ImPlotCol_PlotBg:        return ImGui::GetStyleColorVec4(ImGuiCol_WindowBg);
         case ImPlotCol_PlotBorder:    return ImGui::GetStyleColorVec4(ImGuiCol_Border);
@@ -296,16 +341,8 @@ struct ImPlotStyleVarInfo {
 
 static const ImPlotStyleVarInfo GPlotStyleVarInfo[] =
 {
-    { ImGuiDataType_Float, 1, (ImU32)offsetof(ImPlotStyle, LineWeight)         }, // ImPlotStyleVar_LineWeight
-    { ImGuiDataType_S32,   1, (ImU32)offsetof(ImPlotStyle, Marker)             }, // ImPlotStyleVar_Marker
-    { ImGuiDataType_Float, 1, (ImU32)offsetof(ImPlotStyle, MarkerSize)         }, // ImPlotStyleVar_MarkerSize
-    { ImGuiDataType_Float, 1, (ImU32)offsetof(ImPlotStyle, MarkerWeight)       }, // ImPlotStyleVar_MarkerWeight
-    { ImGuiDataType_Float, 1, (ImU32)offsetof(ImPlotStyle, FillAlpha)          }, // ImPlotStyleVar_FillAlpha
-    { ImGuiDataType_Float, 1, (ImU32)offsetof(ImPlotStyle, ErrorBarSize)       }, // ImPlotStyleVar_ErrorBarSize
-    { ImGuiDataType_Float, 1, (ImU32)offsetof(ImPlotStyle, ErrorBarWeight)     }, // ImPlotStyleVar_ErrorBarWeight
-    { ImGuiDataType_Float, 1, (ImU32)offsetof(ImPlotStyle, DigitalBitHeight)   }, // ImPlotStyleVar_DigitalBitHeight
-    { ImGuiDataType_Float, 1, (ImU32)offsetof(ImPlotStyle, DigitalBitGap)      }, // ImPlotStyleVar_DigitalBitGap
-
+    { ImGuiDataType_Float, 2, (ImU32)offsetof(ImPlotStyle, PlotDefaultSize)    }, // ImPlotStyleVar_PlotDefaultSize
+    { ImGuiDataType_Float, 2, (ImU32)offsetof(ImPlotStyle, PlotMinSize)        }, // ImPlotStyleVar_PlotMinSize
     { ImGuiDataType_Float, 1, (ImU32)offsetof(ImPlotStyle, PlotBorderSize)     }, // ImPlotStyleVar_PlotBorderSize
     { ImGuiDataType_Float, 1, (ImU32)offsetof(ImPlotStyle, MinorAlpha)         }, // ImPlotStyleVar_MinorAlpha
     { ImGuiDataType_Float, 2, (ImU32)offsetof(ImPlotStyle, MajorTickLen)       }, // ImPlotStyleVar_MajorTickLen
@@ -315,16 +352,15 @@ static const ImPlotStyleVarInfo GPlotStyleVarInfo[] =
     { ImGuiDataType_Float, 2, (ImU32)offsetof(ImPlotStyle, MajorGridSize)      }, // ImPlotStyleVar_MajorGridSize
     { ImGuiDataType_Float, 2, (ImU32)offsetof(ImPlotStyle, MinorGridSize)      }, // ImPlotStyleVar_MinorGridSize
     { ImGuiDataType_Float, 2, (ImU32)offsetof(ImPlotStyle, PlotPadding)        }, // ImPlotStyleVar_PlotPadding
-    { ImGuiDataType_Float, 2, (ImU32)offsetof(ImPlotStyle, LabelPadding)       }, // ImPlotStyleVar_LabelPaddine
+    { ImGuiDataType_Float, 2, (ImU32)offsetof(ImPlotStyle, LabelPadding)       }, // ImPlotStyleVar_LabelPadding
     { ImGuiDataType_Float, 2, (ImU32)offsetof(ImPlotStyle, LegendPadding)      }, // ImPlotStyleVar_LegendPadding
     { ImGuiDataType_Float, 2, (ImU32)offsetof(ImPlotStyle, LegendInnerPadding) }, // ImPlotStyleVar_LegendInnerPadding
     { ImGuiDataType_Float, 2, (ImU32)offsetof(ImPlotStyle, LegendSpacing)      }, // ImPlotStyleVar_LegendSpacing
-
     { ImGuiDataType_Float, 2, (ImU32)offsetof(ImPlotStyle, MousePosPadding)    }, // ImPlotStyleVar_MousePosPadding
     { ImGuiDataType_Float, 2, (ImU32)offsetof(ImPlotStyle, AnnotationPadding)  }, // ImPlotStyleVar_AnnotationPadding
     { ImGuiDataType_Float, 2, (ImU32)offsetof(ImPlotStyle, FitPadding)         }, // ImPlotStyleVar_FitPadding
-    { ImGuiDataType_Float, 2, (ImU32)offsetof(ImPlotStyle, PlotDefaultSize)    }, // ImPlotStyleVar_PlotDefaultSize
-    { ImGuiDataType_Float, 2, (ImU32)offsetof(ImPlotStyle, PlotMinSize)        }  // ImPlotStyleVar_PlotMinSize
+    { ImGuiDataType_Float, 1, (ImU32)offsetof(ImPlotStyle, DigitalPadding)     }, // ImPlotStyleVar_DigitalPadding
+    { ImGuiDataType_Float, 1, (ImU32)offsetof(ImPlotStyle, DigitalSpacing)     }, // ImPlotStyleVar_DigitalSpacing
 };
 
 static const ImPlotStyleVarInfo* GetPlotStyleVarInfo(ImPlotStyleVar idx) {
@@ -651,7 +687,7 @@ bool ShowLegendEntries(ImPlotItemGroup& items, const ImRect& legend_bb, bool hov
     }
     // render
     for (int i = 0; i < num_items; ++i) {
-        const int idx           = indices[i];
+        const int idx           = ImHasFlag(items.Legend.Flags, ImPlotLegendFlags_Reverse) ? indices[num_items - 1 - i] : indices[i];
         ImPlotItem* item        = items.GetLegendItem(idx);
         const char* label       = items.GetLegendLabel(idx);
         const float label_width = ImGui::CalcTextSize(label, nullptr, true).x;
@@ -716,8 +752,8 @@ bool ShowLegendEntries(ImPlotItemGroup& items, const ImRect& legend_bb, bool hov
 // Locators
 //-----------------------------------------------------------------------------
 
-static const float TICK_FILL_X = 0.8f;
-static const float TICK_FILL_Y = 1.0f;
+constexpr float TICK_FILL_X = 0.8f;
+constexpr float TICK_FILL_Y = 1.0f;
 
 void Locator_Default(ImPlotTicker& ticker, const ImPlotRange& range, float pixels, bool vertical, ImPlotFormatter formatter, void* formatter_data) {
     if (range.Min == range.Max)
@@ -853,7 +889,7 @@ void AddTicksCustom(const double* values, const char* const labels[], int n, ImP
 //-----------------------------------------------------------------------------
 
 // this may not be thread safe?
-static const double TimeUnitSpans[ImPlotTimeUnit_COUNT] = {
+constexpr double TimeUnitSpans[ImPlotTimeUnit_COUNT] = {
     0.000001,
     0.001,
     1,
@@ -865,7 +901,7 @@ static const double TimeUnitSpans[ImPlotTimeUnit_COUNT] = {
 };
 
 inline ImPlotTimeUnit GetUnitForRange(double range) {
-    static double cutoffs[ImPlotTimeUnit_COUNT] = {0.001, 1, 60, 3600, 86400, 2629800, 31557600, IMPLOT_MAX_TIME};
+    constexpr double cutoffs[ImPlotTimeUnit_COUNT] = {0.001, 1, 60, 3600, 86400, 2629800, 31557600, IMPLOT_MAX_TIME};
     for (int i = 0; i < ImPlotTimeUnit_COUNT; ++i) {
         if (range <= cutoffs[i])
             return (ImPlotTimeUnit)i;
@@ -885,28 +921,28 @@ inline int LowerBoundStep(int max_divs, const int* divs, const int* step, int si
 
 inline int GetTimeStep(int max_divs, ImPlotTimeUnit unit) {
     if (unit == ImPlotTimeUnit_Ms || unit == ImPlotTimeUnit_Us) {
-        static const int step[] = {500,250,200,100,50,25,20,10,5,2,1};
-        static const int divs[] = {2,4,5,10,20,40,50,100,200,500,1000};
+        constexpr int step[] = {500,250,200,100,50,25,20,10,5,2,1};
+        constexpr int divs[] = {2,4,5,10,20,40,50,100,200,500,1000};
         return LowerBoundStep(max_divs, divs, step, 11);
     }
     if (unit == ImPlotTimeUnit_S || unit == ImPlotTimeUnit_Min) {
-        static const int step[] = {30,15,10,5,1};
-        static const int divs[] = {2,4,6,12,60};
+        constexpr int step[] = {30,15,10,5,1};
+        constexpr int divs[] = {2,4,6,12,60};
         return LowerBoundStep(max_divs, divs, step, 5);
     }
     else if (unit == ImPlotTimeUnit_Hr) {
-        static const int step[] = {12,6,3,2,1};
-        static const int divs[] = {2,4,8,12,24};
+        constexpr int step[] = {12,6,3,2,1};
+        constexpr int divs[] = {2,4,8,12,24};
         return LowerBoundStep(max_divs, divs, step, 5);
     }
     else if (unit == ImPlotTimeUnit_Day) {
-        static const int step[] = {14,7,2,1};
-        static const int divs[] = {2,4,14,28};
+        constexpr int step[] = {14,7,2,1};
+        constexpr int divs[] = {2,4,14,28};
         return LowerBoundStep(max_divs, divs, step, 4);
     }
     else if (unit == ImPlotTimeUnit_Mo) {
-        static const int step[] = {6,3,2,1};
-        static const int divs[] = {2,4,6,12};
+        constexpr int step[] = {6,3,2,1};
+        constexpr int divs[] = {2,4,6,12};
         return LowerBoundStep(max_divs, divs, step, 4);
     }
     return 0;
@@ -1650,8 +1686,10 @@ void PadAndDatumAxesX(ImPlotPlot& plot, float& pad_T, float& pad_B, ImPlotAlignm
         if (opp) {
             if (count_T++ > 0)
                 pad_T += K + P;
-            if (label)
-                pad_T += T + P;
+            if (label) {
+                ImVec2 label_size = ImGui::CalcTextSize(plot.GetAxisLabel(axis));
+                pad_T += label_size.y + P;
+            }
             if (ticks)
                 pad_T += ImMax(T, axis.Ticker.MaxSize.y) + P + (time ? T + P : 0);
             axis.Datum1 = plot.CanvasRect.Min.y + pad_T;
@@ -1661,8 +1699,10 @@ void PadAndDatumAxesX(ImPlotPlot& plot, float& pad_T, float& pad_B, ImPlotAlignm
         else {
             if (count_B++ > 0)
                 pad_B += K + P;
-            if (label)
-                pad_B += T + P;
+            if (label) {
+                ImVec2 label_size = ImGui::CalcTextSize(plot.GetAxisLabel(axis));
+                pad_B += label_size.y + P;
+            }
             if (ticks)
                 pad_B += ImMax(T, axis.Ticker.MaxSize.y) + P + (time ? T + P : 0);
             axis.Datum1 = plot.CanvasRect.Max.y - pad_B;
@@ -1822,8 +1862,8 @@ static inline void RenderSelectionRect(ImDrawList& DrawList, const ImVec2& p_min
 // Input Handling
 //-----------------------------------------------------------------------------
 
-static const float MOUSE_CURSOR_DRAG_THRESHOLD = 5.0f;
-static const float BOX_SELECT_DRAG_THRESHOLD   = 4.0f;
+constexpr float MOUSE_CURSOR_DRAG_THRESHOLD = 5.0f;
+constexpr float BOX_SELECT_DRAG_THRESHOLD   = 4.0f;
 
 bool UpdateInput(ImPlotPlot& plot) {
 
@@ -2588,6 +2628,17 @@ void SetupFinish() {
         }
     }
 
+    // (4.5) recalc padding now that we have actual X-axis tick labels (handles multi-line labels)
+    // Save title padding before resetting
+    const float title_pad = (title_size.x > 0) ? (title_size.y + gp.Style.LabelPadding.y) : 0.0f;
+    pad_top = title_pad;
+    pad_bot = 0;
+    PadAndDatumAxesX(plot,pad_top,pad_bot,gp.CurrentAlignmentH);
+    // Update AxesRect to account for title padding (was done in step 0)
+    if (title_size.x > 0) {
+        plot.AxesRect.Min.y = plot.FrameRect.Min.y + gp.Style.PlotPadding.y + title_pad;
+    }
+
     // (5) calc plot bb
     plot.PlotRect = ImRect(plot.CanvasRect.Min + ImVec2(pad_left, pad_top), plot.CanvasRect.Max - ImVec2(pad_right, pad_bot));
 
@@ -3270,9 +3321,9 @@ void EndPlot() {
 // BEGIN/END SUBPLOT
 //-----------------------------------------------------------------------------
 
-static const float SUBPLOT_BORDER_SIZE             = 1.0f;
-static const float SUBPLOT_SPLITTER_HALF_THICKNESS = 4.0f;
-static const float SUBPLOT_SPLITTER_FEEDBACK_TIMER = 0.06f;
+constexpr float SUBPLOT_BORDER_SIZE             = 1.0f;
+constexpr float SUBPLOT_SPLITTER_HALF_THICKNESS = 4.0f;
+constexpr float SUBPLOT_SPLITTER_FEEDBACK_TIMER = 0.06f;
 
 void SubplotSetCell(int row, int col) {
     ImPlotContext& gp      = *GImPlot;
@@ -3632,7 +3683,7 @@ void EndSubplots() {
     // remove items
     if (gp.CurrentItems == &subplot.Items)
         gp.CurrentItems = nullptr;
-    // reset the plot items for the next frame (TODO: put this elswhere)
+    // reset the plot items for the next frame (TODO: put this elsewhere)
     for (int i = 0; i < subplot.Items.GetItemCount(); ++i) {
         subplot.Items.GetItemByIndex(i)->SeenThisFrame = false;
     }
@@ -3900,7 +3951,7 @@ IMPLOT_API void TagYV(double y, const ImVec4& color, const char* fmt, va_list ar
     TagV(gp.CurrentPlot->CurrentY, y, color, fmt, args);
 }
 
-static const float DRAG_GRAB_HALF_SIZE = 4.0f;
+constexpr float DRAG_GRAB_HALF_SIZE = 4.0f;
 
 bool DragPoint(int n_id, double* x, double* y, const ImVec4& col, float radius, ImPlotDragToolFlags flags, bool* out_clicked, bool* out_hovered, bool* out_held) {
     ImGui::PushID("#IMPLOT_DRAG_POINT");
@@ -4101,31 +4152,34 @@ bool DragRect(int n_id, double* x_min, double* y_min, double* x_max, double* y_m
 
     bool modified = false;
     bool clicked = false, hovered = false, held = false;
-    ImRect b_rect(pc.x-DRAG_GRAB_HALF_SIZE,pc.y-DRAG_GRAB_HALF_SIZE,pc.x+DRAG_GRAB_HALF_SIZE,pc.y+DRAG_GRAB_HALF_SIZE);
 
-    ImGui::KeepAliveID(id);
-    if (input) {
-        // middle point
-        clicked = ImGui::ButtonBehavior(b_rect,id,&hovered,&held);
-        if (out_clicked) *out_clicked = clicked;
-        if (out_hovered) *out_hovered = hovered;
-        if (out_held)    *out_held    = held;
-    }
-
-    if ((hovered || held) && show_curs)
-        ImGui::SetMouseCursor(ImGuiMouseCursor_ResizeAll);
-    if (held && ImGui::IsMouseDragging(0)) {
-        for (int i = 0; i < 4; ++i) {
-            ImPlotPoint pp = PixelsToPlot(p[i] + ImGui::GetIO().MouseDelta,IMPLOT_AUTO,IMPLOT_AUTO);
-            *y[i] = pp.y;
-            *x[i] = pp.x;
+    const bool is_movable = *x_min != *x_max || *y_min != *y_max;
+    if (is_movable) {
+        ImGui::KeepAliveID(id);
+        if (input) {
+            // middle point
+            ImRect b_rect(pc.x-DRAG_GRAB_HALF_SIZE,pc.y-DRAG_GRAB_HALF_SIZE,pc.x+DRAG_GRAB_HALF_SIZE,pc.y+DRAG_GRAB_HALF_SIZE);
+            clicked = ImGui::ButtonBehavior(b_rect,id,&hovered,&held);
+            if (out_clicked) *out_clicked = clicked;
+            if (out_hovered) *out_hovered = hovered;
+            if (out_held)    *out_held    = held;
         }
-        modified = true;
+
+        if ((hovered || held) && show_curs)
+            ImGui::SetMouseCursor(ImGuiMouseCursor_ResizeAll);
+        if (held && ImGui::IsMouseDragging(0)) {
+            for (int i = 0; i < 4; ++i) {
+                ImPlotPoint pp = PixelsToPlot(p[i] + ImGui::GetIO().MouseDelta,IMPLOT_AUTO,IMPLOT_AUTO);
+                *y[i] = pp.y;
+                *x[i] = pp.x;
+            }
+            modified = true;
+        }
     }
 
     for (int i = 0; i < 4; ++i) {
         // points
-        b_rect = ImRect(p[i].x-DRAG_GRAB_HALF_SIZE,p[i].y-DRAG_GRAB_HALF_SIZE,p[i].x+DRAG_GRAB_HALF_SIZE,p[i].y+DRAG_GRAB_HALF_SIZE);
+        ImRect b_rect(p[i].x - DRAG_GRAB_HALF_SIZE, p[i].y - DRAG_GRAB_HALF_SIZE, p[i].x + DRAG_GRAB_HALF_SIZE, p[i].y + DRAG_GRAB_HALF_SIZE);
         ImGuiID p_id = id + i + 1;
         ImGui::KeepAliveID(p_id);
         if (input) {
@@ -4487,6 +4541,14 @@ void PopStyleVar(int count) {
     }
 }
 
+ImPlotMarker NextMarker() {
+    ImPlotContext& gp = *GImPlot;
+    IM_ASSERT_USER_ERROR(gp.CurrentItems != nullptr, "NextMarker() needs to be called between BeginPlot() and EndPlot()!");
+    const int idx = gp.CurrentItems->MarkerIdx % ImPlotMarker_COUNT;
+    ++gp.CurrentItems->MarkerIdx;
+    return idx;
+}
+    
 //------------------------------------------------------------------------------
 // [Section] Colormaps
 //------------------------------------------------------------------------------
@@ -4560,7 +4622,7 @@ ImU32 NextColormapColorU32() {
 
 ImVec4 NextColormapColor() {
     return ImGui::ColorConvertU32ToFloat4(NextColormapColorU32());
-}
+}    
 
 int GetColormapSize(ImPlotColormap cmap) {
     ImPlotContext& gp = *GImPlot;
@@ -4956,16 +5018,9 @@ void ShowStyleEditor(ImPlotStyle* ref) {
                "Use \"Export\" below to save them somewhere.");
     if (ImGui::BeginTabBar("##StyleEditor")) {
         if (ImGui::BeginTabItem("Variables")) {
-            ImGui::Text("Item Styling");
-            ImGui::SliderFloat("LineWeight", &style.LineWeight, 0.0f, 5.0f, "%.1f");
-            ImGui::SliderFloat("MarkerSize", &style.MarkerSize, 2.0f, 10.0f, "%.1f");
-            ImGui::SliderFloat("MarkerWeight", &style.MarkerWeight, 0.0f, 5.0f, "%.1f");
-            ImGui::SliderFloat("FillAlpha", &style.FillAlpha, 0.0f, 1.0f, "%.2f");
-            ImGui::SliderFloat("ErrorBarSize", &style.ErrorBarSize, 0.0f, 10.0f, "%.1f");
-            ImGui::SliderFloat("ErrorBarWeight", &style.ErrorBarWeight, 0.0f, 5.0f, "%.1f");
-            ImGui::SliderFloat("DigitalBitHeight", &style.DigitalBitHeight, 0.0f, 20.0f, "%.1f");
-            ImGui::SliderFloat("DigitalBitGap", &style.DigitalBitGap, 0.0f, 20.0f, "%.1f");
             ImGui::Text("Plot Styling");
+            ImGui::SliderFloat2("PlotDefaultSize", (float*)&style.PlotDefaultSize, 0.0f, 1000, "%.0f");
+            ImGui::SliderFloat2("PlotMinSize", (float*)&style.PlotMinSize, 0.0f, 300, "%.0f");
             ImGui::SliderFloat("PlotBorderSize", &style.PlotBorderSize, 0.0f, 2.0f, "%.0f");
             ImGui::SliderFloat("MinorAlpha", &style.MinorAlpha, 0.0f, 1.0f, "%.2f");
             ImGui::SliderFloat2("MajorTickLen", (float*)&style.MajorTickLen, 0.0f, 20.0f, "%.0f");
@@ -4974,8 +5029,6 @@ void ShowStyleEditor(ImPlotStyle* ref) {
             ImGui::SliderFloat2("MinorTickSize", (float*)&style.MinorTickSize, 0.0f, 2.0f, "%.1f");
             ImGui::SliderFloat2("MajorGridSize", (float*)&style.MajorGridSize, 0.0f, 2.0f, "%.1f");
             ImGui::SliderFloat2("MinorGridSize", (float*)&style.MinorGridSize, 0.0f, 2.0f, "%.1f");
-            ImGui::SliderFloat2("PlotDefaultSize", (float*)&style.PlotDefaultSize, 0.0f, 1000, "%.0f");
-            ImGui::SliderFloat2("PlotMinSize", (float*)&style.PlotMinSize, 0.0f, 300, "%.0f");
             ImGui::Text("Plot Padding");
             ImGui::SliderFloat2("PlotPadding", (float*)&style.PlotPadding, 0.0f, 20.0f, "%.0f");
             ImGui::SliderFloat2("LabelPadding", (float*)&style.LabelPadding, 0.0f, 20.0f, "%.0f");
@@ -4985,7 +5038,8 @@ void ShowStyleEditor(ImPlotStyle* ref) {
             ImGui::SliderFloat2("MousePosPadding", (float*)&style.MousePosPadding, 0.0f, 20.0f, "%.0f");
             ImGui::SliderFloat2("AnnotationPadding", (float*)&style.AnnotationPadding, 0.0f, 5.0f, "%.0f");
             ImGui::SliderFloat2("FitPadding", (float*)&style.FitPadding, 0, 0.2f, "%.2f");
-
+            ImGui::SliderFloat("DigitalPadding", &style.DigitalPadding, 0.0f, 20.0f, "%.1f");
+            ImGui::SliderFloat("DigitalSpacing", &style.DigitalSpacing, 0.0f, 10.0f, "%.1f");
             ImGui::EndTabItem();
         }
         if (ImGui::BeginTabItem("Colors")) {
@@ -5068,9 +5122,7 @@ void ShowStyleEditor(ImPlotStyle* ref) {
             ImGui::PopItemWidth();
             ImGui::Separator();
             ImGui::Text("Colors that are set to Auto (i.e. IMPLOT_AUTO_COL) will\n"
-                        "be automatically deduced from your ImGui style or the\n"
-                        "current ImPlot Colormap. If you want to style individual\n"
-                        "plot items, use Push/PopStyleColor around its function.");
+                        "be automatically deduced from your ImGui style.");
             ImGui::EndTabItem();
         }
         if (ImGui::BeginTabItem("Colormaps")) {
@@ -5217,7 +5269,7 @@ void ShowAxisMetrics(const ImPlotPlot& plot, const ImPlotAxis& axis) {
     ImGui::BulletText("Range: [%f,%f]",axis.Range.Min, axis.Range.Max);
     ImGui::BulletText("Pixels: %f", axis.PixelSize());
     ImGui::BulletText("Aspect: %f", axis.GetAspect());
-    ImGui::BulletText(axis.OrthoAxis == nullptr ? "OrtherAxis: NULL" : "OrthoAxis: 0x%08X", axis.OrthoAxis->ID);
+    ImGui::BulletText(axis.OrthoAxis == nullptr ? "OrthoAxis: NULL" : "OrthoAxis: 0x%08X", axis.OrthoAxis->ID);
     ImGui::BulletText("LinkedMin: %p", (void*)axis.LinkedMin);
     ImGui::BulletText("LinkedMax: %p", (void*)axis.LinkedMax);
     ImGui::BulletText("HasRange: %s", axis.HasRange ? "true" : "false");
@@ -5327,7 +5379,7 @@ void ShowMetricsWindow(bool* p_popen) {
                             ImVec4 temp = ImGui::ColorConvertU32ToFloat4(item->Color);
                             if (ImGui::ColorEdit4("Color",&temp.x, ImGuiColorEditFlags_NoInputs))
                                 item->Color = ImGui::ColorConvertFloat4ToU32(temp);
-
+                            ImGui::BulletText("Marker: %s", GetMarkerName(item->Marker));
                             ImGui::BulletText("NameOffset: %d",item->NameOffset);
                             ImGui::BulletText("Name: %s", item->NameOffset != -1 ? plot.Items.Legend.Labels.Buf.Data + item->NameOffset : "N/A");
                             ImGui::BulletText("Hovered: %s",item->LegendHovered ? "true" : "false");
@@ -5762,11 +5814,6 @@ void StyleColorsAuto(ImPlotStyle* dst) {
 
     style->MinorAlpha               = 0.25f;
 
-    colors[ImPlotCol_Line]          = IMPLOT_AUTO_COL;
-    colors[ImPlotCol_Fill]          = IMPLOT_AUTO_COL;
-    colors[ImPlotCol_MarkerOutline] = IMPLOT_AUTO_COL;
-    colors[ImPlotCol_MarkerFill]    = IMPLOT_AUTO_COL;
-    colors[ImPlotCol_ErrorBar]      = IMPLOT_AUTO_COL;
     colors[ImPlotCol_FrameBg]       = IMPLOT_AUTO_COL;
     colors[ImPlotCol_PlotBg]        = IMPLOT_AUTO_COL;
     colors[ImPlotCol_PlotBorder]    = IMPLOT_AUTO_COL;
@@ -5791,12 +5838,7 @@ void StyleColorsClassic(ImPlotStyle* dst) {
     ImVec4* colors                  = style->Colors;
 
     style->MinorAlpha               = 0.5f;
-
-    colors[ImPlotCol_Line]          = IMPLOT_AUTO_COL;
-    colors[ImPlotCol_Fill]          = IMPLOT_AUTO_COL;
-    colors[ImPlotCol_MarkerOutline] = IMPLOT_AUTO_COL;
-    colors[ImPlotCol_MarkerFill]    = IMPLOT_AUTO_COL;
-    colors[ImPlotCol_ErrorBar]      = ImVec4(0.90f, 0.90f, 0.90f, 1.00f);
+    
     colors[ImPlotCol_FrameBg]       = ImVec4(0.43f, 0.43f, 0.43f, 0.39f);
     colors[ImPlotCol_PlotBg]        = ImVec4(0.00f, 0.00f, 0.00f, 0.35f);
     colors[ImPlotCol_PlotBorder]    = ImVec4(0.50f, 0.50f, 0.50f, 0.50f);
@@ -5821,11 +5863,6 @@ void StyleColorsDark(ImPlotStyle* dst) {
 
     style->MinorAlpha               = 0.25f;
 
-    colors[ImPlotCol_Line]          = IMPLOT_AUTO_COL;
-    colors[ImPlotCol_Fill]          = IMPLOT_AUTO_COL;
-    colors[ImPlotCol_MarkerOutline] = IMPLOT_AUTO_COL;
-    colors[ImPlotCol_MarkerFill]    = IMPLOT_AUTO_COL;
-    colors[ImPlotCol_ErrorBar]      = IMPLOT_AUTO_COL;
     colors[ImPlotCol_FrameBg]       = ImVec4(1.00f, 1.00f, 1.00f, 0.07f);
     colors[ImPlotCol_PlotBg]        = ImVec4(0.00f, 0.00f, 0.00f, 0.50f);
     colors[ImPlotCol_PlotBorder]    = ImVec4(0.43f, 0.43f, 0.50f, 0.50f);
@@ -5850,11 +5887,6 @@ void StyleColorsLight(ImPlotStyle* dst) {
 
     style->MinorAlpha               = 1.0f;
 
-    colors[ImPlotCol_Line]          = IMPLOT_AUTO_COL;
-    colors[ImPlotCol_Fill]          = IMPLOT_AUTO_COL;
-    colors[ImPlotCol_MarkerOutline] = IMPLOT_AUTO_COL;
-    colors[ImPlotCol_MarkerFill]    = IMPLOT_AUTO_COL;
-    colors[ImPlotCol_ErrorBar]      = IMPLOT_AUTO_COL;
     colors[ImPlotCol_FrameBg]       = ImVec4(1.00f, 1.00f, 1.00f, 1.00f);
     colors[ImPlotCol_PlotBg]        = ImVec4(0.42f, 0.57f, 1.00f, 0.13f);
     colors[ImPlotCol_PlotBorder]    = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
