@@ -1,6 +1,6 @@
 '
 ' This file is generated. Do not modify it manually.
-' Generated from ImGui 1.91.9b header file.
+' Generated from ImGui 1.92.6 header file.
 '
 SuperStrict
 
@@ -688,6 +688,11 @@ Struct SImVec4
 	End Method
 End Struct
 
+Struct SImTextureRef
+	Field _TexData:Byte Ptr
+	Field _TexID:ULong
+End Struct
+
 
 Function ImGui_CreateContext:TImGuiContext(atlas:TImguiFontAtlas = Null)
 	If atlas Then
@@ -742,6 +747,13 @@ Function ImGui_InputText:Int(label:String, buf:String Var, bufSize:Int, flags:EI
 End Function
 
 
+Rem
+bbdoc:  == (_TexData ? _TexData->TexID : _TexID)  Implemented below in the file.
+End Rem
+Function ImTextureRef_GetTexID:ULong(this:Byte Ptr)
+	Return _ImTextureRef_GetTexID(this)
+End Function
+
 Function ImGui_GetCurrentContext:TImGuiContext()
 	Return TImGuiContext._Create(_ImGui_GetCurrentContext())
 End Function
@@ -789,7 +801,7 @@ Function ImGui_Render()
 End Function
 
 Rem
-bbdoc:  valid after Render() and until the next call to NewFrame(). this is what you have to render.
+bbdoc:  valid after Render() and until the next call to NewFrame(). Call ImGui_ImplXXXX_RenderDrawData() function in your Renderer Backend to render.
 End Rem
 Function ImGui_GetDrawData:TImDrawData()
 	Return TImDrawData._Create(_ImGui_GetDrawData())
@@ -1050,13 +1062,6 @@ Function ImGui_SetWindowFocus()
 End Function
 
 Rem
-bbdoc:  [OBSOLETE] set font scale. Adjust IO.FontGlobalScale if you want to scale all windows. This is an old API! For correct scaling, prefer to reload font + rebuild ImFontAtlas + call style.ScaleAllSizes().
-End Rem
-Function ImGui_SetWindowFontScale(scale:Float)
-	_ImGui_SetWindowFontScale(scale)
-End Function
-
-Rem
 bbdoc:  set named window position.
 End Rem
 Function ImGui_SetWindowPosStr(name:String, pos:SImVec2, cond:EImGuiCond)
@@ -1155,14 +1160,35 @@ Function ImGui_SetScrollFromPosY(local_y:Float, center_y_ratio:Float)
 End Function
 
 Rem
-bbdoc:  use NULL as a shortcut to push default font
+bbdoc:  Use NULL as a shortcut to keep current font. Use 0.0f to keep current size.
 End Rem
-Function ImGui_PushFont(font:TImFont)
-	_ImGui_PushFont(font.handle)
+Function ImGui_PushFontFloat(font:TImFont, font_size_base_unscaled:Float)
+	_ImGui_PushFontFloat(font.handle, font_size_base_unscaled)
 End Function
 
 Function ImGui_PopFont()
 	_ImGui_PopFont()
+End Function
+
+Rem
+bbdoc:  get current font
+End Rem
+Function ImGui_GetFont:TImFont()
+	Return TImFont._Create(_ImGui_GetFont())
+End Function
+
+Rem
+bbdoc:  get current scaled font size (= height in pixels). AFTER global scale factors applied. *IMPORTANT* DO NOT PASS THIS VALUE TO PushFont()! Use ImGui::GetStyle().FontSizeBase to get value before global scale factors.
+End Rem
+Function ImGui_GetFontSize:Float()
+	Return _ImGui_GetFontSize()
+End Function
+
+Rem
+bbdoc:  get current font bound at current size  == GetFont()->GetFontBaked(GetFontSize())
+End Rem
+Function ImGui_GetFontBaked:Byte Ptr()
+	Return _ImGui_GetFontBaked()
 End Function
 
 Rem
@@ -1271,20 +1297,6 @@ End Function
 
 Function ImGui_PopTextWrapPos()
 	_ImGui_PopTextWrapPos()
-End Function
-
-Rem
-bbdoc:  get current font
-End Rem
-Function ImGui_GetFont:TImFont()
-	Return TImFont._Create(_ImGui_GetFont())
-End Function
-
-Rem
-bbdoc:  get current font size (= height in pixels) of current font with current scale applied
-End Rem
-Function ImGui_GetFontSize:Float()
-	Return _ImGui_GetFontSize()
 End Function
 
 Rem
@@ -1748,48 +1760,48 @@ End Function
 Rem
 bbdoc:  Implied url = NULL
 End Rem
-Function ImGui_TextLinkOpenURL(label:String)
-	_ImGui_TextLinkOpenURL(label)
+Function ImGui_TextLinkOpenURL:Int(label:String)
+	Return _ImGui_TextLinkOpenURL(label)
 End Function
 
 Rem
 bbdoc:  hyperlink text button, automatically open file/url when clicked
 End Rem
-Function ImGui_TextLinkOpenURLEx(label:String, url:String)
-	_ImGui_TextLinkOpenURLEx(label, url)
+Function ImGui_TextLinkOpenURLEx:Int(label:String, url:String)
+	Return _ImGui_TextLinkOpenURLEx(label, url)
 End Function
 
 Rem
 bbdoc:  Implied uv0 = ImVec2(0, 0), uv1 = ImVec2(1, 1)
 End Rem
-Function ImGui_Image(user_texture_id:ULong, image_size:SImVec2)
-	_ImGui_Image(user_texture_id, image_size)
+Function ImGui_Image(tex_ref:SImTextureRef, image_size:SImVec2)
+	_ImGui_Image(tex_ref, image_size)
 End Function
 
-Function ImGui_ImageEx(user_texture_id:ULong, image_size:SImVec2, uv0:SImVec2, uv1:SImVec2)
-	_ImGui_ImageEx(user_texture_id, image_size, uv0, uv1)
-End Function
-
-Rem
-bbdoc:  Implied uv0 = ImVec2(0, 0), uv1 = ImVec2(1, 1), bg_col = ImVec4(0, 0, 0, 0), tint_col = ImVec4(1, 1, 1, 1)
-End Rem
-Function ImGui_ImageWithBg(user_texture_id:ULong, image_size:SImVec2)
-	_ImGui_ImageWithBg(user_texture_id, image_size)
-End Function
-
-Function ImGui_ImageWithBgEx(user_texture_id:ULong, image_size:SImVec2, uv0:SImVec2, uv1:SImVec2, bg_col:SImVec4, tint_col:SImVec4)
-	_ImGui_ImageWithBgEx(user_texture_id, image_size, uv0, uv1, bg_col, tint_col)
+Function ImGui_ImageEx(tex_ref:SImTextureRef, image_size:SImVec2, uv0:SImVec2, uv1:SImVec2)
+	_ImGui_ImageEx(tex_ref, image_size, uv0, uv1)
 End Function
 
 Rem
 bbdoc:  Implied uv0 = ImVec2(0, 0), uv1 = ImVec2(1, 1), bg_col = ImVec4(0, 0, 0, 0), tint_col = ImVec4(1, 1, 1, 1)
 End Rem
-Function ImGui_ImageButton:Int(str_id:String, user_texture_id:ULong, image_size:SImVec2)
-	Return _ImGui_ImageButton(str_id, user_texture_id, image_size)
+Function ImGui_ImageWithBg(tex_ref:SImTextureRef, image_size:SImVec2)
+	_ImGui_ImageWithBg(tex_ref, image_size)
 End Function
 
-Function ImGui_ImageButtonEx:Int(str_id:String, user_texture_id:ULong, image_size:SImVec2, uv0:SImVec2, uv1:SImVec2, bg_col:SImVec4, tint_col:SImVec4)
-	Return _ImGui_ImageButtonEx(str_id, user_texture_id, image_size, uv0, uv1, bg_col, tint_col)
+Function ImGui_ImageWithBgEx(tex_ref:SImTextureRef, image_size:SImVec2, uv0:SImVec2, uv1:SImVec2, bg_col:SImVec4, tint_col:SImVec4)
+	_ImGui_ImageWithBgEx(tex_ref, image_size, uv0, uv1, bg_col, tint_col)
+End Function
+
+Rem
+bbdoc:  Implied uv0 = ImVec2(0, 0), uv1 = ImVec2(1, 1), bg_col = ImVec4(0, 0, 0, 0), tint_col = ImVec4(1, 1, 1, 1)
+End Rem
+Function ImGui_ImageButton:Int(str_id:String, tex_ref:SImTextureRef, image_size:SImVec2)
+	Return _ImGui_ImageButton(str_id, tex_ref, image_size)
+End Function
+
+Function ImGui_ImageButtonEx:Int(str_id:String, tex_ref:SImTextureRef, image_size:SImVec2, uv0:SImVec2, uv1:SImVec2, bg_col:SImVec4, tint_col:SImVec4)
+	Return _ImGui_ImageButtonEx(str_id, tex_ref, image_size, uv0, uv1, bg_col, tint_col)
 End Function
 
 Rem
@@ -2311,7 +2323,7 @@ Function ImGui_TreeNode:Int(label:String)
 End Function
 
 Rem
-bbdoc:  helper variation to easily decorelate the id from the displayed string. Read the FAQ about why and how to use ID. to align arbitrary text at the same level as a TreeNode() you can use Bullet().
+bbdoc:  helper variation to easily decorrelate the id from the displayed string. Read the FAQ about why and how to use ID. to align arbitrary text at the same level as a TreeNode() you can use Bullet().
 End Rem
 Function ImGui_TreeNodeStr:Int(str_id:String, fmt:String)
 	Return _ImGui_TreeNodeStr(str_id, fmt)
@@ -2698,7 +2710,7 @@ Function ImGui_CloseCurrentPopup()
 End Function
 
 Rem
-bbdoc:  Implied str_id = NULL, popup_flags = 1
+bbdoc:  Implied str_id = NULL, popup_flags = 0
 End Rem
 Function ImGui_BeginPopupContextItem:Int()
 	Return _ImGui_BeginPopupContextItem()
@@ -2712,7 +2724,7 @@ Function ImGui_BeginPopupContextItemEx:Int(str_id:String, popup_flags:EImGuiPopu
 End Function
 
 Rem
-bbdoc:  Implied str_id = NULL, popup_flags = 1
+bbdoc:  Implied str_id = NULL, popup_flags = 0
 End Rem
 Function ImGui_BeginPopupContextWindow:Int()
 	Return _ImGui_BeginPopupContextWindow()
@@ -2726,7 +2738,7 @@ Function ImGui_BeginPopupContextWindowEx:Int(str_id:String, popup_flags:EImGuiPo
 End Function
 
 Rem
-bbdoc:  Implied str_id = NULL, popup_flags = 1
+bbdoc:  Implied str_id = NULL, popup_flags = 0
 End Rem
 Function ImGui_BeginPopupContextVoid:Int()
 	Return _ImGui_BeginPopupContextVoid()
@@ -2772,7 +2784,7 @@ Function ImGui_TableNextRow()
 End Function
 
 Rem
-bbdoc:  append into the first cell of a new row.
+bbdoc:  append into the first cell of a new row. 'min_row_height' include the minimum top and bottom padding aka CellPadding.y * 2.0f.
 End Rem
 Function ImGui_TableNextRowEx(row_flags:EImGuiTableRowFlags, min_row_height:Float)
 	_ImGui_TableNextRowEx(row_flags, min_row_height)
@@ -2853,7 +2865,7 @@ Function ImGui_TableGetColumnIndex:Int()
 End Function
 
 Rem
-bbdoc:  return current row index.
+bbdoc:  return current row index (header rows are accounted for)
 End Rem
 Function ImGui_TableGetRowIndex:Int()
 	Return _ImGui_TableGetRowIndex()
@@ -3272,6 +3284,13 @@ Function ImGui_GetItemRectSize:SImVec2()
 End Function
 
 Rem
+bbdoc:  get generic flags of last item
+End Rem
+Function ImGui_GetItemFlags:EImGuiItemFlags()
+	Return _ImGui_GetItemFlags()
+End Function
+
+Rem
 bbdoc:  return primary/default viewport. This can never be NULL.
 End Rem
 Function ImGui_GetMainViewport:TImGuiViewport()
@@ -3390,7 +3409,7 @@ Function ImGui_IsKeyPressed:Int(key:EImGuiKey)
 End Function
 
 Rem
-bbdoc:  was key pressed (went from !Down to Down)? if repeat=true, uses io.KeyRepeatDelay / KeyRepeatRate
+bbdoc:  was key pressed (went from !Down to Down)? Repeat rate uses io.KeyRepeatDelay / KeyRepeatRate.
 End Rem
 Function ImGui_IsKeyPressedEx:Int(key:EImGuiKey, rep:Int)
 	Return _ImGui_IsKeyPressedEx(key, rep)
@@ -3583,7 +3602,7 @@ Function ImGui_SetMouseCursor(cursor_type:EImGuiMouseCursor)
 End Function
 
 Rem
-bbdoc:  Override io.WantCaptureMouse flag next frame (said flag is left for your application to handle, typical when true it instucts your app to ignore inputs). This is equivalent to setting "io.WantCaptureMouse = want_capture_mouse;" after the next NewFrame() call.
+bbdoc:  Override io.WantCaptureMouse flag next frame (said flag is left for your application to handle, typical when true it instructs your app to ignore inputs). This is equivalent to setting "io.WantCaptureMouse = want_capture_mouse;" after the next NewFrame() call.
 End Rem
 Function ImGui_SetNextFrameWantCaptureMouse(want_capture_mouse:Int)
 	_ImGui_SetNextFrameWantCaptureMouse(want_capture_mouse)
@@ -3694,6 +3713,9 @@ Function ImVector_Destruct(vector:Byte Ptr)
 	_ImVector_Destruct(vector)
 End Function
 
+Rem
+bbdoc:  Scale all spacing/padding/thickness values. Do not scale fonts.
+End Rem
 Function ImGuiStyle_ScaleAllSizes(this:TImGuiStyle, scale_factor:Float)
 	_ImGuiStyle_ScaleAllSizes(this.handle, scale_factor)
 End Function
@@ -3820,6 +3842,10 @@ End Function
 
 Function ImGuiInputTextCallbackData_SelectAll(this:Byte Ptr)
 	_ImGuiInputTextCallbackData_SelectAll(this)
+End Function
+
+Function ImGuiInputTextCallbackData_SetSelection(this:Byte Ptr, s:Int, e:Int)
+	_ImGuiInputTextCallbackData_SetSelection(this, s, e)
 End Function
 
 Function ImGuiInputTextCallbackData_ClearSelection(this:Byte Ptr)
@@ -4109,7 +4135,7 @@ Function ImGuiSelectionExternalStorage_ApplyRequests(this:Byte Ptr, ms_io:Byte P
 End Function
 
 Rem
-bbdoc: 
+bbdoc:  == (TexRef._TexData ? TexRef._TexData->TexID : TexRef._TexID)
 End Rem
 Function ImDrawCmd_GetTexID:ULong(this:Byte Ptr)
 	Return _ImDrawCmd_GetTexID(this)
@@ -4153,12 +4179,12 @@ Function ImDrawList_PopClipRect(this:TImDrawList)
 	_ImDrawList_PopClipRect(this.handle)
 End Function
 
-Function ImDrawList_PushTextureID(this:TImDrawList, texture_id:ULong)
-	_ImDrawList_PushTextureID(this.handle, texture_id)
+Function ImDrawList_PushTexture(this:TImDrawList, tex_ref:SImTextureRef)
+	_ImDrawList_PushTexture(this.handle, tex_ref)
 End Function
 
-Function ImDrawList_PopTextureID(this:TImDrawList)
-	_ImDrawList_PopTextureID(this.handle)
+Function ImDrawList_PopTexture(this:TImDrawList)
+	_ImDrawList_PopTexture(this.handle)
 End Function
 
 Function ImDrawList_GetClipRectMin:SImVec2(this:TImDrawList)
@@ -4348,27 +4374,27 @@ End Function
 Rem
 bbdoc:  Implied uv_min = ImVec2(0, 0), uv_max = ImVec2(1, 1), col = IM_COL32_WHITE
 End Rem
-Function ImDrawList_AddImage(this:TImDrawList, user_texture_id:ULong, p_min:SImVec2, p_max:SImVec2)
-	_ImDrawList_AddImage(this.handle, user_texture_id, p_min, p_max)
+Function ImDrawList_AddImage(this:TImDrawList, tex_ref:SImTextureRef, p_min:SImVec2, p_max:SImVec2)
+	_ImDrawList_AddImage(this.handle, tex_ref, p_min, p_max)
 End Function
 
-Function ImDrawList_AddImageEx(this:TImDrawList, user_texture_id:ULong, p_min:SImVec2, p_max:SImVec2, uv_min:SImVec2, uv_max:SImVec2, col:UInt)
-	_ImDrawList_AddImageEx(this.handle, user_texture_id, p_min, p_max, uv_min, uv_max, col)
+Function ImDrawList_AddImageEx(this:TImDrawList, tex_ref:SImTextureRef, p_min:SImVec2, p_max:SImVec2, uv_min:SImVec2, uv_max:SImVec2, col:UInt)
+	_ImDrawList_AddImageEx(this.handle, tex_ref, p_min, p_max, uv_min, uv_max, col)
 End Function
 
 Rem
 bbdoc:  Implied uv1 = ImVec2(0, 0), uv2 = ImVec2(1, 0), uv3 = ImVec2(1, 1), uv4 = ImVec2(0, 1), col = IM_COL32_WHITE
 End Rem
-Function ImDrawList_AddImageQuad(this:TImDrawList, user_texture_id:ULong, p1:SImVec2, p2:SImVec2, p3:SImVec2, p4:SImVec2)
-	_ImDrawList_AddImageQuad(this.handle, user_texture_id, p1, p2, p3, p4)
+Function ImDrawList_AddImageQuad(this:TImDrawList, tex_ref:SImTextureRef, p1:SImVec2, p2:SImVec2, p3:SImVec2, p4:SImVec2)
+	_ImDrawList_AddImageQuad(this.handle, tex_ref, p1, p2, p3, p4)
 End Function
 
-Function ImDrawList_AddImageQuadEx(this:TImDrawList, user_texture_id:ULong, p1:SImVec2, p2:SImVec2, p3:SImVec2, p4:SImVec2, uv1:SImVec2, uv2:SImVec2, uv3:SImVec2, uv4:SImVec2, col:UInt)
-	_ImDrawList_AddImageQuadEx(this.handle, user_texture_id, p1, p2, p3, p4, uv1, uv2, uv3, uv4, col)
+Function ImDrawList_AddImageQuadEx(this:TImDrawList, tex_ref:SImTextureRef, p1:SImVec2, p2:SImVec2, p3:SImVec2, p4:SImVec2, uv1:SImVec2, uv2:SImVec2, uv3:SImVec2, uv4:SImVec2, col:UInt)
+	_ImDrawList_AddImageQuadEx(this.handle, tex_ref, p1, p2, p3, p4, uv1, uv2, uv3, uv4, col)
 End Function
 
-Function ImDrawList_AddImageRounded(this:TImDrawList, user_texture_id:ULong, p_min:SImVec2, p_max:SImVec2, uv_min:SImVec2, uv_max:SImVec2, col:UInt, rounding:Float, flags:EImDrawFlags)
-	_ImDrawList_AddImageRounded(this.handle, user_texture_id, p_min, p_max, uv_min, uv_max, col, rounding, flags)
+Function ImDrawList_AddImageRounded(this:TImDrawList, tex_ref:SImTextureRef, p_min:SImVec2, p_max:SImVec2, uv_min:SImVec2, uv_max:SImVec2, col:UInt, rounding:Float, flags:EImDrawFlags)
+	_ImDrawList_AddImageRounded(this.handle, tex_ref, p_min, p_max, uv_min, uv_max, col, rounding, flags)
 End Function
 
 Rem
@@ -4460,7 +4486,7 @@ Function ImDrawList_AddDrawCmd(this:TImDrawList)
 End Function
 
 Rem
-bbdoc:  Create a clone of the CmdBuffer/IdxBuffer/VtxBuffer.
+bbdoc:  Create a clone of the CmdBuffer/IdxBuffer/VtxBuffer. For multi-threaded rendering, consider using `imgui_threaded_rendering` from https:github.com/ocornut/imgui_club instead.
 End Rem
 Function ImDrawList_CloneOutput:TImDrawList(this:TImDrawList)
 	Return TImDrawList._Create(_ImDrawList_CloneOutput(this.handle))
@@ -4525,6 +4551,10 @@ End Function
 Rem
 bbdoc: 
 End Rem
+Function ImDrawList__SetDrawListSharedData(this:TImDrawList, data:Byte Ptr)
+	_ImDrawList__SetDrawListSharedData(this.handle, data)
+End Function
+
 Function ImDrawList__ResetForNewFrame(this:TImDrawList)
 	_ImDrawList__ResetForNewFrame(this.handle)
 End Function
@@ -4545,16 +4575,16 @@ Function ImDrawList__OnChangedClipRect(this:TImDrawList)
 	_ImDrawList__OnChangedClipRect(this.handle)
 End Function
 
-Function ImDrawList__OnChangedTextureID(this:TImDrawList)
-	_ImDrawList__OnChangedTextureID(this.handle)
+Function ImDrawList__OnChangedTexture(this:TImDrawList)
+	_ImDrawList__OnChangedTexture(this.handle)
 End Function
 
 Function ImDrawList__OnChangedVtxOffset(this:TImDrawList)
 	_ImDrawList__OnChangedVtxOffset(this.handle)
 End Function
 
-Function ImDrawList__SetTextureID(this:TImDrawList, texture_id:ULong)
-	_ImDrawList__SetTextureID(this.handle, texture_id)
+Function ImDrawList__SetTexture(this:TImDrawList, tex_ref:SImTextureRef)
+	_ImDrawList__SetTexture(this.handle, tex_ref)
 End Function
 
 Function ImDrawList__CalcCircleAutoSegmentCount:Int(this:TImDrawList, radius:Float)
@@ -4592,6 +4622,49 @@ bbdoc:  Helper to scale the ClipRect field of each ImDrawCmd. Use if your final 
 End Rem
 Function ImDrawData_ScaleClipRects(this:TImDrawData, fb_scale:SImVec2)
 	_ImDrawData_ScaleClipRects(this.handle, fb_scale)
+End Function
+
+Function ImTextureData_Create(this:Byte Ptr, format:EImTextureFormat, w:Int, h:Int)
+	_ImTextureData_Create(this, format, w, h)
+End Function
+
+Function ImTextureData_DestroyPixels(this:Byte Ptr)
+	_ImTextureData_DestroyPixels(this)
+End Function
+
+Function ImTextureData_GetPixels:Byte Ptr(this:Byte Ptr)
+	Return _ImTextureData_GetPixels(this)
+End Function
+
+Function ImTextureData_GetPixelsAt:Byte Ptr(this:Byte Ptr, x:Int, y:Int)
+	Return _ImTextureData_GetPixelsAt(this, x, y)
+End Function
+
+Function ImTextureData_GetSizeInBytes:Int(this:Byte Ptr)
+	Return _ImTextureData_GetSizeInBytes(this)
+End Function
+
+Function ImTextureData_GetPitch:Int(this:Byte Ptr)
+	Return _ImTextureData_GetPitch(this)
+End Function
+
+Function ImTextureData_GetTexRef:SImTextureRef(this:Byte Ptr)
+	Return _ImTextureData_GetTexRef(this)
+End Function
+
+Function ImTextureData_GetTexID:ULong(this:Byte Ptr)
+	Return _ImTextureData_GetTexID(this)
+End Function
+
+Rem
+bbdoc: 
+End Rem
+Function ImTextureData_SetTexID(this:Byte Ptr, tex_id:ULong)
+	_ImTextureData_SetTexID(this, tex_id)
+End Function
+
+Function ImTextureData_SetStatus(this:Byte Ptr, status:EImTextureStatus)
+	_ImTextureData_SetStatus(this, status)
 End Function
 
 Function ImFontGlyphRangesBuilder_Clear(this:Byte Ptr)
@@ -4644,8 +4717,25 @@ Function ImFontAtlas_AddFont:TImFont(this:TImFontAtlas, font_cfg:Byte Ptr)
 	Return TImFont._Create(_ImFontAtlas_AddFont(this.handle, font_cfg))
 End Function
 
+Rem
+bbdoc:  Selects between AddFontDefaultVector() and AddFontDefaultBitmap().
+End Rem
 Function ImFontAtlas_AddFontDefault:TImFont(this:TImFontAtlas, font_cfg:Byte Ptr)
 	Return TImFont._Create(_ImFontAtlas_AddFontDefault(this.handle, font_cfg))
+End Function
+
+Rem
+bbdoc:  Embedded scalable font. Recommended at any higher size.
+End Rem
+Function ImFontAtlas_AddFontDefaultVector:TImFont(this:TImFontAtlas, font_cfg:Byte Ptr)
+	Return TImFont._Create(_ImFontAtlas_AddFontDefaultVector(this.handle, font_cfg))
+End Function
+
+Rem
+bbdoc:  Embedded classic pixel-clean font. Recommended at Size 13px with no scaling.
+End Rem
+Function ImFontAtlas_AddFontDefaultBitmap:TImFont(this:TImFontAtlas, font_cfg:Byte Ptr)
+	Return TImFont._Create(_ImFontAtlas_AddFontDefaultBitmap(this.handle, font_cfg))
 End Function
 
 Function ImFontAtlas_AddFontFromFileTTF:TImFont(this:TImFontAtlas, filename:String, size_pixels:Float, font_cfg:Byte Ptr, glyph_ranges:Byte Ptr)
@@ -4673,64 +4763,50 @@ Function ImFontAtlas_AddFontFromMemoryCompressedBase85TTF:TImFont(this:TImFontAt
 	Return TImFont._Create(_ImFontAtlas_AddFontFromMemoryCompressedBase85TTF(this.handle, compressed_font_data_base85, size_pixels, font_cfg, glyph_ranges))
 End Function
 
-Rem
-bbdoc:  Clear input data (all ImFontConfig structures including sizes, TTF data, glyph ranges, etc.) = all the data used to build the texture and fonts.
-End Rem
-Function ImFontAtlas_ClearInputData(this:TImFontAtlas)
-	_ImFontAtlas_ClearInputData(this.handle)
+Function ImFontAtlas_RemoveFont(this:TImFontAtlas, font:TImFont)
+	_ImFontAtlas_RemoveFont(this.handle, font.handle)
 End Function
 
 Rem
-bbdoc:  Clear input+output font data (same as ClearInputData() + glyphs storage, UV coordinates).
-End Rem
-Function ImFontAtlas_ClearFonts(this:TImFontAtlas)
-	_ImFontAtlas_ClearFonts(this.handle)
-End Function
-
-Rem
-bbdoc:  Clear output texture data (CPU side). Saves RAM once the texture has been copied to graphics memory.
-End Rem
-Function ImFontAtlas_ClearTexData(this:TImFontAtlas)
-	_ImFontAtlas_ClearTexData(this.handle)
-End Function
-
-Rem
-bbdoc:  Clear all input and output.
+bbdoc:  Clear everything (input fonts, output glyphs/textures).
 End Rem
 Function ImFontAtlas_Clear(this:TImFontAtlas)
 	_ImFontAtlas_Clear(this.handle)
 End Function
 
 Rem
-bbdoc:  Build pixels data. This is called automatically for you by the GetTexData*** functions.
+bbdoc:  Compact cached glyphs and texture.
 End Rem
-Function ImFontAtlas_Build:Int(this:TImFontAtlas)
-	Return _ImFontAtlas_Build(this.handle)
+Function ImFontAtlas_CompactCache(this:TImFontAtlas)
+	_ImFontAtlas_CompactCache(this.handle)
 End Function
 
 Rem
-bbdoc:  1 byte per-pixel
+bbdoc:  Change font loader at runtime.
 End Rem
-Function ImFontAtlas_GetTexDataAsAlpha8(this:TImFontAtlas, out_pixels:Byte Ptr, out_width:Int Var, out_height:Int Var, out_bytes_per_pixel:Int Var)
-	_ImFontAtlas_GetTexDataAsAlpha8(this.handle, out_pixels, out_width, out_height, out_bytes_per_pixel)
+Function ImFontAtlas_SetFontLoader(this:TImFontAtlas, font_loader:Byte Ptr)
+	_ImFontAtlas_SetFontLoader(this.handle, font_loader)
 End Function
 
 Rem
-bbdoc:  4 bytes-per-pixel
+bbdoc:  [OBSOLETE] Clear input data (all ImFontConfig structures including sizes, TTF data, glyph ranges, etc.) = all the data used to build the texture and fonts.
 End Rem
-Function ImFontAtlas_GetTexDataAsRGBA32(this:TImFontAtlas, out_pixels:Byte Ptr, out_width:Int Var, out_height:Int Var, out_bytes_per_pixel:Int Var)
-	_ImFontAtlas_GetTexDataAsRGBA32(this.handle, out_pixels, out_width, out_height, out_bytes_per_pixel)
+Function ImFontAtlas_ClearInputData(this:TImFontAtlas)
+	_ImFontAtlas_ClearInputData(this.handle)
 End Function
 
 Rem
-bbdoc:  Bit ambiguous: used to detect when user didn't build texture but effectively we should check TexID != 0 except that would be backend dependent...
+bbdoc:  [OBSOLETE] Clear input+output font data (same as ClearInputData() + glyphs storage, UV coordinates).
 End Rem
-Function ImFontAtlas_IsBuilt:Int(this:TImFontAtlas)
-	Return _ImFontAtlas_IsBuilt(this.handle)
+Function ImFontAtlas_ClearFonts(this:TImFontAtlas)
+	_ImFontAtlas_ClearFonts(this.handle)
 End Function
 
-Function ImFontAtlas_SetTexID(this:TImFontAtlas, id:ULong)
-	_ImFontAtlas_SetTexID(this.handle, id)
+Rem
+bbdoc:  [OBSOLETE] Clear CPU-side copy of the texture data. Saves RAM once the texture has been copied to graphics memory.
+End Rem
+Function ImFontAtlas_ClearTexData(this:TImFontAtlas)
+	_ImFontAtlas_ClearTexData(this.handle)
 End Function
 
 Rem
@@ -4741,94 +4817,50 @@ Function ImFontAtlas_GetGlyphRangesDefault:Byte Ptr(this:TImFontAtlas)
 End Function
 
 Rem
-bbdoc:  Default + Greek and Coptic
+bbdoc:  Register a rectangle. Return -1 (ImFontAtlasRectId_Invalid) on error.
 End Rem
-Function ImFontAtlas_GetGlyphRangesGreek:Byte Ptr(this:TImFontAtlas)
-	Return _ImFontAtlas_GetGlyphRangesGreek(this.handle)
+Function ImFontAtlas_AddCustomRect:Int(this:TImFontAtlas, width:Int, height:Int, out_r:Byte Ptr)
+	Return _ImFontAtlas_AddCustomRect(this.handle, width, height, out_r)
 End Function
 
 Rem
-bbdoc:  Default + Korean characters
+bbdoc:  Unregister a rectangle. Existing pixels will stay in texture until resized / garbage collected.
 End Rem
-Function ImFontAtlas_GetGlyphRangesKorean:Byte Ptr(this:TImFontAtlas)
-	Return _ImFontAtlas_GetGlyphRangesKorean(this.handle)
+Function ImFontAtlas_RemoveCustomRect(this:TImFontAtlas, id:Int)
+	_ImFontAtlas_RemoveCustomRect(this.handle, id)
 End Function
 
 Rem
-bbdoc:  Default + Hiragana, Katakana, Half-Width, Selection of 2999 Ideographs
+bbdoc:  Get rectangle coordinates for current texture. Valid immediately, never store this (read above)!
 End Rem
-Function ImFontAtlas_GetGlyphRangesJapanese:Byte Ptr(this:TImFontAtlas)
-	Return _ImFontAtlas_GetGlyphRangesJapanese(this.handle)
+Function ImFontAtlas_GetCustomRect:Int(this:TImFontAtlas, id:Int, out_r:Byte Ptr)
+	Return _ImFontAtlas_GetCustomRect(this.handle, id, out_r)
+End Function
+
+Function ImFontBaked_ClearOutputData(this:Byte Ptr)
+	_ImFontBaked_ClearOutputData(this)
 End Function
 
 Rem
-bbdoc:  Default + Half-Width + Japanese Hiragana/Katakana + full set of about 21000 CJK Unified Ideographs
+bbdoc:  Return U+FFFD glyph if requested glyph doesn't exists.
 End Rem
-Function ImFontAtlas_GetGlyphRangesChineseFull:Byte Ptr(this:TImFontAtlas)
-	Return _ImFontAtlas_GetGlyphRangesChineseFull(this.handle)
+Function ImFontBaked_FindGlyph:Byte Ptr(this:Byte Ptr, c:Short)
+	Return _ImFontBaked_FindGlyph(this, c)
 End Function
 
 Rem
-bbdoc:  Default + Half-Width + Japanese Hiragana/Katakana + set of 2500 CJK Unified Ideographs for common simplified Chinese
+bbdoc:  Return NULL if glyph doesn't exist
 End Rem
-Function ImFontAtlas_GetGlyphRangesChineseSimplifiedCommon:Byte Ptr(this:TImFontAtlas)
-	Return _ImFontAtlas_GetGlyphRangesChineseSimplifiedCommon(this.handle)
+Function ImFontBaked_FindGlyphNoFallback:Byte Ptr(this:Byte Ptr, c:Short)
+	Return _ImFontBaked_FindGlyphNoFallback(this, c)
 End Function
 
-Rem
-bbdoc:  Default + about 400 Cyrillic characters
-End Rem
-Function ImFontAtlas_GetGlyphRangesCyrillic:Byte Ptr(this:TImFontAtlas)
-	Return _ImFontAtlas_GetGlyphRangesCyrillic(this.handle)
+Function ImFontBaked_GetCharAdvance:Float(this:Byte Ptr, c:Short)
+	Return _ImFontBaked_GetCharAdvance(this, c)
 End Function
 
-Rem
-bbdoc:  Default + Thai characters
-End Rem
-Function ImFontAtlas_GetGlyphRangesThai:Byte Ptr(this:TImFontAtlas)
-	Return _ImFontAtlas_GetGlyphRangesThai(this.handle)
-End Function
-
-Rem
-bbdoc:  Default + Vietnamese characters
-End Rem
-Function ImFontAtlas_GetGlyphRangesVietnamese:Byte Ptr(this:TImFontAtlas)
-	Return _ImFontAtlas_GetGlyphRangesVietnamese(this.handle)
-End Function
-
-Rem
-bbdoc: 
-End Rem
-Function ImFontAtlas_AddCustomRectRegular:Int(this:TImFontAtlas, width:Int, height:Int)
-	Return _ImFontAtlas_AddCustomRectRegular(this.handle, width, height)
-End Function
-
-Function ImFontAtlas_AddCustomRectFontGlyph:Int(this:TImFontAtlas, font:TImFont, id:Short, width:Int, height:Int, advance_x:Float, offset:SImVec2)
-	Return _ImFontAtlas_AddCustomRectFontGlyph(this.handle, font.handle, id, width, height, advance_x, offset)
-End Function
-
-Function ImFontAtlas_GetCustomRectByIndex:Byte Ptr(this:TImFontAtlas, index:Int)
-	Return _ImFontAtlas_GetCustomRectByIndex(this.handle, index)
-End Function
-
-Function ImFont_FindGlyph:Byte Ptr(this:TImFont, c:Short)
-	Return _ImFont_FindGlyph(this.handle, c)
-End Function
-
-Function ImFont_FindGlyphNoFallback:Byte Ptr(this:TImFont, c:Short)
-	Return _ImFont_FindGlyphNoFallback(this.handle, c)
-End Function
-
-Function ImFont_GetCharAdvance:Float(this:TImFont, c:Short)
-	Return _ImFont_GetCharAdvance(this.handle, c)
-End Function
-
-Function ImFont_IsLoaded:Int(this:TImFont)
-	Return _ImFont_IsLoaded(this.handle)
-End Function
-
-Function ImFont_GetDebugName:String(this:TImFont)
-	Return _ImFont_GetDebugName(this.handle)
+Function ImFontBaked_IsGlyphLoaded:Int(this:Byte Ptr, c:Short)
+	Return _ImFontBaked_IsGlyphLoaded(this, c)
 End Function
 
 Rem
@@ -4840,6 +4872,20 @@ End Function
 
 Function ImGuiViewport_GetWorkCenter:SImVec2(this:TImGuiViewport)
 	Return _ImGuiViewport_GetWorkCenter(this.handle)
+End Function
+
+Rem
+bbdoc:  Clear all Platform_XXX fields. Typically called on Platform Backend shutdown.
+End Rem
+Function ImGuiPlatformIO_ClearPlatformHandlers(this:Byte Ptr)
+	_ImGuiPlatformIO_ClearPlatformHandlers(this)
+End Function
+
+Rem
+bbdoc:  Clear all Renderer_XXX fields. Typically called on Renderer Backend shutdown.
+End Rem
+Function ImGuiPlatformIO_ClearRendererHandlers(this:Byte Ptr)
+	_ImGuiPlatformIO_ClearRendererHandlers(this)
 End Function
 
 
@@ -4919,6 +4965,7 @@ Extern
 	Function bmx_imgui_io_get_key_repeat_rate:Float(handle:Byte Ptr)
 	Function bmx_imgui_io_set_key_repeat_rate(handle:Byte Ptr, value:Float)
 
+	Function _ImTextureRef_GetTexID:ULong(this:Byte Ptr) = "ImTextureRef_GetTexID"
 	Function _ImGui_CreateContext:Byte Ptr(shared_font_atlas:Byte Ptr) = "ImGui_CreateContext"
 	Function _ImGui_DestroyContext(ctx:Byte Ptr) = "ImGui_DestroyContext"
 	Function _ImGui_GetCurrentContext:Byte Ptr() = "ImGui_GetCurrentContext"
@@ -4971,7 +5018,6 @@ Extern
 	Function _ImGui_SetWindowSize(size:SImVec2, cond:EImGuiCond) = "ImGui_SetWindowSize"
 	Function _ImGui_SetWindowCollapsed(collapsed:Int, cond:EImGuiCond) = "ImGui_SetWindowCollapsed"
 	Function _ImGui_SetWindowFocus() = "ImGui_SetWindowFocus"
-	Function _ImGui_SetWindowFontScale(scale:Float) = "ImGui_SetWindowFontScale"
 	Function _ImGui_SetWindowPosStr(name:String, pos:SImVec2, cond:EImGuiCond) = "bmx_ImGui_SetWindowPosStr"
 	Function _ImGui_SetWindowSizeStr(name:String, size:SImVec2, cond:EImGuiCond) = "bmx_ImGui_SetWindowSizeStr"
 	Function _ImGui_SetWindowCollapsedStr(name:String, collapsed:Int, cond:EImGuiCond) = "bmx_ImGui_SetWindowCollapsedStr"
@@ -4986,8 +5032,11 @@ Extern
 	Function _ImGui_SetScrollHereY(center_y_ratio:Float) = "ImGui_SetScrollHereY"
 	Function _ImGui_SetScrollFromPosX(local_x:Float, center_x_ratio:Float) = "ImGui_SetScrollFromPosX"
 	Function _ImGui_SetScrollFromPosY(local_y:Float, center_y_ratio:Float) = "ImGui_SetScrollFromPosY"
-	Function _ImGui_PushFont(font:Byte Ptr) = "ImGui_PushFont"
+	Function _ImGui_PushFontFloat(font:Byte Ptr, font_size_base_unscaled:Float) = "ImGui_PushFontFloat"
 	Function _ImGui_PopFont() = "ImGui_PopFont"
+	Function _ImGui_GetFont:Byte Ptr() = "ImGui_GetFont"
+	Function _ImGui_GetFontSize:Float() = "ImGui_GetFontSize"
+	Function _ImGui_GetFontBaked:Byte Ptr() = "ImGui_GetFontBaked"
 	Function _ImGui_PushStyleColor(idx:EImGuiCol, col:UInt) = "ImGui_PushStyleColor"
 	Function _ImGui_PushStyleColorImVec4(idx:EImGuiCol, col:SImVec4) = "ImGui_PushStyleColorImVec4"
 	Function _ImGui_PopStyleColor() = "ImGui_PopStyleColor"
@@ -5006,8 +5055,6 @@ Extern
 	Function _ImGui_CalcItemWidth:Float() = "ImGui_CalcItemWidth"
 	Function _ImGui_PushTextWrapPos(wrap_local_pos_x:Float) = "ImGui_PushTextWrapPos"
 	Function _ImGui_PopTextWrapPos() = "ImGui_PopTextWrapPos"
-	Function _ImGui_GetFont:Byte Ptr() = "ImGui_GetFont"
-	Function _ImGui_GetFontSize:Float() = "ImGui_GetFontSize"
 	Function _ImGui_GetFontTexUvWhitePixel:SImVec2() = "ImGui_GetFontTexUvWhitePixel"
 	Function _ImGui_GetColorU32:UInt(idx:EImGuiCol) = "ImGui_GetColorU32"
 	Function _ImGui_GetColorU32Ex:UInt(idx:EImGuiCol, alpha_mul:Float) = "ImGui_GetColorU32Ex"
@@ -5079,14 +5126,14 @@ Extern
 	Function _ImGui_ProgressBar(fraction:Float, size_arg:SImVec2, overlay:String) = "bmx_ImGui_ProgressBar"
 	Function _ImGui_Bullet() = "ImGui_Bullet"
 	Function _ImGui_TextLink:Int(label:String) = "bmx_ImGui_TextLink"
-	Function _ImGui_TextLinkOpenURL(label:String) = "bmx_ImGui_TextLinkOpenURL"
-	Function _ImGui_TextLinkOpenURLEx(label:String, url:String) = "bmx_ImGui_TextLinkOpenURLEx"
-	Function _ImGui_Image(user_texture_id:ULong, image_size:SImVec2) = "ImGui_Image"
-	Function _ImGui_ImageEx(user_texture_id:ULong, image_size:SImVec2, uv0:SImVec2, uv1:SImVec2) = "ImGui_ImageEx"
-	Function _ImGui_ImageWithBg(user_texture_id:ULong, image_size:SImVec2) = "ImGui_ImageWithBg"
-	Function _ImGui_ImageWithBgEx(user_texture_id:ULong, image_size:SImVec2, uv0:SImVec2, uv1:SImVec2, bg_col:SImVec4, tint_col:SImVec4) = "ImGui_ImageWithBgEx"
-	Function _ImGui_ImageButton:Int(str_id:String, user_texture_id:ULong, image_size:SImVec2) = "bmx_ImGui_ImageButton"
-	Function _ImGui_ImageButtonEx:Int(str_id:String, user_texture_id:ULong, image_size:SImVec2, uv0:SImVec2, uv1:SImVec2, bg_col:SImVec4, tint_col:SImVec4) = "bmx_ImGui_ImageButtonEx"
+	Function _ImGui_TextLinkOpenURL:Int(label:String) = "bmx_ImGui_TextLinkOpenURL"
+	Function _ImGui_TextLinkOpenURLEx:Int(label:String, url:String) = "bmx_ImGui_TextLinkOpenURLEx"
+	Function _ImGui_Image(tex_ref:SImTextureRef, image_size:SImVec2) = "ImGui_Image"
+	Function _ImGui_ImageEx(tex_ref:SImTextureRef, image_size:SImVec2, uv0:SImVec2, uv1:SImVec2) = "ImGui_ImageEx"
+	Function _ImGui_ImageWithBg(tex_ref:SImTextureRef, image_size:SImVec2) = "ImGui_ImageWithBg"
+	Function _ImGui_ImageWithBgEx(tex_ref:SImTextureRef, image_size:SImVec2, uv0:SImVec2, uv1:SImVec2, bg_col:SImVec4, tint_col:SImVec4) = "ImGui_ImageWithBgEx"
+	Function _ImGui_ImageButton:Int(str_id:String, tex_ref:SImTextureRef, image_size:SImVec2) = "bmx_ImGui_ImageButton"
+	Function _ImGui_ImageButtonEx:Int(str_id:String, tex_ref:SImTextureRef, image_size:SImVec2, uv0:SImVec2, uv1:SImVec2, bg_col:SImVec4, tint_col:SImVec4) = "bmx_ImGui_ImageButtonEx"
 	Function _ImGui_BeginCombo:Int(label:String, preview_value:String, flags:EImGuiComboFlags) = "bmx_ImGui_BeginCombo"
 	Function _ImGui_EndCombo() = "ImGui_EndCombo"
 	Function _ImGui_ComboChar:Int(label:String, current_item:Int Var, items:String[], items_count:Int) = "bmx_ImGui_ComboChar"
@@ -5327,6 +5374,7 @@ Extern
 	Function _ImGui_GetItemRectMin:SImVec2() = "ImGui_GetItemRectMin"
 	Function _ImGui_GetItemRectMax:SImVec2() = "ImGui_GetItemRectMax"
 	Function _ImGui_GetItemRectSize:SImVec2() = "ImGui_GetItemRectSize"
+	Function _ImGui_GetItemFlags:EImGuiItemFlags() = "ImGui_GetItemFlags"
 	Function _ImGui_GetMainViewport:Byte Ptr() = "ImGui_GetMainViewport"
 	Function _ImGui_GetBackgroundDrawList:Byte Ptr() = "ImGui_GetBackgroundDrawList"
 	Function _ImGui_GetForegroundDrawList:Byte Ptr() = "ImGui_GetForegroundDrawList"
@@ -5413,6 +5461,7 @@ Extern
 	Function _ImGuiInputTextCallbackData_DeleteChars(this:Byte Ptr, pos:Int, bytes_count:Int) = "ImGuiInputTextCallbackData_DeleteChars"
 	Function _ImGuiInputTextCallbackData_InsertChars(this:Byte Ptr, pos:Int, text:String, text_end:String) = "bmx_ImGuiInputTextCallbackData_InsertChars"
 	Function _ImGuiInputTextCallbackData_SelectAll(this:Byte Ptr) = "ImGuiInputTextCallbackData_SelectAll"
+	Function _ImGuiInputTextCallbackData_SetSelection(this:Byte Ptr, s:Int, e:Int) = "ImGuiInputTextCallbackData_SetSelection"
 	Function _ImGuiInputTextCallbackData_ClearSelection(this:Byte Ptr) = "ImGuiInputTextCallbackData_ClearSelection"
 	Function _ImGuiInputTextCallbackData_HasSelection:Int(this:Byte Ptr) = "ImGuiInputTextCallbackData_HasSelection"
 	Function _ImGuiPayload_Clear(this:Byte Ptr) = "ImGuiPayload_Clear"
@@ -5477,8 +5526,8 @@ Extern
 	Function _ImDrawList_PushClipRect(this:Byte Ptr, clip_rect_min:SImVec2, clip_rect_max:SImVec2, intersect_with_current_clip_rect:Int) = "ImDrawList_PushClipRect"
 	Function _ImDrawList_PushClipRectFullScreen(this:Byte Ptr) = "ImDrawList_PushClipRectFullScreen"
 	Function _ImDrawList_PopClipRect(this:Byte Ptr) = "ImDrawList_PopClipRect"
-	Function _ImDrawList_PushTextureID(this:Byte Ptr, texture_id:ULong) = "ImDrawList_PushTextureID"
-	Function _ImDrawList_PopTextureID(this:Byte Ptr) = "ImDrawList_PopTextureID"
+	Function _ImDrawList_PushTexture(this:Byte Ptr, tex_ref:SImTextureRef) = "ImDrawList_PushTexture"
+	Function _ImDrawList_PopTexture(this:Byte Ptr) = "ImDrawList_PopTexture"
 	Function _ImDrawList_GetClipRectMin:SImVec2(this:Byte Ptr) = "ImDrawList_GetClipRectMin"
 	Function _ImDrawList_GetClipRectMax:SImVec2(this:Byte Ptr) = "ImDrawList_GetClipRectMax"
 	Function _ImDrawList_AddLine(this:Byte Ptr, p1:SImVec2, p2:SImVec2, col:UInt) = "ImDrawList_AddLine"
@@ -5513,11 +5562,11 @@ Extern
 	Function _ImDrawList_AddPolyline(this:Byte Ptr, points:Byte Ptr, num_points:Int, col:UInt, flags:EImDrawFlags, thickness:Float) = "ImDrawList_AddPolyline"
 	Function _ImDrawList_AddConvexPolyFilled(this:Byte Ptr, points:Byte Ptr, num_points:Int, col:UInt) = "ImDrawList_AddConvexPolyFilled"
 	Function _ImDrawList_AddConcavePolyFilled(this:Byte Ptr, points:Byte Ptr, num_points:Int, col:UInt) = "ImDrawList_AddConcavePolyFilled"
-	Function _ImDrawList_AddImage(this:Byte Ptr, user_texture_id:ULong, p_min:SImVec2, p_max:SImVec2) = "ImDrawList_AddImage"
-	Function _ImDrawList_AddImageEx(this:Byte Ptr, user_texture_id:ULong, p_min:SImVec2, p_max:SImVec2, uv_min:SImVec2, uv_max:SImVec2, col:UInt) = "ImDrawList_AddImageEx"
-	Function _ImDrawList_AddImageQuad(this:Byte Ptr, user_texture_id:ULong, p1:SImVec2, p2:SImVec2, p3:SImVec2, p4:SImVec2) = "ImDrawList_AddImageQuad"
-	Function _ImDrawList_AddImageQuadEx(this:Byte Ptr, user_texture_id:ULong, p1:SImVec2, p2:SImVec2, p3:SImVec2, p4:SImVec2, uv1:SImVec2, uv2:SImVec2, uv3:SImVec2, uv4:SImVec2, col:UInt) = "ImDrawList_AddImageQuadEx"
-	Function _ImDrawList_AddImageRounded(this:Byte Ptr, user_texture_id:ULong, p_min:SImVec2, p_max:SImVec2, uv_min:SImVec2, uv_max:SImVec2, col:UInt, rounding:Float, flags:EImDrawFlags) = "ImDrawList_AddImageRounded"
+	Function _ImDrawList_AddImage(this:Byte Ptr, tex_ref:SImTextureRef, p_min:SImVec2, p_max:SImVec2) = "ImDrawList_AddImage"
+	Function _ImDrawList_AddImageEx(this:Byte Ptr, tex_ref:SImTextureRef, p_min:SImVec2, p_max:SImVec2, uv_min:SImVec2, uv_max:SImVec2, col:UInt) = "ImDrawList_AddImageEx"
+	Function _ImDrawList_AddImageQuad(this:Byte Ptr, tex_ref:SImTextureRef, p1:SImVec2, p2:SImVec2, p3:SImVec2, p4:SImVec2) = "ImDrawList_AddImageQuad"
+	Function _ImDrawList_AddImageQuadEx(this:Byte Ptr, tex_ref:SImTextureRef, p1:SImVec2, p2:SImVec2, p3:SImVec2, p4:SImVec2, uv1:SImVec2, uv2:SImVec2, uv3:SImVec2, uv4:SImVec2, col:UInt) = "ImDrawList_AddImageQuadEx"
+	Function _ImDrawList_AddImageRounded(this:Byte Ptr, tex_ref:SImTextureRef, p_min:SImVec2, p_max:SImVec2, uv_min:SImVec2, uv_max:SImVec2, col:UInt, rounding:Float, flags:EImDrawFlags) = "ImDrawList_AddImageRounded"
 	Function _ImDrawList_PathClear(this:Byte Ptr) = "ImDrawList_PathClear"
 	Function _ImDrawList_PathLineTo(this:Byte Ptr, pos:SImVec2) = "ImDrawList_PathLineTo"
 	Function _ImDrawList_PathLineToMergeDuplicate(this:Byte Ptr, pos:SImVec2) = "ImDrawList_PathLineToMergeDuplicate"
@@ -5546,14 +5595,15 @@ Extern
 	Function _ImDrawList_PrimWriteVtx(this:Byte Ptr, pos:SImVec2, uv:SImVec2, col:UInt) = "ImDrawList_PrimWriteVtx"
 	Function _ImDrawList_PrimWriteIdx(this:Byte Ptr, idx:Short) = "ImDrawList_PrimWriteIdx"
 	Function _ImDrawList_PrimVtx(this:Byte Ptr, pos:SImVec2, uv:SImVec2, col:UInt) = "ImDrawList_PrimVtx"
+	Function _ImDrawList__SetDrawListSharedData(this:Byte Ptr, data:Byte Ptr) = "ImDrawList__SetDrawListSharedData"
 	Function _ImDrawList__ResetForNewFrame(this:Byte Ptr) = "ImDrawList__ResetForNewFrame"
 	Function _ImDrawList__ClearFreeMemory(this:Byte Ptr) = "ImDrawList__ClearFreeMemory"
 	Function _ImDrawList__PopUnusedDrawCmd(this:Byte Ptr) = "ImDrawList__PopUnusedDrawCmd"
 	Function _ImDrawList__TryMergeDrawCmds(this:Byte Ptr) = "ImDrawList__TryMergeDrawCmds"
 	Function _ImDrawList__OnChangedClipRect(this:Byte Ptr) = "ImDrawList__OnChangedClipRect"
-	Function _ImDrawList__OnChangedTextureID(this:Byte Ptr) = "ImDrawList__OnChangedTextureID"
+	Function _ImDrawList__OnChangedTexture(this:Byte Ptr) = "ImDrawList__OnChangedTexture"
 	Function _ImDrawList__OnChangedVtxOffset(this:Byte Ptr) = "ImDrawList__OnChangedVtxOffset"
-	Function _ImDrawList__SetTextureID(this:Byte Ptr, texture_id:ULong) = "ImDrawList__SetTextureID"
+	Function _ImDrawList__SetTexture(this:Byte Ptr, tex_ref:SImTextureRef) = "ImDrawList__SetTexture"
 	Function _ImDrawList__CalcCircleAutoSegmentCount:Int(this:Byte Ptr, radius:Float) = "ImDrawList__CalcCircleAutoSegmentCount"
 	Function _ImDrawList__PathArcToFastEx(this:Byte Ptr, center:SImVec2, radius:Float, a_min_sample:Int, a_max_sample:Int, a_step:Int) = "ImDrawList__PathArcToFastEx"
 	Function _ImDrawList__PathArcToN(this:Byte Ptr, center:SImVec2, radius:Float, a_min:Float, a_max:Float, num_segments:Int) = "ImDrawList__PathArcToN"
@@ -5561,6 +5611,16 @@ Extern
 	Function _ImDrawData_AddDrawList(this:Byte Ptr, draw_list:Byte Ptr) = "ImDrawData_AddDrawList"
 	Function _ImDrawData_DeIndexAllBuffers(this:Byte Ptr) = "ImDrawData_DeIndexAllBuffers"
 	Function _ImDrawData_ScaleClipRects(this:Byte Ptr, fb_scale:SImVec2) = "ImDrawData_ScaleClipRects"
+	Function _ImTextureData_Create(this:Byte Ptr, format:EImTextureFormat, w:Int, h:Int) = "ImTextureData_Create"
+	Function _ImTextureData_DestroyPixels(this:Byte Ptr) = "ImTextureData_DestroyPixels"
+	Function _ImTextureData_GetPixels:Byte Ptr(this:Byte Ptr) = "ImTextureData_GetPixels"
+	Function _ImTextureData_GetPixelsAt:Byte Ptr(this:Byte Ptr, x:Int, y:Int) = "ImTextureData_GetPixelsAt"
+	Function _ImTextureData_GetSizeInBytes:Int(this:Byte Ptr) = "ImTextureData_GetSizeInBytes"
+	Function _ImTextureData_GetPitch:Int(this:Byte Ptr) = "ImTextureData_GetPitch"
+	Function _ImTextureData_GetTexRef:SImTextureRef(this:Byte Ptr) = "ImTextureData_GetTexRef"
+	Function _ImTextureData_GetTexID:ULong(this:Byte Ptr) = "ImTextureData_GetTexID"
+	Function _ImTextureData_SetTexID(this:Byte Ptr, tex_id:ULong) = "ImTextureData_SetTexID"
+	Function _ImTextureData_SetStatus(this:Byte Ptr, status:EImTextureStatus) = "ImTextureData_SetStatus"
 	Function _ImFontGlyphRangesBuilder_Clear(this:Byte Ptr) = "ImFontGlyphRangesBuilder_Clear"
 	Function _ImFontGlyphRangesBuilder_GetBit:Int(this:Byte Ptr, n:size_t) = "ImFontGlyphRangesBuilder_GetBit"
 	Function _ImFontGlyphRangesBuilder_SetBit(this:Byte Ptr, n:size_t) = "ImFontGlyphRangesBuilder_SetBit"
@@ -5570,38 +5630,32 @@ Extern
 	Function _ImFontGlyphRangesBuilder_BuildRanges(this:Byte Ptr, out_ranges:Byte Ptr) = "ImFontGlyphRangesBuilder_BuildRanges"
 	Function _ImFontAtlas_AddFont:Byte Ptr(this:Byte Ptr, font_cfg:Byte Ptr) = "ImFontAtlas_AddFont"
 	Function _ImFontAtlas_AddFontDefault:Byte Ptr(this:Byte Ptr, font_cfg:Byte Ptr) = "ImFontAtlas_AddFontDefault"
+	Function _ImFontAtlas_AddFontDefaultVector:Byte Ptr(this:Byte Ptr, font_cfg:Byte Ptr) = "ImFontAtlas_AddFontDefaultVector"
+	Function _ImFontAtlas_AddFontDefaultBitmap:Byte Ptr(this:Byte Ptr, font_cfg:Byte Ptr) = "ImFontAtlas_AddFontDefaultBitmap"
 	Function _ImFontAtlas_AddFontFromFileTTF:Byte Ptr(this:Byte Ptr, filename:String, size_pixels:Float, font_cfg:Byte Ptr, glyph_ranges:Byte Ptr) = "bmx_ImFontAtlas_AddFontFromFileTTF"
 	Function _ImFontAtlas_AddFontFromMemoryTTF:Byte Ptr(this:Byte Ptr, font_data:Byte Ptr, font_data_size:Int, size_pixels:Float, font_cfg:Byte Ptr, glyph_ranges:Byte Ptr) = "ImFontAtlas_AddFontFromMemoryTTF"
 	Function _ImFontAtlas_AddFontFromMemoryCompressedTTF:Byte Ptr(this:Byte Ptr, compressed_font_data:Byte Ptr, compressed_font_data_size:Int, size_pixels:Float, font_cfg:Byte Ptr, glyph_ranges:Byte Ptr) = "ImFontAtlas_AddFontFromMemoryCompressedTTF"
 	Function _ImFontAtlas_AddFontFromMemoryCompressedBase85TTF:Byte Ptr(this:Byte Ptr, compressed_font_data_base85:String, size_pixels:Float, font_cfg:Byte Ptr, glyph_ranges:Byte Ptr) = "bmx_ImFontAtlas_AddFontFromMemoryCompressedBase85TTF"
+	Function _ImFontAtlas_RemoveFont(this:Byte Ptr, font:Byte Ptr) = "ImFontAtlas_RemoveFont"
+	Function _ImFontAtlas_Clear(this:Byte Ptr) = "ImFontAtlas_Clear"
+	Function _ImFontAtlas_CompactCache(this:Byte Ptr) = "ImFontAtlas_CompactCache"
+	Function _ImFontAtlas_SetFontLoader(this:Byte Ptr, font_loader:Byte Ptr) = "ImFontAtlas_SetFontLoader"
 	Function _ImFontAtlas_ClearInputData(this:Byte Ptr) = "ImFontAtlas_ClearInputData"
 	Function _ImFontAtlas_ClearFonts(this:Byte Ptr) = "ImFontAtlas_ClearFonts"
 	Function _ImFontAtlas_ClearTexData(this:Byte Ptr) = "ImFontAtlas_ClearTexData"
-	Function _ImFontAtlas_Clear(this:Byte Ptr) = "ImFontAtlas_Clear"
-	Function _ImFontAtlas_Build:Int(this:Byte Ptr) = "ImFontAtlas_Build"
-	Function _ImFontAtlas_GetTexDataAsAlpha8(this:Byte Ptr, out_pixels:Byte Ptr, out_width:Int Var, out_height:Int Var, out_bytes_per_pixel:Int Var) = "ImFontAtlas_GetTexDataAsAlpha8"
-	Function _ImFontAtlas_GetTexDataAsRGBA32(this:Byte Ptr, out_pixels:Byte Ptr, out_width:Int Var, out_height:Int Var, out_bytes_per_pixel:Int Var) = "ImFontAtlas_GetTexDataAsRGBA32"
-	Function _ImFontAtlas_IsBuilt:Int(this:Byte Ptr) = "ImFontAtlas_IsBuilt"
-	Function _ImFontAtlas_SetTexID(this:Byte Ptr, id:ULong) = "ImFontAtlas_SetTexID"
 	Function _ImFontAtlas_GetGlyphRangesDefault:Byte Ptr(this:Byte Ptr) = "ImFontAtlas_GetGlyphRangesDefault"
-	Function _ImFontAtlas_GetGlyphRangesGreek:Byte Ptr(this:Byte Ptr) = "ImFontAtlas_GetGlyphRangesGreek"
-	Function _ImFontAtlas_GetGlyphRangesKorean:Byte Ptr(this:Byte Ptr) = "ImFontAtlas_GetGlyphRangesKorean"
-	Function _ImFontAtlas_GetGlyphRangesJapanese:Byte Ptr(this:Byte Ptr) = "ImFontAtlas_GetGlyphRangesJapanese"
-	Function _ImFontAtlas_GetGlyphRangesChineseFull:Byte Ptr(this:Byte Ptr) = "ImFontAtlas_GetGlyphRangesChineseFull"
-	Function _ImFontAtlas_GetGlyphRangesChineseSimplifiedCommon:Byte Ptr(this:Byte Ptr) = "ImFontAtlas_GetGlyphRangesChineseSimplifiedCommon"
-	Function _ImFontAtlas_GetGlyphRangesCyrillic:Byte Ptr(this:Byte Ptr) = "ImFontAtlas_GetGlyphRangesCyrillic"
-	Function _ImFontAtlas_GetGlyphRangesThai:Byte Ptr(this:Byte Ptr) = "ImFontAtlas_GetGlyphRangesThai"
-	Function _ImFontAtlas_GetGlyphRangesVietnamese:Byte Ptr(this:Byte Ptr) = "ImFontAtlas_GetGlyphRangesVietnamese"
-	Function _ImFontAtlas_AddCustomRectRegular:Int(this:Byte Ptr, width:Int, height:Int) = "ImFontAtlas_AddCustomRectRegular"
-	Function _ImFontAtlas_AddCustomRectFontGlyph:Int(this:Byte Ptr, font:Byte Ptr, id:Short, width:Int, height:Int, advance_x:Float, offset:SImVec2) = "ImFontAtlas_AddCustomRectFontGlyph"
-	Function _ImFontAtlas_GetCustomRectByIndex:Byte Ptr(this:Byte Ptr, index:Int) = "ImFontAtlas_GetCustomRectByIndex"
-	Function _ImFont_FindGlyph:Byte Ptr(this:Byte Ptr, c:Short) = "ImFont_FindGlyph"
-	Function _ImFont_FindGlyphNoFallback:Byte Ptr(this:Byte Ptr, c:Short) = "ImFont_FindGlyphNoFallback"
-	Function _ImFont_GetCharAdvance:Float(this:Byte Ptr, c:Short) = "ImFont_GetCharAdvance"
-	Function _ImFont_IsLoaded:Int(this:Byte Ptr) = "ImFont_IsLoaded"
-	Function _ImFont_GetDebugName:String(this:Byte Ptr) = "bmx_ImFont_GetDebugName"
+	Function _ImFontAtlas_AddCustomRect:Int(this:Byte Ptr, width:Int, height:Int, out_r:Byte Ptr) = "ImFontAtlas_AddCustomRect"
+	Function _ImFontAtlas_RemoveCustomRect(this:Byte Ptr, id:Int) = "ImFontAtlas_RemoveCustomRect"
+	Function _ImFontAtlas_GetCustomRect:Int(this:Byte Ptr, id:Int, out_r:Byte Ptr) = "ImFontAtlas_GetCustomRect"
+	Function _ImFontBaked_ClearOutputData(this:Byte Ptr) = "ImFontBaked_ClearOutputData"
+	Function _ImFontBaked_FindGlyph:Byte Ptr(this:Byte Ptr, c:Short) = "ImFontBaked_FindGlyph"
+	Function _ImFontBaked_FindGlyphNoFallback:Byte Ptr(this:Byte Ptr, c:Short) = "ImFontBaked_FindGlyphNoFallback"
+	Function _ImFontBaked_GetCharAdvance:Float(this:Byte Ptr, c:Short) = "ImFontBaked_GetCharAdvance"
+	Function _ImFontBaked_IsGlyphLoaded:Int(this:Byte Ptr, c:Short) = "ImFontBaked_IsGlyphLoaded"
 	Function _ImGuiViewport_GetCenter:SImVec2(this:Byte Ptr) = "ImGuiViewport_GetCenter"
 	Function _ImGuiViewport_GetWorkCenter:SImVec2(this:Byte Ptr) = "ImGuiViewport_GetWorkCenter"
+	Function _ImGuiPlatformIO_ClearPlatformHandlers(this:Byte Ptr) = "ImGuiPlatformIO_ClearPlatformHandlers"
+	Function _ImGuiPlatformIO_ClearRendererHandlers(this:Byte Ptr) = "ImGuiPlatformIO_ClearRendererHandlers"
 End Extern
 
 Public
@@ -5634,8 +5688,6 @@ Enum EImGuiWindowFlags Flags
 	_Popup = 67108864
 	_Modal = 134217728
 	_ChildMenu = 268435456
-	_NavFlattened = 536870912
-	_AlwaysUseWindowPadding = 1073741824
 End Enum
 
 Enum EImGuiChildFlags Flags
@@ -5649,7 +5701,6 @@ Enum EImGuiChildFlags Flags
 	_AlwaysAutoResize = 64
 	_FrameStyle = 128
 	_NavFlattened = 256
-	_Border = 1
 End Enum
 
 Enum EImGuiItemFlags Flags
@@ -5660,6 +5711,7 @@ Enum EImGuiItemFlags Flags
 	_ButtonRepeat = 8
 	_AutoClosePopups = 16
 	_AllowDuplicateId = 32
+	_Disabled = 64
 End Enum
 
 Enum EImGuiInputTextFlags Flags
@@ -5688,6 +5740,7 @@ Enum EImGuiInputTextFlags Flags
 	_CallbackCharFilter = 2097152
 	_CallbackResize = 4194304
 	_CallbackEdit = 8388608
+	_WordWrap = 16777216
 End Enum
 
 Enum EImGuiTreeNodeFlags Flags
@@ -5708,25 +5761,29 @@ Enum EImGuiTreeNodeFlags Flags
 	_SpanLabelWidth = 8192
 	_SpanAllColumns = 16384
 	_LabelSpanAllColumns = 32768
-	_NavLeftJumpsBackHere = 131072
+	_NavLeftJumpsToParent = 131072
 	_CollapsingHeader = 26
-	_AllowItemOverlap = 4
+	_DrawLinesNone = 262144
+	_DrawLinesFull = 524288
+	_DrawLinesToNodes = 1048576
+	_NavLeftJumpsBackHere = 131072
 	_SpanTextWidth = 8192
 End Enum
 
 Enum EImGuiPopupFlags Flags
 	_None = 0
-	_MouseButtonLeft = 0
-	_MouseButtonRight = 1
-	_MouseButtonMiddle = 2
-	_MouseButtonMask_ = 31
-	_MouseButtonDefault_ = 1
+	_MouseButtonLeft = 4
+	_MouseButtonRight = 8
+	_MouseButtonMiddle = 12
 	_NoReopen = 32
 	_NoOpenOverExistingPopup = 128
 	_NoOpenOverItems = 256
 	_AnyPopupId = 1024
 	_AnyPopupLevel = 2048
 	_AnyPopup = 3072
+	_MouseButtonShift_ = 2
+	_MouseButtonMask_ = 12
+	_InvalidMask_ = 3
 End Enum
 
 Enum EImGuiSelectableFlags Flags
@@ -5737,8 +5794,8 @@ Enum EImGuiSelectableFlags Flags
 	_Disabled = 8
 	_AllowOverlap = 16
 	_Highlight = 32
+	_SelectOnNav = 64
 	_DontClosePopups = 1
-	_AllowItemOverlap = 16
 End Enum
 
 Enum EImGuiComboFlags Flags
@@ -5763,10 +5820,12 @@ Enum EImGuiTabBarFlags Flags
 	_NoTabListScrollingButtons = 16
 	_NoTooltip = 32
 	_DrawSelectedOverline = 64
-	_FittingPolicyResizeDown = 128
-	_FittingPolicyScroll = 256
-	_FittingPolicyMask_ = 384
+	_FittingPolicyMixed = 128
+	_FittingPolicyShrink = 256
+	_FittingPolicyScroll = 512
+	_FittingPolicyMask_ = 896
 	_FittingPolicyDefault_ = 128
+	_FittingPolicyResizeDown = 256
 End Enum
 
 Enum EImGuiTabItemFlags Flags
@@ -5827,6 +5886,7 @@ Enum EImGuiDragDropFlags Flags
 	_AcceptBeforeDelivery = 1024
 	_AcceptNoDrawDefaultRect = 2048
 	_AcceptNoPreviewTooltip = 4096
+	_AcceptDrawAsHovered = 8192
 	_AcceptPeekOnly = 3072
 	_SourceAutoExpirePayload = 32
 End Enum
@@ -6021,19 +6081,15 @@ Enum EImGuiKey
 	__ReservedForModAlt = 665
 	__ReservedForModSuper = 666
 	__NamedKey_END = 667
+	__NamedKey_COUNT = 155
 	ImGuiMod_None = 0
 	ImGuiMod_Ctrl = 4096
 	ImGuiMod_Shift = 8192
 	ImGuiMod_Alt = 16384
 	ImGuiMod_Super = 32768
 	ImGuiMod_Mask_ = 61440
-	__NamedKey_COUNT = 155
 	__COUNT = 667
 	ImGuiMod_Shortcut = 4096
-	__ModCtrl = 4096
-	__ModShift = 8192
-	__ModAlt = 16384
-	__ModSuper = 32768
 End Enum
 
 Enum EImGuiInputFlags Flags
@@ -6069,6 +6125,7 @@ Enum EImGuiBackendFlags Flags
 	_HasMouseCursors = 2
 	_HasSetMousePos = 4
 	_RendererHasVtxOffset = 8
+	_RendererHasTextures = 16
 End Enum
 
 Enum EImGuiCol
@@ -6105,34 +6162,38 @@ Enum EImGuiCol
 	_ResizeGrip = 30
 	_ResizeGripHovered = 31
 	_ResizeGripActive = 32
-	_TabHovered = 33
-	_Tab = 34
-	_TabSelected = 35
-	_TabSelectedOverline = 36
-	_TabDimmed = 37
-	_TabDimmedSelected = 38
-	_TabDimmedSelectedOverline = 39
-	_PlotLines = 40
-	_PlotLinesHovered = 41
-	_PlotHistogram = 42
-	_PlotHistogramHovered = 43
-	_TableHeaderBg = 44
-	_TableBorderStrong = 45
-	_TableBorderLight = 46
-	_TableRowBg = 47
-	_TableRowBgAlt = 48
-	_TextLink = 49
-	_TextSelectedBg = 50
-	_DragDropTarget = 51
-	_NavCursor = 52
-	_NavWindowingHighlight = 53
-	_NavWindowingDimBg = 54
-	_ModalWindowDimBg = 55
-	_COUNT = 56
-	_TabActive = 35
-	_TabUnfocused = 37
-	_TabUnfocusedActive = 38
-	_NavHighlight = 52
+	_InputTextCursor = 33
+	_TabHovered = 34
+	_Tab = 35
+	_TabSelected = 36
+	_TabSelectedOverline = 37
+	_TabDimmed = 38
+	_TabDimmedSelected = 39
+	_TabDimmedSelectedOverline = 40
+	_PlotLines = 41
+	_PlotLinesHovered = 42
+	_PlotHistogram = 43
+	_PlotHistogramHovered = 44
+	_TableHeaderBg = 45
+	_TableBorderStrong = 46
+	_TableBorderLight = 47
+	_TableRowBg = 48
+	_TableRowBgAlt = 49
+	_TextLink = 50
+	_TextSelectedBg = 51
+	_TreeLines = 52
+	_DragDropTarget = 53
+	_DragDropTargetBg = 54
+	_UnsavedMarker = 55
+	_NavCursor = 56
+	_NavWindowingHighlight = 57
+	_NavWindowingDimBg = 58
+	_ModalWindowDimBg = 59
+	_COUNT = 60
+	_TabActive = 36
+	_TabUnfocused = 38
+	_TabUnfocusedActive = 39
+	_NavHighlight = 56
 End Enum
 
 Enum EImGuiStyleVar
@@ -6156,21 +6217,27 @@ Enum EImGuiStyleVar
 	_CellPadding = 17
 	_ScrollbarSize = 18
 	_ScrollbarRounding = 19
-	_GrabMinSize = 20
-	_GrabRounding = 21
-	_ImageBorderSize = 22
-	_TabRounding = 23
-	_TabBorderSize = 24
-	_TabBarBorderSize = 25
-	_TabBarOverlineSize = 26
-	_TableAngledHeadersAngle = 27
-	_TableAngledHeadersTextAlign = 28
-	_ButtonTextAlign = 29
-	_SelectableTextAlign = 30
-	_SeparatorTextBorderSize = 31
-	_SeparatorTextAlign = 32
-	_SeparatorTextPadding = 33
-	_COUNT = 34
+	_ScrollbarPadding = 20
+	_GrabMinSize = 21
+	_GrabRounding = 22
+	_ImageRounding = 23
+	_ImageBorderSize = 24
+	_TabRounding = 25
+	_TabBorderSize = 26
+	_TabMinWidthBase = 27
+	_TabMinWidthShrink = 28
+	_TabBarBorderSize = 29
+	_TabBarOverlineSize = 30
+	_TableAngledHeadersAngle = 31
+	_TableAngledHeadersTextAlign = 32
+	_TreeLinesSize = 33
+	_TreeLinesRounding = 34
+	_ButtonTextAlign = 35
+	_SelectableTextAlign = 36
+	_SeparatorTextBorderSize = 37
+	_SeparatorTextAlign = 38
+	_SeparatorTextPadding = 39
+	_COUNT = 40
 End Enum
 
 Enum EImGuiButtonFlags Flags
@@ -6194,10 +6261,11 @@ Enum EImGuiColorEditFlags Flags
 	_NoSidePreview = 256
 	_NoDragDrop = 512
 	_NoBorder = 1024
-	_AlphaOpaque = 2048
-	_AlphaNoBg = 4096
-	_AlphaPreviewHalf = 8192
-	_AlphaBar = 65536
+	_NoColorMarkers = 2048
+	_AlphaOpaque = 4096
+	_AlphaNoBg = 8192
+	_AlphaPreviewHalf = 16384
+	_AlphaBar = 262144
 	_HDR = 524288
 	_DisplayRGB = 1048576
 	_DisplayHSV = 2097152
@@ -6209,7 +6277,7 @@ Enum EImGuiColorEditFlags Flags
 	_InputRGB = 134217728
 	_InputHSV = 268435456
 	_DefaultOptions_ = 177209344
-	_AlphaMask_ = 14338
+	_AlphaMask_ = 28674
 	_DisplayMask_ = 7340032
 	_DataTypeMask_ = 25165824
 	_PickerMask_ = 100663296
@@ -6226,6 +6294,7 @@ Enum EImGuiSliderFlags Flags
 	_ClampOnInput = 512
 	_ClampZeroRange = 1024
 	_NoSpeedTweaks = 2048
+	_ColorMarkers = 4096
 	_AlwaysClamp = 1536
 	_InvalidMask_ = 1879048207
 End Enum
@@ -6351,6 +6420,11 @@ Enum EImGuiTableBgTarget
 	_CellBg = 3
 End Enum
 
+Enum EImGuiListClipperFlags Flags
+	_None = 0
+	_NoSetTableRowCounters = 1
+End Enum
+
 Enum EImGuiMultiSelectFlags Flags
 	_None = 0
 	_SingleSelect = 1
@@ -6369,6 +6443,7 @@ Enum EImGuiMultiSelectFlags Flags
 	_SelectOnClick = 8192
 	_SelectOnClickRelease = 16384
 	_NavWrapX = 65536
+	_NoSelectOnRightClick = 131072
 End Enum
 
 Enum EImGuiSelectionRequestType
@@ -6402,11 +6477,31 @@ Enum EImDrawListFlags Flags
 	_AllowVtxOffset = 8
 End Enum
 
+Enum EImTextureFormat
+	__RGBA32 = 0
+	__Alpha8 = 1
+End Enum
+
+Enum EImTextureStatus
+	__OK = 0
+	__Destroyed = 1
+	__WantCreate = 2
+	__WantUpdates = 3
+	__WantDestroy = 4
+End Enum
+
 Enum EImFontAtlasFlags Flags
 	_None = 0
 	_NoPowerOfTwoHeight = 1
 	_NoMouseCursors = 2
 	_NoBakedLines = 4
+End Enum
+
+Enum EImFontFlags Flags
+	_None = 0
+	_NoLoadError = 2
+	_NoLoadGlyphs = 4
+	_LockBakedSizes = 8
 End Enum
 
 Enum EImGuiViewportFlags Flags

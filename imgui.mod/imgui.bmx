@@ -1,4 +1,4 @@
-' Copyright (c) 2025 Bruce A Henderson
+' Copyright (c) 2025-2026 Bruce A Henderson
 '
 ' Permission is hereby granted, free of charge, to any person obtaining a copy
 ' of this software and associated documentation files (the "Software"), to deal
@@ -22,8 +22,18 @@ SuperStrict
 
 Module ImGui.ImGui
 
-Import "generated/common_gen.bmx"
+ModuleInfo "Version: 1.01"
+ModuleInfo "License: MIT"
+ModuleInfo "Copyright: imgui - 2014-2026 Omar Cornut"
+ModuleInfo "Copyright: BlitzMax wrapper - 2025-2026 Bruce A Henderson"
+
+ModuleInfo "History: 1.01"
+ModuleInfo "History: Updated to imgui 1.92.6"
+ModuleInfo "History: 1.00 Initial Release"
 
 ModuleInfo "CPP_OPTS: -std=c++11"
 ModuleInfo "C_OPTS: -std=c99"
+
+Import "generated/common_gen.bmx"
+
 

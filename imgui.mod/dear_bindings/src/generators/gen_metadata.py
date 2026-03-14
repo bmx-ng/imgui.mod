@@ -116,6 +116,8 @@ def emit_type_comprehension_pointer(pointer):
 
     if hasattr(pointer, 'nullable'):
         result["is_nullable"] = pointer.nullable
+    if hasattr(pointer, 'reference'):
+        result["is_reference"] = pointer.reference
 
     result["inner_type"] = emit_type_comprehension_element(pointer.target)
 
@@ -221,8 +223,10 @@ def emit_type(type_info, declaration_suffix=""):
 
     # A version of the declaration with non-nullable pointers marked as ^ instead of *
     # (which the type comprehender knows how to interpret and output with appropriate annotations)
+    # Similarly, this emits references that have been turned into pointers as & for metadata purposes
     context = code_dom.WriteContext()
     context.mark_non_nullable_pointers = True
+    context.emit_converted_references_as_references = True
     declaration_with_non_nullable_pointers = type_info.to_c_string(context) + declaration_suffix
 
     result["declaration"] = declaration
@@ -354,6 +358,16 @@ def emit_struct_field_list(container, fields_root):
                     dummy_field.is_array = [False]
                     dummy_field.width_specifiers = [None]
                     dummy_field.is_anonymous = child.is_anonymous  # Technically wrong, but see above
+                    # We need to pretend this is in the same place in the tree, otherwise preprocessor defines don't
+                    # propagate correctly to it
+                    dummy_field.parent = child
+                    # If the struct had comments, temporarily attach them to the dummy field
+                    # This will result in the comments getting duplicated as they will also appear on the struct
+                    # declaration, but that's probably acceptable
+                    if child.pre_comments:
+                        dummy_field.pre_comments = child.pre_comments
+                    if child.attached_comment:
+                        dummy_field.attached_comment = child.attached_comment
                     dummy_type = utils.create_type(child.name)
                     dummy_field.field_type = dummy_type
                     emit_field(fields_root, dummy_field)
