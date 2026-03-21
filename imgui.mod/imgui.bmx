@@ -34,6 +34,6 @@ ModuleInfo "History: 1.00 Initial Release"
 ModuleInfo "CPP_OPTS: -std=c++11"
 ModuleInfo "C_OPTS: -std=c99"
 
-Import "generated/common_gen.bmx"
+Import "imgui_internal.bmx"
 
 

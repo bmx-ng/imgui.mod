@@ -407,6 +407,13 @@ Type TCodeGenerator
 					Continue
 			End Select
 
+			' skip functions we aren't implementing yet
+			Select func.name
+				Case "ImGuiPlatformIO_SetPlatform_GetWindowWorkAreaInsets", "ImGuiPlatformIO_SetPlatform_GetWindowFramebufferScale", ..
+					"ImGuiPlatformIO_SetPlatform_GetWindowPos", "ImGuiPlatformIO_SetPlatform_GetWindowSize"
+					Continue
+			End Select
+
 			' comments
 			If func.comments Then
 				stream.WriteString("Rem~n")
@@ -833,6 +840,9 @@ Type TCodeGenerator
 		stream.WriteString("""
 			~tFunction _ImGui_InputText:Int(label:String, buf:String Var, buf_size:size_t, flags:EImGuiInputTextFlags) = "bmx_ImGui_InputText"
 
+			~tFunction bmx_imgui_io_get_config_flags:EImGuiConfigFlags(handle:Byte Ptr)
+			~tFunction bmx_imgui_io_set_config_flags(handle:Byte Ptr, flags:EImGuiConfigFlags)
+			~tFunction bmx_imgui_io_get_backend_flags:EImGuiBackendFlags(handle:Byte Ptr)
 			~tFunction bmx_imgui_io_get_display_size:SImVec2(handle:Byte Ptr)
 			~tFunction bmx_imgui_io_get_delta_time:Float(handle:Byte Ptr)
 			~tFunction bmx_imgui_io_get_ini_saving_rate:Float(handle:Byte Ptr)
@@ -872,6 +882,30 @@ Type TCodeGenerator
 			~tFunction bmx_imgui_io_set_config_nav_cursor_visible_auto(handle:Byte Ptr, value:Int)
 			~tFunction bmx_imgui_io_get_config_nav_cursor_visible_always:Int(handle:Byte Ptr)
 			~tFunction bmx_imgui_io_set_config_nav_cursor_visible_always(handle:Byte Ptr, value:Int)
+			~tFunction bmx_imgui_io_get_config_docking_no_split:Int(handle:Byte Ptr)
+			~tFunction bmx_imgui_io_set_config_docking_no_split(handle:Byte Ptr, value:Int)
+			~tFunction bmx_imgui_io_get_config_docking_no_docking_over:Int(handle:Byte Ptr)
+			~tFunction bmx_imgui_io_set_config_docking_no_docking_over(handle:Byte Ptr, value:Int)
+			~tFunction bmx_imgui_io_get_config_docking_with_shift:Int(handle:Byte Ptr)
+			~tFunction bmx_imgui_io_set_config_docking_with_shift(handle:Byte Ptr, value:Int)
+			~tFunction bmx_imgui_io_get_config_docking_always_tab_bar:Int(handle:Byte Ptr)
+			~tFunction bmx_imgui_io_set_config_docking_always_tab_bar(handle:Byte Ptr, value:Int)
+			~tFunction bmx_imgui_io_get_config_docking_transparent_payload:Int(handle:Byte Ptr)
+			~tFunction bmx_imgui_io_set_config_docking_transparent_payload(handle:Byte Ptr, value:Int)
+			~tFunction bmx_imgui_io_get_config_viewports_no_auto_merge:Int(handle:Byte Ptr)
+			~tFunction bmx_imgui_io_set_config_viewports_no_auto_merge(handle:Byte Ptr, value:Int)
+			~tFunction bmx_imgui_io_get_config_viewports_no_task_bar_icon:Int(handle:Byte Ptr)
+			~tFunction bmx_imgui_io_set_config_viewports_no_task_bar_icon(handle:Byte Ptr, value:Int)
+			~tFunction bmx_imgui_io_get_config_viewports_no_decoration:Int(handle:Byte Ptr)
+			~tFunction bmx_imgui_io_set_config_viewports_no_decoration(handle:Byte Ptr, value:Int)
+			~tFunction bmx_imgui_io_get_config_viewports_no_default_parent:Int(handle:Byte Ptr)
+			~tFunction bmx_imgui_io_set_config_viewports_no_default_parent(handle:Byte Ptr, value:Int)
+			~tFunction bmx_imgui_io_get_config_viewports_platform_focus_sets_imgui_focus:Int(handle:Byte Ptr)
+			~tFunction bmx_imgui_io_set_config_viewports_platform_focus_sets_imgui_focus(handle:Byte Ptr, value:Int)
+			~tFunction bmx_imgui_io_get_config_dpi_scale_fonts:Int(handle:Byte Ptr)
+			~tFunction bmx_imgui_io_set_config_dpi_scale_fonts(handle:Byte Ptr, value:Int)
+			~tFunction bmx_imgui_io_get_config_dpi_scale_viewports:Int(handle:Byte Ptr)
+			~tFunction bmx_imgui_io_set_config_dpi_scale_viewports(handle:Byte Ptr, value:Int)
 			~tFunction bmx_imgui_io_get_mouse_draw_cursor:Int(handle:Byte Ptr)
 			~tFunction bmx_imgui_io_set_mouse_draw_cursor(handle:Byte Ptr, value:Int)
 			~tFunction bmx_imgui_io_get_config_macosx_behaviors:Int(handle:Byte Ptr)
@@ -904,6 +938,14 @@ Type TCodeGenerator
 			~tFunction bmx_imgui_io_set_key_repeat_delay(handle:Byte Ptr, value:Float)
 			~tFunction bmx_imgui_io_get_key_repeat_rate:Float(handle:Byte Ptr)
 			~tFunction bmx_imgui_io_set_key_repeat_rate(handle:Byte Ptr, value:Float)
+			~tFunction bmx_imgui_viewport_get_id:UInt(handle:Byte Ptr)
+			~tFunction bmx_imgui_viewport_get_flags:EImGuiViewportFlags(handle:Byte Ptr)
+			~tFunction bmx_imgui_viewport_get_pos:SImVec2(handle:Byte Ptr)
+			~tFunction bmx_imgui_viewport_get_size:SImVec2(handle:Byte Ptr)
+			~tFunction bmx_imgui_viewport_get_framebuffer_scale:SImVec2(handle:Byte Ptr)
+			~tFunction bmx_imgui_viewport_get_work_pos:SImVec2(handle:Byte Ptr)
+			~tFunction bmx_imgui_viewport_get_work_size:SImVec2(handle:Byte Ptr)
+			~tFunction bmx_imgui_viewport_get_dpi_scale:Float(handle:Byte Ptr)
 			""")
 		stream.WriteString("~n~n")
 
@@ -913,6 +955,13 @@ Type TCodeGenerator
 			If func.Name = "ImGui_InputText" Then
 				Continue
 			End If
+
+			' skip functions we aren't implementing yet
+			Select func.name
+				Case "ImGuiPlatformIO_SetPlatform_GetWindowWorkAreaInsets", "ImGuiPlatformIO_SetPlatform_GetWindowFramebufferScale", ..
+					"ImGuiPlatformIO_SetPlatform_GetWindowPos", "ImGuiPlatformIO_SetPlatform_GetWindowSize"
+					Continue
+			End Select
 
 			Local bmxFunc:Int = False
 			Local returnType:String
@@ -1155,8 +1204,26 @@ Type TCodeGenerator
 			stream.WriteString("~n")
 
 			For Local element:TIGEnumElement = eachin e.elements
-				stream.WriteString("~t" + element.name.Replace(e.name, "_") + " = " + element.value + "~n")
+				Local name:String = element.name.Replace(e.name, "_")
+				If name.StartsWith("__") Then
+					name = name[1..]
+				End If
+				If name.StartsWith("ImGuiMod_") Then
+					name = name.Replace("ImGuiMod_", "_Mod_")
+				End If
+				stream.WriteString("~t" + name + " = " + element.value + "~n")
 			Next
+
+			' extended from internal
+			If e.name = "ImGuiDockNodeFlags_" Then
+				stream.Writestring("~t' extensions from imgui_internal~n")
+   				stream.WriteString("~t_DockSpace = 1 Shl 10~n")
+				stream.WriteString("~t_CentralNode = 1 Shl 11~n")
+				stream.WriteString("~t_NoTabBar = 1 Shl 12~n")
+				stream.WriteString("~t_HiddenTabBar = 1 Shl 13~n")
+				stream.WriteString("~t_NoWindowMenuButton = 1 Shl 14~n")
+				stream.WriteString("~t_NoCloseButton = 1 Shl 15~n")
+			End If
 
 			stream.WriteString("End Enum~n~n")
 		Next
@@ -1198,6 +1265,18 @@ Type TCodeGenerator
 
 		float bmx_imgui_io_get_ini_saving_rate(ImGuiIO * io) {
 			return io->IniSavingRate;
+		}
+
+		ImGuiConfigFlags bmx_imgui_io_get_config_flags(ImGuiIO * io) {
+			return io->ConfigFlags;
+		}
+
+		void bmx_imgui_io_set_config_flags(ImGuiIO * io, ImGuiConfigFlags flags) {
+			io->ConfigFlags = flags;
+		}
+
+		ImGuiBackendFlags bmx_imgui_io_get_backend_flags(ImGuiIO * io) {
+			return io->BackendFlags;
 		}
 
 		ImVec2 bmx_imgui_io_get_display_size(ImGuiIO * io) {
@@ -1358,6 +1437,102 @@ Type TCodeGenerator
 			io->ConfigNavCursorVisibleAlways = value;
 		}
 
+		int bmx_imgui_io_get_config_docking_no_split(ImGuiIO * io) {
+			return io->ConfigDockingNoSplit;
+		}
+
+		void bmx_imgui_io_set_config_docking_no_split(ImGuiIO * io, int value) {
+			io->ConfigDockingNoSplit = value;
+		}
+
+		int bmx_imgui_io_get_config_docking_no_docking_over(ImGuiIO * io) {
+			return io->ConfigDockingNoDockingOver;
+		}
+
+		void bmx_imgui_io_set_config_docking_no_docking_over(ImGuiIO * io, int value) {
+			io->ConfigDockingNoDockingOver = value;
+		}
+
+		int bmx_imgui_io_get_config_docking_with_shift(ImGuiIO * io) {
+			return io->ConfigDockingWithShift;
+		}
+
+		void bmx_imgui_io_set_config_docking_with_shift(ImGuiIO * io, int value) {
+			io->ConfigDockingWithShift = value;
+		}
+
+		int bmx_imgui_io_get_config_docking_always_tab_bar(ImGuiIO * io) {
+			return io->ConfigDockingAlwaysTabBar;
+		}
+
+		void bmx_imgui_io_set_config_docking_always_tab_bar(ImGuiIO * io, int value) {
+			io->ConfigDockingAlwaysTabBar = value;
+		}
+
+		int bmx_imgui_io_get_config_docking_transparent_payload(ImGuiIO * io) {
+			return io->ConfigDockingTransparentPayload;
+		}
+
+		void bmx_imgui_io_set_config_docking_transparent_payload(ImGuiIO * io, int value) {
+			io->ConfigDockingTransparentPayload = value;
+		}
+
+		int bmx_imgui_io_get_config_viewports_no_auto_merge(ImGuiIO * io) {
+			return io->ConfigViewportsNoAutoMerge;
+		}
+
+		void bmx_imgui_io_set_config_viewports_no_auto_merge(ImGuiIO * io, int value) {
+			io->ConfigViewportsNoAutoMerge = value;
+		}
+
+		int bmx_imgui_io_get_config_viewports_no_task_bar_icon(ImGuiIO * io) {
+			return io->ConfigViewportsNoTaskBarIcon;
+		}
+
+		void bmx_imgui_io_set_config_viewports_no_task_bar_icon(ImGuiIO * io, int value) {
+			io->ConfigViewportsNoTaskBarIcon = value;
+		}
+
+		int bmx_imgui_io_get_config_viewports_no_decoration(ImGuiIO * io) {
+			return io->ConfigViewportsNoDecoration;
+		}
+
+		void bmx_imgui_io_set_config_viewports_no_decoration(ImGuiIO * io, int value) {
+			io->ConfigViewportsNoDecoration = value;
+		}
+
+		int bmx_imgui_io_get_config_viewports_no_default_parent(ImGuiIO * io) {
+			return io->ConfigViewportsNoDefaultParent;
+		}
+
+		void bmx_imgui_io_set_config_viewports_no_default_parent(ImGuiIO * io, int value) {
+			io->ConfigViewportsNoDefaultParent = value;
+		}
+
+		int bmx_imgui_io_get_config_viewports_platform_focus_sets_imgui_focus(ImGuiIO * io) {
+			return io->ConfigViewportsPlatformFocusSetsImGuiFocus;
+		}
+
+		void bmx_imgui_io_set_config_viewports_platform_focus_sets_imgui_focus(ImGuiIO * io, int value) {
+			io->ConfigViewportsPlatformFocusSetsImGuiFocus = value;
+		}
+
+		int bmx_imgui_io_get_config_dpi_scale_fonts(ImGuiIO * io) {
+			return io->ConfigDpiScaleFonts;
+		}
+
+		void bmx_imgui_io_set_config_dpi_scale_fonts(ImGuiIO * io, int value) {
+			io->ConfigDpiScaleFonts = value;
+		}
+
+		int bmx_imgui_io_get_config_dpi_scale_viewports(ImGuiIO * io) {
+			return io->ConfigDpiScaleViewports;
+		}
+
+		void bmx_imgui_io_set_config_dpi_scale_viewports(ImGuiIO * io, int value) {
+			io->ConfigDpiScaleViewports = value;
+		}
+
 		int bmx_imgui_io_get_mouse_draw_cursor(ImGuiIO * io) {
 			return io->MouseDrawCursor;
 		}
@@ -1484,6 +1659,38 @@ Type TCodeGenerator
 
 		void bmx_imgui_io_set_key_repeat_rate(ImGuiIO * io, float value) {
 			io->KeyRepeatRate = value;
+		}
+
+		ImGuiID bmx_imgui_viewport_get_id(ImGuiViewport * viewport) {
+			return viewport->ID;
+		}
+
+		ImGuiViewportFlags bmx_imgui_viewport_get_flags(ImGuiViewport * viewport) {
+			return viewport->Flags;
+		}
+
+		ImVec2 bmx_imgui_viewport_get_pos(ImGuiViewport * viewport) {
+			return viewport->Pos;
+		}
+
+		ImVec2 bmx_imgui_viewport_get_size(ImGuiViewport * viewport) {
+			return viewport->Size;
+		}
+
+		ImVec2 bmx_imgui_viewport_get_framebuffer_scale(ImGuiViewport * viewport) {
+			return viewport->FramebufferScale;
+		}
+
+		ImVec2 bmx_imgui_viewport_get_work_pos(ImGuiViewport * viewport) {
+			return viewport->WorkPos;
+		}
+
+		ImVec2 bmx_imgui_viewport_get_work_size(ImGuiViewport * viewport) {
+			return viewport->WorkSize;
+		}
+
+		float bmx_imgui_viewport_get_dpi_scale(ImGuiViewport * viewport) {
+			return viewport->DpiScale;
 		}
 
 		""")
@@ -1826,6 +2033,30 @@ Type TCodeGenerator
 			End Function
 			Public
 			Rem
+			bbdoc: see #EImGuiConfigFlags
+			about: Set by user/application. Keyboard/Gamepad navigation options, etc.
+			End Rem
+			Method GetConfigFlags:EImGuiConfigFlags()
+				Return bmx_imgui_io_get_config_flags(handle)
+			End Method
+
+			Rem
+			bbdoc: see #EImGuiConfigFlags
+			about: Set by user/application. Keyboard/Gamepad navigation options, etc.
+			End Rem
+			Method SetConfigFlags(flags:EImGuiConfigFlags)
+				bmx_imgui_io_set_config_flags(handle, flags)
+			End Method
+
+			Rem
+			bbdoc: see #EImGuiBackendFlags
+			about: Set by backend (imgui_impl_xxx files or custom backend) to communicate features supported by the backend.
+			End Rem
+			Method GetBackendFlags:EImGuiBackendFlags()
+				Return bmx_imgui_io_get_backend_flags(handle)
+			End Method
+
+			Rem
 			bbdoc: Main display size, in pixels (generally == GetMainViewport()->Size).
 			about: May change every frame.
 			End Rem
@@ -2120,6 +2351,184 @@ Type TCodeGenerator
 			End Method
 
 			Rem
+			bbdoc: Returns whether to disable window splitting in Simplified docking mode.
+			about: When enabled, docking is limited to merging multiple windows together into tab-bars.
+			End Rem
+			Method GetConfigDockingNoSplit:Int()
+				Return bmx_imgui_io_get_config_docking_no_split(handle)
+			End Method
+
+			Rem
+			bbdoc: Sets whether to disable window splitting in Simplified docking mode.
+			about: When enabled, docking is limited to merging multiple windows together into tab-bars.
+			End Rem
+			Method SetConfigDockingNoSplit(value:Int)
+				bmx_imgui_io_set_config_docking_no_split(handle, value)
+			End Method
+
+			Rem
+			bbdoc: Returns whether to disable window merging into a same tab-bar in Simplified docking mode.
+			about: When enabled, docking is limited to splitting windows.
+			End Rem
+			Method GetConfigDockingNoDockingOver:Int()
+				Return bmx_imgui_io_get_config_docking_no_docking_over(handle)
+			End Method
+
+			Rem
+			bbdoc: Sets whether to disable window merging into a same tab-bar in Simplified docking mode.
+			about: When enabled, docking is limited to splitting windows.
+			End Rem
+			Method SetConfigDockingNoDockingOver(value:Int)
+				bmx_imgui_io_set_config_docking_no_docking_over(handle, value)
+			End Method
+
+			Rem
+			bbdoc: Returns whether to enable docking with holding Shift key (reduce visual noise, allows dropping in wider space).
+			End Rem
+			Method GetConfigDockingWithShift:Int()
+				Return bmx_imgui_io_get_config_docking_with_shift(handle)
+			End Method
+
+			Rem
+			bbdoc: Sets whether to enable docking with holding Shift key (reduce visual noise, allows dropping in wider space).
+			End Rem
+			Method SetConfigDockingWithShift(value:Int)
+				bmx_imgui_io_set_config_docking_with_shift(handle, value)
+			End Method
+
+			Rem
+			bbdoc: Returns whether to make every single floating window display within a docking node.
+			End Rem
+			Method GetConfigDockingAlwaysTabBar:Int()
+				Return bmx_imgui_io_get_config_docking_always_tab_bar(handle)
+			End Method
+
+			Rem
+			bbdoc: Sets whether to make every single floating window display within a docking node.
+			End Rem
+			Method SetConfigDockingAlwaysTabBar(value:Int)
+				bmx_imgui_io_set_config_docking_always_tab_bar(handle, value)
+			End Method
+
+			Rem
+			bbdoc: Returns whether to make window or viewport transparent when docking and only display docking boxes on the target viewport.
+			End Rem
+			Method GetConfigDockingTransparentPayload:Int()
+				Return bmx_imgui_io_get_config_docking_transparent_payload(handle)
+			End Method
+
+			Rem
+			bbdoc: Sets whether to make window or viewport transparent when docking and only display docking boxes on the target viewport.
+			End Rem
+			Method SetConfigDockingTransparentPayload(value:Int)
+				bmx_imgui_io_set_config_docking_transparent_payload(handle, value)
+			End Method
+
+			Rem
+			bbdoc: Returns whether to make all floating imgui windows always create their own viewport.
+			about: Otherwise, they are merged into the main host viewports when overlapping it. May also set ImGuiViewportFlags_NoAutoMerge on individual viewport.
+			End Rem
+			Method GetConfigViewportsNoAutoMerge:Int()
+				Return bmx_imgui_io_get_config_viewports_no_auto_merge(handle)
+			End Method
+
+			Rem
+			bbdoc: Sets whether to make all floating imgui windows always create their own viewport.
+			about: Otherwise, they are merged into the main host viewports when overlapping it. May also set ImGuiViewportFlags_NoAutoMerge on individual viewport.
+			End Rem
+			Method SetConfigViewportsNoAutoMerge(value:Int)
+				bmx_imgui_io_set_config_viewports_no_auto_merge(handle, value)
+			End Method
+
+			Rem
+			bbdoc: Returns whether to disable default OS task bar icon flag for secondary viewports.
+			End Rem
+			Method GetConfigViewportsNoTaskBarIcon:Int()
+				Return bmx_imgui_io_get_config_viewports_no_task_bar_icon(handle)
+			End Method
+
+			Rem
+			bbdoc: Sets whether to disable default OS task bar icon flag for secondary viewports.
+			End Rem
+			Method SetConfigViewportsNoTaskBarIcon(value:Int)
+				bmx_imgui_io_set_config_viewports_no_task_bar_icon(handle, value)
+			End Method
+
+			Rem
+			bbdoc: Returns whether to disable default OS window decoration flag for secondary viewports.
+			End Rem
+			Method GetConfigViewportsNoDecoration:Int()
+				Return bmx_imgui_io_get_config_viewports_no_decoration(handle)
+			End Method
+
+			Rem
+			bbdoc: Sets whether to disable default OS window decoration flag for secondary viewports.
+			End Rem
+			Method SetConfigViewportsNoDecoration(value:Int)
+				bmx_imgui_io_set_config_viewports_no_decoration(handle, value)
+			End Method
+
+			Rem
+			bbdoc: Returns whether to set secondary viewports' ParentViewportId to main viewport ID by default.
+			about: Expects the platform backend to setup a parent/child relationship between the OS windows based on this value. Some backend may ignore this. Set to true if you want viewports to automatically be parent of main viewport, otherwise all viewports will be top-level OS windows.
+			End Rem
+			Method GetConfigViewportsNoDefaultParent:Int()
+				Return bmx_imgui_io_get_config_viewports_no_default_parent(handle)
+			End Method
+
+			Rem
+			bbdoc: Sets whether to set secondary viewports' ParentViewportId to main viewport ID by default.
+			about: Expects the platform backend to setup a parent/child relationship between the OS windows based on this value. Some backend may ignore this. Set to true if you want viewports to automatically be parent of main viewport, otherwise all viewports will be top-level OS windows.
+			End Rem
+			Method SetConfigViewportsNoDefaultParent(value:Int)
+				bmx_imgui_io_set_config_viewports_no_default_parent(handle, value)
+			End Method
+
+			Rem
+			bbdoc: Returns whether when a platform window is focused (e.g. using Alt+Tab, clicking Platform Title Bar), apply corresponding focus on imgui windows (may clear focus/active id from imgui windows location in other platform windows). In principle this is better enabled but we provide an opt-out, because some Linux window managers tend to eagerly focus windows (e.g. on mouse hover, or even a simple window pos/size change).
+			End Rem
+			Method GetConfigViewportsPlatformFocusSetsImGuiFocus:Int()
+				Return bmx_imgui_io_get_config_viewports_platform_focus_sets_imgui_focus(handle)
+			End Method
+
+			Rem
+			bbdoc: Sets whether when a platform window is focused (e.g. using Alt+Tab, clicking Platform Title Bar), apply corresponding focus on imgui windows (may clear focus/active id from imgui windows location in other platform windows). In principle this is better enabled but we provide an opt-out, because some Linux window managers tend to eagerly focus windows (e.g. on mouse hover, or even a simple window pos/size change).
+			End Rem
+			Method SetConfigViewportsPlatformFocusSetsImGuiFocus(value:Int)
+				bmx_imgui_io_set_config_viewports_platform_focus_sets_imgui_focus(handle, value)
+			End Method
+
+			Rem
+			bbdoc: Returns whether to automatically overwrite style.FontScaleDpi when Monitor DPI changes.
+			about: This will scale fonts but _NOT_ scale sizes/padding for now.
+			End Rem
+			Method GetConfigDpiScaleFonts:Int()
+				Return bmx_imgui_io_get_config_dpi_scale_fonts(handle)
+			End Method
+
+			Rem
+			bbdoc: Sets whether to automatically overwrite style.FontScaleDpi when Monitor DPI changes.
+			about: This will scale fonts but _NOT_ scale sizes/padding for now.
+			End Rem
+			Method SetConfigDpiScaleFonts(value:Int)
+				bmx_imgui_io_set_config_dpi_scale_fonts(handle, value)
+			End Method
+
+			Rem
+			bbdoc: Returns whether to scale Dear ImGui and Platform Windows when Monitor DPI changes.
+			End Rem
+			Method GetConfigDpiScaleViewports:Int()
+				Return bmx_imgui_io_get_config_dpi_scale_viewports(handle)
+			End Method
+
+			Rem
+			bbdoc: Sets whether to scale Dear ImGui and Platform Windows when Monitor DPI changes.
+			End Rem
+			Method SetConfigDpiScaleViewports(value:Int)
+				bmx_imgui_io_set_config_dpi_scale_viewports(handle, value)
+			End Method
+
+			Rem
 			bbdoc: Request ImGui to draw a mouse cursor for you (if you are on a platform without a mouse cursor).
 			End Rem
 			Method GetMouseDrawCursor:Int()
@@ -2396,6 +2805,63 @@ Type TCodeGenerator
 				this.handle = handle
 				Return this
 			End Function
+
+			Rem
+			bbdoc: Unique identifier for the viewport
+			End Rem
+			Method GetID:UInt()
+				Return bmx_imgui_viewport_get_id(handle)
+			End Method
+
+			Rem
+			bbdoc: See #EImGuiViewportFlags_
+			End Rem
+			Method GetFlags:EImGuiViewportFlags()
+				Return bmx_imgui_viewport_get_flags(handle)
+			End Method
+
+			Rem
+			bbdoc: Main Area: Position of the viewport (Dear ImGui coordinates are the same as OS desktop/native coordinates)
+			End Rem
+			Method GetPos:SImVec2()
+				Return bmx_imgui_viewport_get_pos(handle)
+			End Method
+
+			Rem
+			bbdoc: Main Area: Size of the viewport (Dear ImGui coordinates are the same as OS desktop/native coordinates)
+			End Rem
+			Method GetSize:SImVec2()
+				Return bmx_imgui_viewport_get_size(handle)
+			End Method
+
+			Rem
+			bbdoc: Density of the viewport for Retina display (always 1,1 on Windows, may be 2,2 etc on macOS/iOS). This will affect font rasterizer density.
+			End Rem
+			Method GetFramebufferScale:SImVec2()
+				Return bmx_imgui_viewport_get_framebuffer_scale(handle)
+			End Method
+
+			Rem
+			bbdoc: Work Area: Position of the viewport minus task bars, menus bars, status bars (>= Pos)
+			End Rem
+			Method GetWorkPos:SImVec2()
+				Return bmx_imgui_viewport_get_work_pos(handle)
+			End Method
+
+			Rem
+			bbdoc: Work Area: Size of the viewport minus task bars, menu bars, status bars (<= Size)
+			End Rem
+			Method GetWorkSize:SImVec2()
+				Return bmx_imgui_viewport_get_work_size(handle)
+			End Method
+
+			Rem
+			bbdoc: 1.0f = 96 DPI = No extra scale.
+			End Rem
+			Method GetDpiScale:Float()
+				Return bmx_imgui_viewport_get_dpi_scale(handle)
+			End Method
+
 		End Type
 
 		""")

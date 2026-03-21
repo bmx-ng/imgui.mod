@@ -32,6 +32,18 @@ float bmx_imgui_io_get_ini_saving_rate(ImGuiIO * io) {
 	return io->IniSavingRate;
 }
 
+ImGuiConfigFlags bmx_imgui_io_get_config_flags(ImGuiIO * io) {
+	return io->ConfigFlags;
+}
+
+void bmx_imgui_io_set_config_flags(ImGuiIO * io, ImGuiConfigFlags flags) {
+	io->ConfigFlags = flags;
+}
+
+ImGuiBackendFlags bmx_imgui_io_get_backend_flags(ImGuiIO * io) {
+	return io->BackendFlags;
+}
+
 ImVec2 bmx_imgui_io_get_display_size(ImGuiIO * io) {
 	return io->DisplaySize;
 }
@@ -190,6 +202,102 @@ void bmx_imgui_io_set_config_nav_cursor_visible_always(ImGuiIO * io, int value) 
 	io->ConfigNavCursorVisibleAlways = value;
 }
 
+int bmx_imgui_io_get_config_docking_no_split(ImGuiIO * io) {
+	return io->ConfigDockingNoSplit;
+}
+
+void bmx_imgui_io_set_config_docking_no_split(ImGuiIO * io, int value) {
+	io->ConfigDockingNoSplit = value;
+}
+
+int bmx_imgui_io_get_config_docking_no_docking_over(ImGuiIO * io) {
+	return io->ConfigDockingNoDockingOver;
+}
+
+void bmx_imgui_io_set_config_docking_no_docking_over(ImGuiIO * io, int value) {
+	io->ConfigDockingNoDockingOver = value;
+}
+
+int bmx_imgui_io_get_config_docking_with_shift(ImGuiIO * io) {
+	return io->ConfigDockingWithShift;
+}
+
+void bmx_imgui_io_set_config_docking_with_shift(ImGuiIO * io, int value) {
+	io->ConfigDockingWithShift = value;
+}
+
+int bmx_imgui_io_get_config_docking_always_tab_bar(ImGuiIO * io) {
+	return io->ConfigDockingAlwaysTabBar;
+}
+
+void bmx_imgui_io_set_config_docking_always_tab_bar(ImGuiIO * io, int value) {
+	io->ConfigDockingAlwaysTabBar = value;
+}
+
+int bmx_imgui_io_get_config_docking_transparent_payload(ImGuiIO * io) {
+	return io->ConfigDockingTransparentPayload;
+}
+
+void bmx_imgui_io_set_config_docking_transparent_payload(ImGuiIO * io, int value) {
+	io->ConfigDockingTransparentPayload = value;
+}
+
+int bmx_imgui_io_get_config_viewports_no_auto_merge(ImGuiIO * io) {
+	return io->ConfigViewportsNoAutoMerge;
+}
+
+void bmx_imgui_io_set_config_viewports_no_auto_merge(ImGuiIO * io, int value) {
+	io->ConfigViewportsNoAutoMerge = value;
+}
+
+int bmx_imgui_io_get_config_viewports_no_task_bar_icon(ImGuiIO * io) {
+	return io->ConfigViewportsNoTaskBarIcon;
+}
+
+void bmx_imgui_io_set_config_viewports_no_task_bar_icon(ImGuiIO * io, int value) {
+	io->ConfigViewportsNoTaskBarIcon = value;
+}
+
+int bmx_imgui_io_get_config_viewports_no_decoration(ImGuiIO * io) {
+	return io->ConfigViewportsNoDecoration;
+}
+
+void bmx_imgui_io_set_config_viewports_no_decoration(ImGuiIO * io, int value) {
+	io->ConfigViewportsNoDecoration = value;
+}
+
+int bmx_imgui_io_get_config_viewports_no_default_parent(ImGuiIO * io) {
+	return io->ConfigViewportsNoDefaultParent;
+}
+
+void bmx_imgui_io_set_config_viewports_no_default_parent(ImGuiIO * io, int value) {
+	io->ConfigViewportsNoDefaultParent = value;
+}
+
+int bmx_imgui_io_get_config_viewports_platform_focus_sets_imgui_focus(ImGuiIO * io) {
+	return io->ConfigViewportsPlatformFocusSetsImGuiFocus;
+}
+
+void bmx_imgui_io_set_config_viewports_platform_focus_sets_imgui_focus(ImGuiIO * io, int value) {
+	io->ConfigViewportsPlatformFocusSetsImGuiFocus = value;
+}
+
+int bmx_imgui_io_get_config_dpi_scale_fonts(ImGuiIO * io) {
+	return io->ConfigDpiScaleFonts;
+}
+
+void bmx_imgui_io_set_config_dpi_scale_fonts(ImGuiIO * io, int value) {
+	io->ConfigDpiScaleFonts = value;
+}
+
+int bmx_imgui_io_get_config_dpi_scale_viewports(ImGuiIO * io) {
+	return io->ConfigDpiScaleViewports;
+}
+
+void bmx_imgui_io_set_config_dpi_scale_viewports(ImGuiIO * io, int value) {
+	io->ConfigDpiScaleViewports = value;
+}
+
 int bmx_imgui_io_get_mouse_draw_cursor(ImGuiIO * io) {
 	return io->MouseDrawCursor;
 }
@@ -316,6 +424,38 @@ float bmx_imgui_io_get_key_repeat_rate(ImGuiIO * io) {
 
 void bmx_imgui_io_set_key_repeat_rate(ImGuiIO * io, float value) {
 	io->KeyRepeatRate = value;
+}
+
+ImGuiID bmx_imgui_viewport_get_id(ImGuiViewport * viewport) {
+	return viewport->ID;
+}
+
+ImGuiViewportFlags bmx_imgui_viewport_get_flags(ImGuiViewport * viewport) {
+	return viewport->Flags;
+}
+
+ImVec2 bmx_imgui_viewport_get_pos(ImGuiViewport * viewport) {
+	return viewport->Pos;
+}
+
+ImVec2 bmx_imgui_viewport_get_size(ImGuiViewport * viewport) {
+	return viewport->Size;
+}
+
+ImVec2 bmx_imgui_viewport_get_framebuffer_scale(ImGuiViewport * viewport) {
+	return viewport->FramebufferScale;
+}
+
+ImVec2 bmx_imgui_viewport_get_work_pos(ImGuiViewport * viewport) {
+	return viewport->WorkPos;
+}
+
+ImVec2 bmx_imgui_viewport_get_work_size(ImGuiViewport * viewport) {
+	return viewport->WorkSize;
+}
+
+float bmx_imgui_viewport_get_dpi_scale(ImGuiViewport * viewport) {
+	return viewport->DpiScale;
 }
 
 
