@@ -11319,29 +11319,6 @@
     ],
     "typedefs": [
         {
-            "name": "ImDrawIdx",
-            "type": {
-                "declaration": "unsigned short",
-                "description": {
-                    "kind": "Builtin",
-                    "builtin_type": "unsigned_short"
-                }
-            },
-            "comments": {
-                "attached": "// Default: 16-bit (for maximum compatibility with renderer backends)"
-            },
-            "conditionals": [
-                {
-                    "condition": "ifndef",
-                    "expression": "ImDrawIdx"
-                }
-            ],
-            "is_internal": false,
-            "source_location": {
-                "filename": "imgui.h"
-            }
-        },
-        {
             "name": "ImGuiID",
             "type": {
                 "declaration": "unsigned int",
@@ -12695,6 +12672,29 @@
             }
         },
         {
+            "name": "ImDrawIdx",
+            "type": {
+                "declaration": "unsigned short",
+                "description": {
+                    "kind": "Builtin",
+                    "builtin_type": "unsigned_short"
+                }
+            },
+            "comments": {
+                "attached": "// Default: 16-bit (for maximum compatibility with renderer backends)"
+            },
+            "conditionals": [
+                {
+                    "condition": "ifndef",
+                    "expression": "ImDrawIdx"
+                }
+            ],
+            "is_internal": false,
+            "source_location": {
+                "filename": "imgui.h"
+            }
+        },
+        {
             "name": "ImDrawCallback",
             "type": {
                 "declaration": "void (*ImDrawCallback)(const ImDrawList* parent_list, const ImDrawCmd* cmd)",
@@ -13386,78 +13386,6 @@
             }
         },
         {
-            "name": "ImVector_char",
-            "original_fully_qualified_name": "ImVector<char>",
-            "kind": "struct",
-            "by_value": false,
-            "forward_declaration": false,
-            "is_anonymous": false,
-            "fields": [
-                {
-                    "name": "Size",
-                    "is_array": false,
-                    "is_anonymous": false,
-                    "type": {
-                        "declaration": "int",
-                        "description": {
-                            "kind": "Builtin",
-                            "builtin_type": "int"
-                        }
-                    },
-                    "is_internal": false,
-                    "source_location": {
-                        "filename": "imgui.h",
-                        "line": 2291
-                    }
-                },
-                {
-                    "name": "Capacity",
-                    "is_array": false,
-                    "is_anonymous": false,
-                    "type": {
-                        "declaration": "int",
-                        "description": {
-                            "kind": "Builtin",
-                            "builtin_type": "int"
-                        }
-                    },
-                    "is_internal": false,
-                    "source_location": {
-                        "filename": "imgui.h",
-                        "line": 2292
-                    }
-                },
-                {
-                    "name": "Data",
-                    "is_array": false,
-                    "is_anonymous": false,
-                    "type": {
-                        "declaration": "char*",
-                        "description": {
-                            "kind": "Pointer",
-                            "inner_type": {
-                                "kind": "Builtin",
-                                "builtin_type": "char"
-                            }
-                        }
-                    },
-                    "is_internal": false,
-                    "source_location": {
-                        "filename": "imgui.h",
-                        "line": 2293
-                    }
-                }
-            ],
-            "comments": {
-                "attached": "// Instantiation of ImVector<char>"
-            },
-            "is_internal": false,
-            "source_location": {
-                "filename": "imgui.h",
-                "line": 2289
-            }
-        },
-        {
             "name": "ImVector_ImGuiStoragePair",
             "original_fully_qualified_name": "ImVector<ImGuiStoragePair>",
             "kind": "struct",
@@ -13594,78 +13522,6 @@
             ],
             "comments": {
                 "attached": "// Instantiation of ImVector<ImGuiSelectionRequest>"
-            },
-            "is_internal": false,
-            "source_location": {
-                "filename": "imgui.h",
-                "line": 2289
-            }
-        },
-        {
-            "name": "ImVector_ImDrawChannel",
-            "original_fully_qualified_name": "ImVector<ImDrawChannel>",
-            "kind": "struct",
-            "by_value": false,
-            "forward_declaration": false,
-            "is_anonymous": false,
-            "fields": [
-                {
-                    "name": "Size",
-                    "is_array": false,
-                    "is_anonymous": false,
-                    "type": {
-                        "declaration": "int",
-                        "description": {
-                            "kind": "Builtin",
-                            "builtin_type": "int"
-                        }
-                    },
-                    "is_internal": false,
-                    "source_location": {
-                        "filename": "imgui.h",
-                        "line": 2291
-                    }
-                },
-                {
-                    "name": "Capacity",
-                    "is_array": false,
-                    "is_anonymous": false,
-                    "type": {
-                        "declaration": "int",
-                        "description": {
-                            "kind": "Builtin",
-                            "builtin_type": "int"
-                        }
-                    },
-                    "is_internal": false,
-                    "source_location": {
-                        "filename": "imgui.h",
-                        "line": 2292
-                    }
-                },
-                {
-                    "name": "Data",
-                    "is_array": false,
-                    "is_anonymous": false,
-                    "type": {
-                        "declaration": "ImDrawChannel*",
-                        "description": {
-                            "kind": "Pointer",
-                            "inner_type": {
-                                "kind": "User",
-                                "name": "ImDrawChannel"
-                            }
-                        }
-                    },
-                    "is_internal": false,
-                    "source_location": {
-                        "filename": "imgui.h",
-                        "line": 2293
-                    }
-                }
-            ],
-            "comments": {
-                "attached": "// Instantiation of ImVector<ImDrawChannel>"
             },
             "is_internal": false,
             "source_location": {
@@ -13890,78 +13746,6 @@
             }
         },
         {
-            "name": "ImVector_ImVec2",
-            "original_fully_qualified_name": "ImVector<ImVec2>",
-            "kind": "struct",
-            "by_value": false,
-            "forward_declaration": false,
-            "is_anonymous": false,
-            "fields": [
-                {
-                    "name": "Size",
-                    "is_array": false,
-                    "is_anonymous": false,
-                    "type": {
-                        "declaration": "int",
-                        "description": {
-                            "kind": "Builtin",
-                            "builtin_type": "int"
-                        }
-                    },
-                    "is_internal": false,
-                    "source_location": {
-                        "filename": "imgui.h",
-                        "line": 2291
-                    }
-                },
-                {
-                    "name": "Capacity",
-                    "is_array": false,
-                    "is_anonymous": false,
-                    "type": {
-                        "declaration": "int",
-                        "description": {
-                            "kind": "Builtin",
-                            "builtin_type": "int"
-                        }
-                    },
-                    "is_internal": false,
-                    "source_location": {
-                        "filename": "imgui.h",
-                        "line": 2292
-                    }
-                },
-                {
-                    "name": "Data",
-                    "is_array": false,
-                    "is_anonymous": false,
-                    "type": {
-                        "declaration": "ImVec2*",
-                        "description": {
-                            "kind": "Pointer",
-                            "inner_type": {
-                                "kind": "User",
-                                "name": "ImVec2"
-                            }
-                        }
-                    },
-                    "is_internal": false,
-                    "source_location": {
-                        "filename": "imgui.h",
-                        "line": 2293
-                    }
-                }
-            ],
-            "comments": {
-                "attached": "// Instantiation of ImVector<ImVec2>"
-            },
-            "is_internal": false,
-            "source_location": {
-                "filename": "imgui.h",
-                "line": 2289
-            }
-        },
-        {
             "name": "ImVector_ImVec4",
             "original_fully_qualified_name": "ImVector<ImVec4>",
             "kind": "struct",
@@ -14170,225 +13954,6 @@
             ],
             "comments": {
                 "attached": "// Instantiation of ImVector<ImU8>"
-            },
-            "is_internal": false,
-            "source_location": {
-                "filename": "imgui.h",
-                "line": 2289
-            }
-        },
-        {
-            "name": "ImVector_ImDrawListPtr",
-            "original_fully_qualified_name": "ImVector<ImDrawList*>",
-            "kind": "struct",
-            "by_value": false,
-            "forward_declaration": false,
-            "is_anonymous": false,
-            "fields": [
-                {
-                    "name": "Size",
-                    "is_array": false,
-                    "is_anonymous": false,
-                    "type": {
-                        "declaration": "int",
-                        "description": {
-                            "kind": "Builtin",
-                            "builtin_type": "int"
-                        }
-                    },
-                    "is_internal": false,
-                    "source_location": {
-                        "filename": "imgui.h",
-                        "line": 2291
-                    }
-                },
-                {
-                    "name": "Capacity",
-                    "is_array": false,
-                    "is_anonymous": false,
-                    "type": {
-                        "declaration": "int",
-                        "description": {
-                            "kind": "Builtin",
-                            "builtin_type": "int"
-                        }
-                    },
-                    "is_internal": false,
-                    "source_location": {
-                        "filename": "imgui.h",
-                        "line": 2292
-                    }
-                },
-                {
-                    "name": "Data",
-                    "is_array": false,
-                    "is_anonymous": false,
-                    "type": {
-                        "declaration": "ImDrawList**",
-                        "description": {
-                            "kind": "Pointer",
-                            "inner_type": {
-                                "kind": "Pointer",
-                                "inner_type": {
-                                    "kind": "User",
-                                    "name": "ImDrawList"
-                                }
-                            }
-                        }
-                    },
-                    "is_internal": false,
-                    "source_location": {
-                        "filename": "imgui.h",
-                        "line": 2293
-                    }
-                }
-            ],
-            "comments": {
-                "attached": "// Instantiation of ImVector<ImDrawList*>"
-            },
-            "is_internal": false,
-            "source_location": {
-                "filename": "imgui.h",
-                "line": 2289
-            }
-        },
-        {
-            "name": "ImVector_ImTextureRect",
-            "original_fully_qualified_name": "ImVector<ImTextureRect>",
-            "kind": "struct",
-            "by_value": false,
-            "forward_declaration": false,
-            "is_anonymous": false,
-            "fields": [
-                {
-                    "name": "Size",
-                    "is_array": false,
-                    "is_anonymous": false,
-                    "type": {
-                        "declaration": "int",
-                        "description": {
-                            "kind": "Builtin",
-                            "builtin_type": "int"
-                        }
-                    },
-                    "is_internal": false,
-                    "source_location": {
-                        "filename": "imgui.h",
-                        "line": 2291
-                    }
-                },
-                {
-                    "name": "Capacity",
-                    "is_array": false,
-                    "is_anonymous": false,
-                    "type": {
-                        "declaration": "int",
-                        "description": {
-                            "kind": "Builtin",
-                            "builtin_type": "int"
-                        }
-                    },
-                    "is_internal": false,
-                    "source_location": {
-                        "filename": "imgui.h",
-                        "line": 2292
-                    }
-                },
-                {
-                    "name": "Data",
-                    "is_array": false,
-                    "is_anonymous": false,
-                    "type": {
-                        "declaration": "ImTextureRect*",
-                        "description": {
-                            "kind": "Pointer",
-                            "inner_type": {
-                                "kind": "User",
-                                "name": "ImTextureRect"
-                            }
-                        }
-                    },
-                    "is_internal": false,
-                    "source_location": {
-                        "filename": "imgui.h",
-                        "line": 2293
-                    }
-                }
-            ],
-            "comments": {
-                "attached": "// Instantiation of ImVector<ImTextureRect>"
-            },
-            "is_internal": false,
-            "source_location": {
-                "filename": "imgui.h",
-                "line": 2289
-            }
-        },
-        {
-            "name": "ImVector_ImU32",
-            "original_fully_qualified_name": "ImVector<ImU32>",
-            "kind": "struct",
-            "by_value": false,
-            "forward_declaration": false,
-            "is_anonymous": false,
-            "fields": [
-                {
-                    "name": "Size",
-                    "is_array": false,
-                    "is_anonymous": false,
-                    "type": {
-                        "declaration": "int",
-                        "description": {
-                            "kind": "Builtin",
-                            "builtin_type": "int"
-                        }
-                    },
-                    "is_internal": false,
-                    "source_location": {
-                        "filename": "imgui.h",
-                        "line": 2291
-                    }
-                },
-                {
-                    "name": "Capacity",
-                    "is_array": false,
-                    "is_anonymous": false,
-                    "type": {
-                        "declaration": "int",
-                        "description": {
-                            "kind": "Builtin",
-                            "builtin_type": "int"
-                        }
-                    },
-                    "is_internal": false,
-                    "source_location": {
-                        "filename": "imgui.h",
-                        "line": 2292
-                    }
-                },
-                {
-                    "name": "Data",
-                    "is_array": false,
-                    "is_anonymous": false,
-                    "type": {
-                        "declaration": "ImU32*",
-                        "description": {
-                            "kind": "Pointer",
-                            "inner_type": {
-                                "kind": "User",
-                                "name": "ImU32"
-                            }
-                        }
-                    },
-                    "is_internal": false,
-                    "source_location": {
-                        "filename": "imgui.h",
-                        "line": 2293
-                    }
-                }
-            ],
-            "comments": {
-                "attached": "// Instantiation of ImVector<ImU32>"
             },
             "is_internal": false,
             "source_location": {
@@ -14691,78 +14256,6 @@
             }
         },
         {
-            "name": "ImVector_float",
-            "original_fully_qualified_name": "ImVector<float>",
-            "kind": "struct",
-            "by_value": false,
-            "forward_declaration": false,
-            "is_anonymous": false,
-            "fields": [
-                {
-                    "name": "Size",
-                    "is_array": false,
-                    "is_anonymous": false,
-                    "type": {
-                        "declaration": "int",
-                        "description": {
-                            "kind": "Builtin",
-                            "builtin_type": "int"
-                        }
-                    },
-                    "is_internal": false,
-                    "source_location": {
-                        "filename": "imgui.h",
-                        "line": 2291
-                    }
-                },
-                {
-                    "name": "Capacity",
-                    "is_array": false,
-                    "is_anonymous": false,
-                    "type": {
-                        "declaration": "int",
-                        "description": {
-                            "kind": "Builtin",
-                            "builtin_type": "int"
-                        }
-                    },
-                    "is_internal": false,
-                    "source_location": {
-                        "filename": "imgui.h",
-                        "line": 2292
-                    }
-                },
-                {
-                    "name": "Data",
-                    "is_array": false,
-                    "is_anonymous": false,
-                    "type": {
-                        "declaration": "float*",
-                        "description": {
-                            "kind": "Pointer",
-                            "inner_type": {
-                                "kind": "Builtin",
-                                "builtin_type": "float"
-                            }
-                        }
-                    },
-                    "is_internal": false,
-                    "source_location": {
-                        "filename": "imgui.h",
-                        "line": 2293
-                    }
-                }
-            ],
-            "comments": {
-                "attached": "// Instantiation of ImVector<float>"
-            },
-            "is_internal": false,
-            "source_location": {
-                "filename": "imgui.h",
-                "line": 2289
-            }
-        },
-        {
             "name": "ImVector_ImU16",
             "original_fully_qualified_name": "ImVector<ImU16>",
             "kind": "struct",
@@ -15054,6 +14547,297 @@
             }
         },
         {
+            "name": "ImVector_ImGuiViewportPtr",
+            "original_fully_qualified_name": "ImVector<ImGuiViewport*>",
+            "kind": "struct",
+            "by_value": false,
+            "forward_declaration": false,
+            "is_anonymous": false,
+            "fields": [
+                {
+                    "name": "Size",
+                    "is_array": false,
+                    "is_anonymous": false,
+                    "type": {
+                        "declaration": "int",
+                        "description": {
+                            "kind": "Builtin",
+                            "builtin_type": "int"
+                        }
+                    },
+                    "is_internal": false,
+                    "source_location": {
+                        "filename": "imgui.h",
+                        "line": 2291
+                    }
+                },
+                {
+                    "name": "Capacity",
+                    "is_array": false,
+                    "is_anonymous": false,
+                    "type": {
+                        "declaration": "int",
+                        "description": {
+                            "kind": "Builtin",
+                            "builtin_type": "int"
+                        }
+                    },
+                    "is_internal": false,
+                    "source_location": {
+                        "filename": "imgui.h",
+                        "line": 2292
+                    }
+                },
+                {
+                    "name": "Data",
+                    "is_array": false,
+                    "is_anonymous": false,
+                    "type": {
+                        "declaration": "ImGuiViewport**",
+                        "description": {
+                            "kind": "Pointer",
+                            "inner_type": {
+                                "kind": "Pointer",
+                                "inner_type": {
+                                    "kind": "User",
+                                    "name": "ImGuiViewport"
+                                }
+                            }
+                        }
+                    },
+                    "is_internal": false,
+                    "source_location": {
+                        "filename": "imgui.h",
+                        "line": 2293
+                    }
+                }
+            ],
+            "comments": {
+                "attached": "// Instantiation of ImVector<ImGuiViewport*>"
+            },
+            "is_internal": false,
+            "source_location": {
+                "filename": "imgui.h",
+                "line": 2289
+            }
+        },
+        {
+            "name": "ImVector_ImU32",
+            "original_fully_qualified_name": "ImVector<ImU32>",
+            "kind": "struct",
+            "by_value": false,
+            "forward_declaration": false,
+            "is_anonymous": false,
+            "fields": [
+                {
+                    "name": "Size",
+                    "is_array": false,
+                    "is_anonymous": false,
+                    "type": {
+                        "declaration": "int",
+                        "description": {
+                            "kind": "Builtin",
+                            "builtin_type": "int"
+                        }
+                    },
+                    "is_internal": false,
+                    "source_location": {
+                        "filename": "imgui.h",
+                        "line": 2291
+                    }
+                },
+                {
+                    "name": "Capacity",
+                    "is_array": false,
+                    "is_anonymous": false,
+                    "type": {
+                        "declaration": "int",
+                        "description": {
+                            "kind": "Builtin",
+                            "builtin_type": "int"
+                        }
+                    },
+                    "is_internal": false,
+                    "source_location": {
+                        "filename": "imgui.h",
+                        "line": 2292
+                    }
+                },
+                {
+                    "name": "Data",
+                    "is_array": false,
+                    "is_anonymous": false,
+                    "type": {
+                        "declaration": "ImU32*",
+                        "description": {
+                            "kind": "Pointer",
+                            "inner_type": {
+                                "kind": "User",
+                                "name": "ImU32"
+                            }
+                        }
+                    },
+                    "is_internal": false,
+                    "source_location": {
+                        "filename": "imgui.h",
+                        "line": 2293
+                    }
+                }
+            ],
+            "comments": {
+                "attached": "// Instantiation of ImVector<ImU32>"
+            },
+            "is_internal": false,
+            "source_location": {
+                "filename": "imgui.h",
+                "line": 2289
+            }
+        },
+        {
+            "name": "ImVector_ImVec2",
+            "original_fully_qualified_name": "ImVector<ImVec2>",
+            "kind": "struct",
+            "by_value": false,
+            "forward_declaration": false,
+            "is_anonymous": false,
+            "fields": [
+                {
+                    "name": "Size",
+                    "is_array": false,
+                    "is_anonymous": false,
+                    "type": {
+                        "declaration": "int",
+                        "description": {
+                            "kind": "Builtin",
+                            "builtin_type": "int"
+                        }
+                    },
+                    "is_internal": false,
+                    "source_location": {
+                        "filename": "imgui.h",
+                        "line": 2291
+                    }
+                },
+                {
+                    "name": "Capacity",
+                    "is_array": false,
+                    "is_anonymous": false,
+                    "type": {
+                        "declaration": "int",
+                        "description": {
+                            "kind": "Builtin",
+                            "builtin_type": "int"
+                        }
+                    },
+                    "is_internal": false,
+                    "source_location": {
+                        "filename": "imgui.h",
+                        "line": 2292
+                    }
+                },
+                {
+                    "name": "Data",
+                    "is_array": false,
+                    "is_anonymous": false,
+                    "type": {
+                        "declaration": "ImVec2*",
+                        "description": {
+                            "kind": "Pointer",
+                            "inner_type": {
+                                "kind": "User",
+                                "name": "ImVec2"
+                            }
+                        }
+                    },
+                    "is_internal": false,
+                    "source_location": {
+                        "filename": "imgui.h",
+                        "line": 2293
+                    }
+                }
+            ],
+            "comments": {
+                "attached": "// Instantiation of ImVector<ImVec2>"
+            },
+            "is_internal": false,
+            "source_location": {
+                "filename": "imgui.h",
+                "line": 2289
+            }
+        },
+        {
+            "name": "ImVector_ImDrawChannel",
+            "original_fully_qualified_name": "ImVector<ImDrawChannel>",
+            "kind": "struct",
+            "by_value": false,
+            "forward_declaration": false,
+            "is_anonymous": false,
+            "fields": [
+                {
+                    "name": "Size",
+                    "is_array": false,
+                    "is_anonymous": false,
+                    "type": {
+                        "declaration": "int",
+                        "description": {
+                            "kind": "Builtin",
+                            "builtin_type": "int"
+                        }
+                    },
+                    "is_internal": false,
+                    "source_location": {
+                        "filename": "imgui.h",
+                        "line": 2291
+                    }
+                },
+                {
+                    "name": "Capacity",
+                    "is_array": false,
+                    "is_anonymous": false,
+                    "type": {
+                        "declaration": "int",
+                        "description": {
+                            "kind": "Builtin",
+                            "builtin_type": "int"
+                        }
+                    },
+                    "is_internal": false,
+                    "source_location": {
+                        "filename": "imgui.h",
+                        "line": 2292
+                    }
+                },
+                {
+                    "name": "Data",
+                    "is_array": false,
+                    "is_anonymous": false,
+                    "type": {
+                        "declaration": "ImDrawChannel*",
+                        "description": {
+                            "kind": "Pointer",
+                            "inner_type": {
+                                "kind": "User",
+                                "name": "ImDrawChannel"
+                            }
+                        }
+                    },
+                    "is_internal": false,
+                    "source_location": {
+                        "filename": "imgui.h",
+                        "line": 2293
+                    }
+                }
+            ],
+            "comments": {
+                "attached": "// Instantiation of ImVector<ImDrawChannel>"
+            },
+            "is_internal": false,
+            "source_location": {
+                "filename": "imgui.h",
+                "line": 2289
+            }
+        },
+        {
             "name": "ImVector_ImTextureDataPtr",
             "original_fully_qualified_name": "ImVector<ImTextureData*>",
             "kind": "struct",
@@ -15129,8 +14913,8 @@
             }
         },
         {
-            "name": "ImVector_ImGuiViewportPtr",
-            "original_fully_qualified_name": "ImVector<ImGuiViewport*>",
+            "name": "ImVector_char",
+            "original_fully_qualified_name": "ImVector<char>",
             "kind": "struct",
             "by_value": false,
             "forward_declaration": false,
@@ -15175,14 +14959,158 @@
                     "is_array": false,
                     "is_anonymous": false,
                     "type": {
-                        "declaration": "ImGuiViewport**",
+                        "declaration": "char*",
+                        "description": {
+                            "kind": "Pointer",
+                            "inner_type": {
+                                "kind": "Builtin",
+                                "builtin_type": "char"
+                            }
+                        }
+                    },
+                    "is_internal": false,
+                    "source_location": {
+                        "filename": "imgui.h",
+                        "line": 2293
+                    }
+                }
+            ],
+            "comments": {
+                "attached": "// Instantiation of ImVector<char>"
+            },
+            "is_internal": false,
+            "source_location": {
+                "filename": "imgui.h",
+                "line": 2289
+            }
+        },
+        {
+            "name": "ImVector_float",
+            "original_fully_qualified_name": "ImVector<float>",
+            "kind": "struct",
+            "by_value": false,
+            "forward_declaration": false,
+            "is_anonymous": false,
+            "fields": [
+                {
+                    "name": "Size",
+                    "is_array": false,
+                    "is_anonymous": false,
+                    "type": {
+                        "declaration": "int",
+                        "description": {
+                            "kind": "Builtin",
+                            "builtin_type": "int"
+                        }
+                    },
+                    "is_internal": false,
+                    "source_location": {
+                        "filename": "imgui.h",
+                        "line": 2291
+                    }
+                },
+                {
+                    "name": "Capacity",
+                    "is_array": false,
+                    "is_anonymous": false,
+                    "type": {
+                        "declaration": "int",
+                        "description": {
+                            "kind": "Builtin",
+                            "builtin_type": "int"
+                        }
+                    },
+                    "is_internal": false,
+                    "source_location": {
+                        "filename": "imgui.h",
+                        "line": 2292
+                    }
+                },
+                {
+                    "name": "Data",
+                    "is_array": false,
+                    "is_anonymous": false,
+                    "type": {
+                        "declaration": "float*",
+                        "description": {
+                            "kind": "Pointer",
+                            "inner_type": {
+                                "kind": "Builtin",
+                                "builtin_type": "float"
+                            }
+                        }
+                    },
+                    "is_internal": false,
+                    "source_location": {
+                        "filename": "imgui.h",
+                        "line": 2293
+                    }
+                }
+            ],
+            "comments": {
+                "attached": "// Instantiation of ImVector<float>"
+            },
+            "is_internal": false,
+            "source_location": {
+                "filename": "imgui.h",
+                "line": 2289
+            }
+        },
+        {
+            "name": "ImVector_ImDrawListPtr",
+            "original_fully_qualified_name": "ImVector<ImDrawList*>",
+            "kind": "struct",
+            "by_value": false,
+            "forward_declaration": false,
+            "is_anonymous": false,
+            "fields": [
+                {
+                    "name": "Size",
+                    "is_array": false,
+                    "is_anonymous": false,
+                    "type": {
+                        "declaration": "int",
+                        "description": {
+                            "kind": "Builtin",
+                            "builtin_type": "int"
+                        }
+                    },
+                    "is_internal": false,
+                    "source_location": {
+                        "filename": "imgui.h",
+                        "line": 2291
+                    }
+                },
+                {
+                    "name": "Capacity",
+                    "is_array": false,
+                    "is_anonymous": false,
+                    "type": {
+                        "declaration": "int",
+                        "description": {
+                            "kind": "Builtin",
+                            "builtin_type": "int"
+                        }
+                    },
+                    "is_internal": false,
+                    "source_location": {
+                        "filename": "imgui.h",
+                        "line": 2292
+                    }
+                },
+                {
+                    "name": "Data",
+                    "is_array": false,
+                    "is_anonymous": false,
+                    "type": {
+                        "declaration": "ImDrawList**",
                         "description": {
                             "kind": "Pointer",
                             "inner_type": {
                                 "kind": "Pointer",
                                 "inner_type": {
                                     "kind": "User",
-                                    "name": "ImGuiViewport"
+                                    "name": "ImDrawList"
                                 }
                             }
                         }
@@ -15195,7 +15123,79 @@
                 }
             ],
             "comments": {
-                "attached": "// Instantiation of ImVector<ImGuiViewport*>"
+                "attached": "// Instantiation of ImVector<ImDrawList*>"
+            },
+            "is_internal": false,
+            "source_location": {
+                "filename": "imgui.h",
+                "line": 2289
+            }
+        },
+        {
+            "name": "ImVector_ImTextureRect",
+            "original_fully_qualified_name": "ImVector<ImTextureRect>",
+            "kind": "struct",
+            "by_value": false,
+            "forward_declaration": false,
+            "is_anonymous": false,
+            "fields": [
+                {
+                    "name": "Size",
+                    "is_array": false,
+                    "is_anonymous": false,
+                    "type": {
+                        "declaration": "int",
+                        "description": {
+                            "kind": "Builtin",
+                            "builtin_type": "int"
+                        }
+                    },
+                    "is_internal": false,
+                    "source_location": {
+                        "filename": "imgui.h",
+                        "line": 2291
+                    }
+                },
+                {
+                    "name": "Capacity",
+                    "is_array": false,
+                    "is_anonymous": false,
+                    "type": {
+                        "declaration": "int",
+                        "description": {
+                            "kind": "Builtin",
+                            "builtin_type": "int"
+                        }
+                    },
+                    "is_internal": false,
+                    "source_location": {
+                        "filename": "imgui.h",
+                        "line": 2292
+                    }
+                },
+                {
+                    "name": "Data",
+                    "is_array": false,
+                    "is_anonymous": false,
+                    "type": {
+                        "declaration": "ImTextureRect*",
+                        "description": {
+                            "kind": "Pointer",
+                            "inner_type": {
+                                "kind": "User",
+                                "name": "ImTextureRect"
+                            }
+                        }
+                    },
+                    "is_internal": false,
+                    "source_location": {
+                        "filename": "imgui.h",
+                        "line": 2293
+                    }
+                }
+            ],
+            "comments": {
+                "attached": "// Instantiation of ImVector<ImTextureRect>"
             },
             "is_internal": false,
             "source_location": {
@@ -34795,7 +34795,6 @@
                     "is_instance_pointer": false
                 },
                 {
-                    "name": "__unnamed_arg1__",
                     "is_array": false,
                     "is_varargs": true,
                     "is_instance_pointer": false
@@ -34918,7 +34917,6 @@
                     "is_instance_pointer": false
                 },
                 {
-                    "name": "__unnamed_arg2__",
                     "is_array": false,
                     "is_varargs": true,
                     "is_instance_pointer": false
@@ -35041,7 +35039,6 @@
                     "is_instance_pointer": false
                 },
                 {
-                    "name": "__unnamed_arg1__",
                     "is_array": false,
                     "is_varargs": true,
                     "is_instance_pointer": false
@@ -35151,7 +35148,6 @@
                     "is_instance_pointer": false
                 },
                 {
-                    "name": "__unnamed_arg1__",
                     "is_array": false,
                     "is_varargs": true,
                     "is_instance_pointer": false
@@ -35280,7 +35276,6 @@
                     "is_instance_pointer": false
                 },
                 {
-                    "name": "__unnamed_arg2__",
                     "is_array": false,
                     "is_varargs": true,
                     "is_instance_pointer": false
@@ -35409,7 +35404,6 @@
                     "is_instance_pointer": false
                 },
                 {
-                    "name": "__unnamed_arg1__",
                     "is_array": false,
                     "is_varargs": true,
                     "is_instance_pointer": false
@@ -46558,7 +46552,6 @@
                     "is_instance_pointer": false
                 },
                 {
-                    "name": "__unnamed_arg2__",
                     "is_array": false,
                     "is_varargs": true,
                     "is_instance_pointer": false
@@ -46630,7 +46623,6 @@
                     "is_instance_pointer": false
                 },
                 {
-                    "name": "__unnamed_arg2__",
                     "is_array": false,
                     "is_varargs": true,
                     "is_instance_pointer": false
@@ -46924,7 +46916,6 @@
                     "is_instance_pointer": false
                 },
                 {
-                    "name": "__unnamed_arg3__",
                     "is_array": false,
                     "is_varargs": true,
                     "is_instance_pointer": false
@@ -47006,7 +46997,6 @@
                     "is_instance_pointer": false
                 },
                 {
-                    "name": "__unnamed_arg3__",
                     "is_array": false,
                     "is_varargs": true,
                     "is_instance_pointer": false
@@ -50528,7 +50518,6 @@
                     "is_instance_pointer": false
                 },
                 {
-                    "name": "__unnamed_arg1__",
                     "is_array": false,
                     "is_varargs": true,
                     "is_instance_pointer": false
@@ -50670,7 +50659,6 @@
                     "is_instance_pointer": false
                 },
                 {
-                    "name": "__unnamed_arg1__",
                     "is_array": false,
                     "is_varargs": true,
                     "is_instance_pointer": false
@@ -53806,7 +53794,6 @@
                     "is_instance_pointer": false
                 },
                 {
-                    "name": "__unnamed_arg1__",
                     "is_array": false,
                     "is_varargs": true,
                     "is_instance_pointer": false
@@ -57933,7 +57920,6 @@
                     "is_instance_pointer": false
                 },
                 {
-                    "name": "__unnamed_arg1__",
                     "is_array": false,
                     "is_varargs": true,
                     "is_instance_pointer": false
@@ -61755,7 +61741,6 @@
                     "is_instance_pointer": false
                 },
                 {
-                    "name": "__unnamed_arg2__",
                     "is_array": false,
                     "is_varargs": true,
                     "is_instance_pointer": false

@@ -91,6 +91,30 @@ Type TImGuiIO
 	End Function
 	Public
 	Rem
+	bbdoc: see #EImGuiConfigFlags
+	about: Set by user/application. Keyboard/Gamepad navigation options, etc.
+	End Rem
+	Method GetConfigFlags:EImGuiConfigFlags()
+		Return bmx_imgui_io_get_config_flags(handle)
+	End Method
+
+	Rem
+	bbdoc: see #EImGuiConfigFlags
+	about: Set by user/application. Keyboard/Gamepad navigation options, etc.
+	End Rem
+	Method SetConfigFlags(flags:EImGuiConfigFlags)
+		bmx_imgui_io_set_config_flags(handle, flags)
+	End Method
+
+	Rem
+	bbdoc: see #EImGuiBackendFlags
+	about: Set by backend (imgui_impl_xxx files or custom backend) to communicate features supported by the backend.
+	End Rem
+	Method GetBackendFlags:EImGuiBackendFlags()
+		Return bmx_imgui_io_get_backend_flags(handle)
+	End Method
+
+	Rem
 	bbdoc: Main display size, in pixels (generally == GetMainViewport()->Size).
 	about: May change every frame.
 	End Rem
@@ -385,6 +409,184 @@ Type TImGuiIO
 	End Method
 
 	Rem
+	bbdoc: Returns whether to disable window splitting in Simplified docking mode.
+	about: When enabled, docking is limited to merging multiple windows together into tab-bars.
+	End Rem
+	Method GetConfigDockingNoSplit:Int()
+		Return bmx_imgui_io_get_config_docking_no_split(handle)
+	End Method
+
+	Rem
+	bbdoc: Sets whether to disable window splitting in Simplified docking mode.
+	about: When enabled, docking is limited to merging multiple windows together into tab-bars.
+	End Rem
+	Method SetConfigDockingNoSplit(value:Int)
+		bmx_imgui_io_set_config_docking_no_split(handle, value)
+	End Method
+
+	Rem
+	bbdoc: Returns whether to disable window merging into a same tab-bar in Simplified docking mode.
+	about: When enabled, docking is limited to splitting windows.
+	End Rem
+	Method GetConfigDockingNoDockingOver:Int()
+		Return bmx_imgui_io_get_config_docking_no_docking_over(handle)
+	End Method
+
+	Rem
+	bbdoc: Sets whether to disable window merging into a same tab-bar in Simplified docking mode.
+	about: When enabled, docking is limited to splitting windows.
+	End Rem
+	Method SetConfigDockingNoDockingOver(value:Int)
+		bmx_imgui_io_set_config_docking_no_docking_over(handle, value)
+	End Method
+
+	Rem
+	bbdoc: Returns whether to enable docking with holding Shift key (reduce visual noise, allows dropping in wider space).
+	End Rem
+	Method GetConfigDockingWithShift:Int()
+		Return bmx_imgui_io_get_config_docking_with_shift(handle)
+	End Method
+
+	Rem
+	bbdoc: Sets whether to enable docking with holding Shift key (reduce visual noise, allows dropping in wider space).
+	End Rem
+	Method SetConfigDockingWithShift(value:Int)
+		bmx_imgui_io_set_config_docking_with_shift(handle, value)
+	End Method
+
+	Rem
+	bbdoc: Returns whether to make every single floating window display within a docking node.
+	End Rem
+	Method GetConfigDockingAlwaysTabBar:Int()
+		Return bmx_imgui_io_get_config_docking_always_tab_bar(handle)
+	End Method
+
+	Rem
+	bbdoc: Sets whether to make every single floating window display within a docking node.
+	End Rem
+	Method SetConfigDockingAlwaysTabBar(value:Int)
+		bmx_imgui_io_set_config_docking_always_tab_bar(handle, value)
+	End Method
+
+	Rem
+	bbdoc: Returns whether to make window or viewport transparent when docking and only display docking boxes on the target viewport.
+	End Rem
+	Method GetConfigDockingTransparentPayload:Int()
+		Return bmx_imgui_io_get_config_docking_transparent_payload(handle)
+	End Method
+
+	Rem
+	bbdoc: Sets whether to make window or viewport transparent when docking and only display docking boxes on the target viewport.
+	End Rem
+	Method SetConfigDockingTransparentPayload(value:Int)
+		bmx_imgui_io_set_config_docking_transparent_payload(handle, value)
+	End Method
+
+	Rem
+	bbdoc: Returns whether to make all floating imgui windows always create their own viewport.
+	about: Otherwise, they are merged into the main host viewports when overlapping it. May also set ImGuiViewportFlags_NoAutoMerge on individual viewport.
+	End Rem
+	Method GetConfigViewportsNoAutoMerge:Int()
+		Return bmx_imgui_io_get_config_viewports_no_auto_merge(handle)
+	End Method
+
+	Rem
+	bbdoc: Sets whether to make all floating imgui windows always create their own viewport.
+	about: Otherwise, they are merged into the main host viewports when overlapping it. May also set ImGuiViewportFlags_NoAutoMerge on individual viewport.
+	End Rem
+	Method SetConfigViewportsNoAutoMerge(value:Int)
+		bmx_imgui_io_set_config_viewports_no_auto_merge(handle, value)
+	End Method
+
+	Rem
+	bbdoc: Returns whether to disable default OS task bar icon flag for secondary viewports.
+	End Rem
+	Method GetConfigViewportsNoTaskBarIcon:Int()
+		Return bmx_imgui_io_get_config_viewports_no_task_bar_icon(handle)
+	End Method
+
+	Rem
+	bbdoc: Sets whether to disable default OS task bar icon flag for secondary viewports.
+	End Rem
+	Method SetConfigViewportsNoTaskBarIcon(value:Int)
+		bmx_imgui_io_set_config_viewports_no_task_bar_icon(handle, value)
+	End Method
+
+	Rem
+	bbdoc: Returns whether to disable default OS window decoration flag for secondary viewports.
+	End Rem
+	Method GetConfigViewportsNoDecoration:Int()
+		Return bmx_imgui_io_get_config_viewports_no_decoration(handle)
+	End Method
+
+	Rem
+	bbdoc: Sets whether to disable default OS window decoration flag for secondary viewports.
+	End Rem
+	Method SetConfigViewportsNoDecoration(value:Int)
+		bmx_imgui_io_set_config_viewports_no_decoration(handle, value)
+	End Method
+
+	Rem
+	bbdoc: Returns whether to set secondary viewports' ParentViewportId to main viewport ID by default.
+	about: Expects the platform backend to setup a parent/child relationship between the OS windows based on this value. Some backend may ignore this. Set to true if you want viewports to automatically be parent of main viewport, otherwise all viewports will be top-level OS windows.
+	End Rem
+	Method GetConfigViewportsNoDefaultParent:Int()
+		Return bmx_imgui_io_get_config_viewports_no_default_parent(handle)
+	End Method
+
+	Rem
+	bbdoc: Sets whether to set secondary viewports' ParentViewportId to main viewport ID by default.
+	about: Expects the platform backend to setup a parent/child relationship between the OS windows based on this value. Some backend may ignore this. Set to true if you want viewports to automatically be parent of main viewport, otherwise all viewports will be top-level OS windows.
+	End Rem
+	Method SetConfigViewportsNoDefaultParent(value:Int)
+		bmx_imgui_io_set_config_viewports_no_default_parent(handle, value)
+	End Method
+
+	Rem
+	bbdoc: Returns whether when a platform window is focused (e.g. using Alt+Tab, clicking Platform Title Bar), apply corresponding focus on imgui windows (may clear focus/active id from imgui windows location in other platform windows). In principle this is better enabled but we provide an opt-out, because some Linux window managers tend to eagerly focus windows (e.g. on mouse hover, or even a simple window pos/size change).
+	End Rem
+	Method GetConfigViewportsPlatformFocusSetsImGuiFocus:Int()
+		Return bmx_imgui_io_get_config_viewports_platform_focus_sets_imgui_focus(handle)
+	End Method
+
+	Rem
+	bbdoc: Sets whether when a platform window is focused (e.g. using Alt+Tab, clicking Platform Title Bar), apply corresponding focus on imgui windows (may clear focus/active id from imgui windows location in other platform windows). In principle this is better enabled but we provide an opt-out, because some Linux window managers tend to eagerly focus windows (e.g. on mouse hover, or even a simple window pos/size change).
+	End Rem
+	Method SetConfigViewportsPlatformFocusSetsImGuiFocus(value:Int)
+		bmx_imgui_io_set_config_viewports_platform_focus_sets_imgui_focus(handle, value)
+	End Method
+
+	Rem
+	bbdoc: Returns whether to automatically overwrite style.FontScaleDpi when Monitor DPI changes.
+	about: This will scale fonts but _NOT_ scale sizes/padding for now.
+	End Rem
+	Method GetConfigDpiScaleFonts:Int()
+		Return bmx_imgui_io_get_config_dpi_scale_fonts(handle)
+	End Method
+
+	Rem
+	bbdoc: Sets whether to automatically overwrite style.FontScaleDpi when Monitor DPI changes.
+	about: This will scale fonts but _NOT_ scale sizes/padding for now.
+	End Rem
+	Method SetConfigDpiScaleFonts(value:Int)
+		bmx_imgui_io_set_config_dpi_scale_fonts(handle, value)
+	End Method
+
+	Rem
+	bbdoc: Returns whether to scale Dear ImGui and Platform Windows when Monitor DPI changes.
+	End Rem
+	Method GetConfigDpiScaleViewports:Int()
+		Return bmx_imgui_io_get_config_dpi_scale_viewports(handle)
+	End Method
+
+	Rem
+	bbdoc: Sets whether to scale Dear ImGui and Platform Windows when Monitor DPI changes.
+	End Rem
+	Method SetConfigDpiScaleViewports(value:Int)
+		bmx_imgui_io_set_config_dpi_scale_viewports(handle, value)
+	End Method
+
+	Rem
 	bbdoc: Request ImGui to draw a mouse cursor for you (if you are on a platform without a mouse cursor).
 	End Rem
 	Method GetMouseDrawCursor:Int()
@@ -661,6 +863,63 @@ Type TImGuiViewport
 		this.handle = handle
 		Return this
 	End Function
+
+	Rem
+	bbdoc: Unique identifier for the viewport
+	End Rem
+	Method GetID:UInt()
+		Return bmx_imgui_viewport_get_id(handle)
+	End Method
+
+	Rem
+	bbdoc: See #EImGuiViewportFlags_
+	End Rem
+	Method GetFlags:EImGuiViewportFlags()
+		Return bmx_imgui_viewport_get_flags(handle)
+	End Method
+
+	Rem
+	bbdoc: Main Area: Position of the viewport (Dear ImGui coordinates are the same as OS desktop/native coordinates)
+	End Rem
+	Method GetPos:SImVec2()
+		Return bmx_imgui_viewport_get_pos(handle)
+	End Method
+
+	Rem
+	bbdoc: Main Area: Size of the viewport (Dear ImGui coordinates are the same as OS desktop/native coordinates)
+	End Rem
+	Method GetSize:SImVec2()
+		Return bmx_imgui_viewport_get_size(handle)
+	End Method
+
+	Rem
+	bbdoc: Density of the viewport for Retina display (always 1,1 on Windows, may be 2,2 etc on macOS/iOS). This will affect font rasterizer density.
+	End Rem
+	Method GetFramebufferScale:SImVec2()
+		Return bmx_imgui_viewport_get_framebuffer_scale(handle)
+	End Method
+
+	Rem
+	bbdoc: Work Area: Position of the viewport minus task bars, menus bars, status bars (>= Pos)
+	End Rem
+	Method GetWorkPos:SImVec2()
+		Return bmx_imgui_viewport_get_work_pos(handle)
+	End Method
+
+	Rem
+	bbdoc: Work Area: Size of the viewport minus task bars, menu bars, status bars (<= Size)
+	End Rem
+	Method GetWorkSize:SImVec2()
+		Return bmx_imgui_viewport_get_work_size(handle)
+	End Method
+
+	Rem
+	bbdoc: 1.0f = 96 DPI = No extra scale.
+	End Rem
+	Method GetDpiScale:Float()
+		Return bmx_imgui_viewport_get_dpi_scale(handle)
+	End Method
+
 End Type
 
 
@@ -943,6 +1202,13 @@ Function ImGui_GetWindowDrawList:TImDrawList()
 End Function
 
 Rem
+bbdoc:  get DPI scale currently associated to the current window's viewport.
+End Rem
+Function ImGui_GetWindowDpiScale:Float()
+	Return _ImGui_GetWindowDpiScale()
+End Function
+
+Rem
 bbdoc:  get current window position in screen space (IT IS UNLIKELY YOU EVER NEED TO USE THIS. Consider always using GetCursorScreenPos() and GetContentRegionAvail() instead)
 End Rem
 Function ImGui_GetWindowPos:SImVec2()
@@ -968,6 +1234,13 @@ bbdoc:  get current window height (IT IS UNLIKELY YOU EVER NEED TO USE THIS). Sh
 End Rem
 Function ImGui_GetWindowHeight:Float()
 	Return _ImGui_GetWindowHeight()
+End Function
+
+Rem
+bbdoc:  get viewport currently associated to the current window.
+End Rem
+Function ImGui_GetWindowViewport:TImGuiViewport()
+	Return TImGuiViewport._Create(_ImGui_GetWindowViewport())
 End Function
 
 Rem
@@ -1031,6 +1304,13 @@ bbdoc:  set next window background color alpha. helper to easily override the Al
 End Rem
 Function ImGui_SetNextWindowBgAlpha(alpha:Float)
 	_ImGui_SetNextWindowBgAlpha(alpha)
+End Function
+
+Rem
+bbdoc:  set next window viewport
+End Rem
+Function ImGui_SetNextWindowViewport(viewport_id:UInt)
+	_ImGui_SetNextWindowViewport(viewport_id)
 End Function
 
 Rem
@@ -3006,6 +3286,56 @@ Function ImGui_SetTabItemClosed(tab_or_docked_window_label:String)
 End Function
 
 Rem
+bbdoc:  Implied size = ImVec2(0, 0), flags = 0, window_class = NULL
+End Rem
+Function ImGui_DockSpace:UInt(dockspace_id:UInt)
+	Return _ImGui_DockSpace(dockspace_id)
+End Function
+
+Function ImGui_DockSpaceEx:UInt(dockspace_id:UInt, size:SImVec2, flags:EImGuiDockNodeFlags, window_class:Byte Ptr)
+	Return _ImGui_DockSpaceEx(dockspace_id, size, flags, window_class)
+End Function
+
+Rem
+bbdoc:  Implied dockspace_id = 0, viewport = NULL, flags = 0, window_class = NULL
+End Rem
+Function ImGui_DockSpaceOverViewport:UInt()
+	Return _ImGui_DockSpaceOverViewport()
+End Function
+
+Function ImGui_DockSpaceOverViewportEx:UInt(dockspace_id:UInt, viewport:TImGuiViewport, flags:EImGuiDockNodeFlags, window_class:Byte Ptr)
+	Return _ImGui_DockSpaceOverViewportEx(dockspace_id, viewport.handle, flags, window_class)
+End Function
+
+Rem
+bbdoc:  set next window dock id
+End Rem
+Function ImGui_SetNextWindowDockID(dock_id:UInt, cond:EImGuiCond)
+	_ImGui_SetNextWindowDockID(dock_id, cond)
+End Function
+
+Rem
+bbdoc:  set next window class (control docking compatibility + provide hints to platform backend via custom viewport flags and platform parent/child relationship)
+End Rem
+Function ImGui_SetNextWindowClass(window_class:Byte Ptr)
+	_ImGui_SetNextWindowClass(window_class)
+End Function
+
+Rem
+bbdoc:  get dock id of current window, or 0 if not associated to any docking node.
+End Rem
+Function ImGui_GetWindowDockID:UInt()
+	Return _ImGui_GetWindowDockID()
+End Function
+
+Rem
+bbdoc:  is current window docked into another window?
+End Rem
+Function ImGui_IsWindowDocked:Int()
+	Return _ImGui_IsWindowDocked()
+End Function
+
+Rem
 bbdoc:  start logging to tty (stdout)
 End Rem
 Function ImGui_LogToTTY(auto_open_depth:Int)
@@ -3298,17 +3628,31 @@ Function ImGui_GetMainViewport:TImGuiViewport()
 End Function
 
 Rem
-bbdoc:  this draw list will be the first rendered one. Useful to quickly draw shapes/text behind dear imgui contents.
+bbdoc:  Implied viewport = NULL
 End Rem
 Function ImGui_GetBackgroundDrawList:TImDrawList()
 	Return TImDrawList._Create(_ImGui_GetBackgroundDrawList())
 End Function
 
 Rem
-bbdoc:  this draw list will be the last rendered one. Useful to quickly draw shapes/text over dear imgui contents.
+bbdoc:  get background draw list for the given viewport or viewport associated to the current window. this draw list will be the first rendering one. Useful to quickly draw shapes/text behind dear imgui contents.
+End Rem
+Function ImGui_GetBackgroundDrawListEx:TImDrawList(viewport:TImGuiViewport)
+	Return TImDrawList._Create(_ImGui_GetBackgroundDrawListEx(viewport.handle))
+End Function
+
+Rem
+bbdoc:  Implied viewport = NULL
 End Rem
 Function ImGui_GetForegroundDrawList:TImDrawList()
 	Return TImDrawList._Create(_ImGui_GetForegroundDrawList())
+End Function
+
+Rem
+bbdoc:  get foreground draw list for the given viewport or viewport associated to the current window. this draw list will be the top-most rendered one. Useful to quickly draw shapes/text over dear imgui contents.
+End Rem
+Function ImGui_GetForegroundDrawListEx:TImDrawList(viewport:TImGuiViewport)
+	Return TImDrawList._Create(_ImGui_GetForegroundDrawListEx(viewport.handle))
 End Function
 
 Rem
@@ -3700,6 +4044,48 @@ Function ImGui_MemFree(handle:Byte Ptr)
 End Function
 
 Rem
+bbdoc:  call in main loop. will call CreateWindow/ResizeWindow/etc. platform functions for each secondary viewport, and DestroyWindow for each inactive viewport.
+End Rem
+Function ImGui_UpdatePlatformWindows()
+	_ImGui_UpdatePlatformWindows()
+End Function
+
+Rem
+bbdoc:  Implied platform_render_arg = NULL, renderer_render_arg = NULL
+End Rem
+Function ImGui_RenderPlatformWindowsDefault()
+	_ImGui_RenderPlatformWindowsDefault()
+End Function
+
+Rem
+bbdoc:  call in main loop. will call RenderWindow/SwapBuffers platform functions for each secondary viewport which doesn't have the ImGuiViewportFlags_Minimized flag set. May be reimplemented by user for custom rendering needs.
+End Rem
+Function ImGui_RenderPlatformWindowsDefaultEx(platform_render_arg:Byte Ptr, renderer_render_arg:Byte Ptr)
+	_ImGui_RenderPlatformWindowsDefaultEx(platform_render_arg, renderer_render_arg)
+End Function
+
+Rem
+bbdoc:  call DestroyWindow platform functions for all viewports. call from backend Shutdown() if you need to close platform windows before imgui shutdown. otherwise will be called by DestroyContext().
+End Rem
+Function ImGui_DestroyPlatformWindows()
+	_ImGui_DestroyPlatformWindows()
+End Function
+
+Rem
+bbdoc:  this is a helper for backends.
+End Rem
+Function ImGui_FindViewportByID:TImGuiViewport(viewport_id:UInt)
+	Return TImGuiViewport._Create(_ImGui_FindViewportByID(viewport_id))
+End Function
+
+Rem
+bbdoc:  this is a helper for backends. the type platform_handle is decided by the backend (e.g. HWND, MyWindow*, GLFWwindow* etc.)
+End Rem
+Function ImGui_FindViewportByPlatformHandle:TImGuiViewport(platform_handle:Byte Ptr)
+	Return TImGuiViewport._Create(_ImGui_FindViewportByPlatformHandle(platform_handle))
+End Function
+
+Rem
 bbdoc:  Construct a zero-size ImVector<> (of any type). This is primarily useful when calling ImFontGlyphRangesBuilder_BuildRanges()
 End Rem
 Function ImVector_Construct(vector:Byte Ptr)
@@ -3760,6 +4146,13 @@ bbdoc:  Queue a mouse source change (Mouse/TouchScreen/Pen)
 End Rem
 Function ImGuiIO_AddMouseSourceEvent(this:TImGuiIO, source:EImGuiMouseSource)
 	_ImGuiIO_AddMouseSourceEvent(this.handle, source)
+End Function
+
+Rem
+bbdoc:  Queue a mouse hovered viewport. Requires backend to set ImGuiBackendFlags_HasMouseHoveredViewport to call this (for multi-viewport support).
+End Rem
+Function ImGuiIO_AddMouseViewportEvent(this:TImGuiIO, id:UInt)
+	_ImGuiIO_AddMouseViewportEvent(this.handle, id)
 End Function
 
 Rem
@@ -4893,6 +5286,9 @@ Private
 Extern
 	Function _ImGui_InputText:Int(label:String, buf:String Var, buf_size:size_t, flags:EImGuiInputTextFlags) = "bmx_ImGui_InputText"
 
+	Function bmx_imgui_io_get_config_flags:EImGuiConfigFlags(handle:Byte Ptr)
+	Function bmx_imgui_io_set_config_flags(handle:Byte Ptr, flags:EImGuiConfigFlags)
+	Function bmx_imgui_io_get_backend_flags:EImGuiBackendFlags(handle:Byte Ptr)
 	Function bmx_imgui_io_get_display_size:SImVec2(handle:Byte Ptr)
 	Function bmx_imgui_io_get_delta_time:Float(handle:Byte Ptr)
 	Function bmx_imgui_io_get_ini_saving_rate:Float(handle:Byte Ptr)
@@ -4932,6 +5328,30 @@ Extern
 	Function bmx_imgui_io_set_config_nav_cursor_visible_auto(handle:Byte Ptr, value:Int)
 	Function bmx_imgui_io_get_config_nav_cursor_visible_always:Int(handle:Byte Ptr)
 	Function bmx_imgui_io_set_config_nav_cursor_visible_always(handle:Byte Ptr, value:Int)
+	Function bmx_imgui_io_get_config_docking_no_split:Int(handle:Byte Ptr)
+	Function bmx_imgui_io_set_config_docking_no_split(handle:Byte Ptr, value:Int)
+	Function bmx_imgui_io_get_config_docking_no_docking_over:Int(handle:Byte Ptr)
+	Function bmx_imgui_io_set_config_docking_no_docking_over(handle:Byte Ptr, value:Int)
+	Function bmx_imgui_io_get_config_docking_with_shift:Int(handle:Byte Ptr)
+	Function bmx_imgui_io_set_config_docking_with_shift(handle:Byte Ptr, value:Int)
+	Function bmx_imgui_io_get_config_docking_always_tab_bar:Int(handle:Byte Ptr)
+	Function bmx_imgui_io_set_config_docking_always_tab_bar(handle:Byte Ptr, value:Int)
+	Function bmx_imgui_io_get_config_docking_transparent_payload:Int(handle:Byte Ptr)
+	Function bmx_imgui_io_set_config_docking_transparent_payload(handle:Byte Ptr, value:Int)
+	Function bmx_imgui_io_get_config_viewports_no_auto_merge:Int(handle:Byte Ptr)
+	Function bmx_imgui_io_set_config_viewports_no_auto_merge(handle:Byte Ptr, value:Int)
+	Function bmx_imgui_io_get_config_viewports_no_task_bar_icon:Int(handle:Byte Ptr)
+	Function bmx_imgui_io_set_config_viewports_no_task_bar_icon(handle:Byte Ptr, value:Int)
+	Function bmx_imgui_io_get_config_viewports_no_decoration:Int(handle:Byte Ptr)
+	Function bmx_imgui_io_set_config_viewports_no_decoration(handle:Byte Ptr, value:Int)
+	Function bmx_imgui_io_get_config_viewports_no_default_parent:Int(handle:Byte Ptr)
+	Function bmx_imgui_io_set_config_viewports_no_default_parent(handle:Byte Ptr, value:Int)
+	Function bmx_imgui_io_get_config_viewports_platform_focus_sets_imgui_focus:Int(handle:Byte Ptr)
+	Function bmx_imgui_io_set_config_viewports_platform_focus_sets_imgui_focus(handle:Byte Ptr, value:Int)
+	Function bmx_imgui_io_get_config_dpi_scale_fonts:Int(handle:Byte Ptr)
+	Function bmx_imgui_io_set_config_dpi_scale_fonts(handle:Byte Ptr, value:Int)
+	Function bmx_imgui_io_get_config_dpi_scale_viewports:Int(handle:Byte Ptr)
+	Function bmx_imgui_io_set_config_dpi_scale_viewports(handle:Byte Ptr, value:Int)
 	Function bmx_imgui_io_get_mouse_draw_cursor:Int(handle:Byte Ptr)
 	Function bmx_imgui_io_set_mouse_draw_cursor(handle:Byte Ptr, value:Int)
 	Function bmx_imgui_io_get_config_macosx_behaviors:Int(handle:Byte Ptr)
@@ -4964,6 +5384,14 @@ Extern
 	Function bmx_imgui_io_set_key_repeat_delay(handle:Byte Ptr, value:Float)
 	Function bmx_imgui_io_get_key_repeat_rate:Float(handle:Byte Ptr)
 	Function bmx_imgui_io_set_key_repeat_rate(handle:Byte Ptr, value:Float)
+	Function bmx_imgui_viewport_get_id:UInt(handle:Byte Ptr)
+	Function bmx_imgui_viewport_get_flags:EImGuiViewportFlags(handle:Byte Ptr)
+	Function bmx_imgui_viewport_get_pos:SImVec2(handle:Byte Ptr)
+	Function bmx_imgui_viewport_get_size:SImVec2(handle:Byte Ptr)
+	Function bmx_imgui_viewport_get_framebuffer_scale:SImVec2(handle:Byte Ptr)
+	Function bmx_imgui_viewport_get_work_pos:SImVec2(handle:Byte Ptr)
+	Function bmx_imgui_viewport_get_work_size:SImVec2(handle:Byte Ptr)
+	Function bmx_imgui_viewport_get_dpi_scale:Float(handle:Byte Ptr)
 
 	Function _ImTextureRef_GetTexID:ULong(this:Byte Ptr) = "ImTextureRef_GetTexID"
 	Function _ImGui_CreateContext:Byte Ptr(shared_font_atlas:Byte Ptr) = "ImGui_CreateContext"
@@ -5001,10 +5429,12 @@ Extern
 	Function _ImGui_IsWindowFocused:Int(flags:EImGuiFocusedFlags) = "ImGui_IsWindowFocused"
 	Function _ImGui_IsWindowHovered:Int(flags:EImGuiHoveredFlags) = "ImGui_IsWindowHovered"
 	Function _ImGui_GetWindowDrawList:Byte Ptr() = "ImGui_GetWindowDrawList"
+	Function _ImGui_GetWindowDpiScale:Float() = "ImGui_GetWindowDpiScale"
 	Function _ImGui_GetWindowPos:SImVec2() = "ImGui_GetWindowPos"
 	Function _ImGui_GetWindowSize:SImVec2() = "ImGui_GetWindowSize"
 	Function _ImGui_GetWindowWidth:Float() = "ImGui_GetWindowWidth"
 	Function _ImGui_GetWindowHeight:Float() = "ImGui_GetWindowHeight"
+	Function _ImGui_GetWindowViewport:Byte Ptr() = "ImGui_GetWindowViewport"
 	Function _ImGui_SetNextWindowPos(pos:SImVec2, cond:EImGuiCond) = "ImGui_SetNextWindowPos"
 	Function _ImGui_SetNextWindowPosEx(pos:SImVec2, cond:EImGuiCond, pivot:SImVec2) = "ImGui_SetNextWindowPosEx"
 	Function _ImGui_SetNextWindowSize(size:SImVec2, cond:EImGuiCond) = "ImGui_SetNextWindowSize"
@@ -5014,6 +5444,7 @@ Extern
 	Function _ImGui_SetNextWindowFocus() = "ImGui_SetNextWindowFocus"
 	Function _ImGui_SetNextWindowScroll(scroll:SImVec2) = "ImGui_SetNextWindowScroll"
 	Function _ImGui_SetNextWindowBgAlpha(alpha:Float) = "ImGui_SetNextWindowBgAlpha"
+	Function _ImGui_SetNextWindowViewport(viewport_id:UInt) = "ImGui_SetNextWindowViewport"
 	Function _ImGui_SetWindowPos(pos:SImVec2, cond:EImGuiCond) = "ImGui_SetWindowPos"
 	Function _ImGui_SetWindowSize(size:SImVec2, cond:EImGuiCond) = "ImGui_SetWindowSize"
 	Function _ImGui_SetWindowCollapsed(collapsed:Int, cond:EImGuiCond) = "ImGui_SetWindowCollapsed"
@@ -5333,6 +5764,14 @@ Extern
 	Function _ImGui_EndTabItem() = "ImGui_EndTabItem"
 	Function _ImGui_TabItemButton:Int(label:String, flags:EImGuiTabItemFlags) = "bmx_ImGui_TabItemButton"
 	Function _ImGui_SetTabItemClosed(tab_or_docked_window_label:String) = "bmx_ImGui_SetTabItemClosed"
+	Function _ImGui_DockSpace:UInt(dockspace_id:UInt) = "ImGui_DockSpace"
+	Function _ImGui_DockSpaceEx:UInt(dockspace_id:UInt, size:SImVec2, flags:EImGuiDockNodeFlags, window_class:Byte Ptr) = "ImGui_DockSpaceEx"
+	Function _ImGui_DockSpaceOverViewport:UInt() = "ImGui_DockSpaceOverViewport"
+	Function _ImGui_DockSpaceOverViewportEx:UInt(dockspace_id:UInt, viewport:Byte Ptr, flags:EImGuiDockNodeFlags, window_class:Byte Ptr) = "ImGui_DockSpaceOverViewportEx"
+	Function _ImGui_SetNextWindowDockID(dock_id:UInt, cond:EImGuiCond) = "ImGui_SetNextWindowDockID"
+	Function _ImGui_SetNextWindowClass(window_class:Byte Ptr) = "ImGui_SetNextWindowClass"
+	Function _ImGui_GetWindowDockID:UInt() = "ImGui_GetWindowDockID"
+	Function _ImGui_IsWindowDocked:Int() = "ImGui_IsWindowDocked"
 	Function _ImGui_LogToTTY(auto_open_depth:Int) = "ImGui_LogToTTY"
 	Function _ImGui_LogToFile(auto_open_depth:Int, filename:String) = "bmx_ImGui_LogToFile"
 	Function _ImGui_LogToClipboard(auto_open_depth:Int) = "ImGui_LogToClipboard"
@@ -5377,7 +5816,9 @@ Extern
 	Function _ImGui_GetItemFlags:EImGuiItemFlags() = "ImGui_GetItemFlags"
 	Function _ImGui_GetMainViewport:Byte Ptr() = "ImGui_GetMainViewport"
 	Function _ImGui_GetBackgroundDrawList:Byte Ptr() = "ImGui_GetBackgroundDrawList"
+	Function _ImGui_GetBackgroundDrawListEx:Byte Ptr(viewport:Byte Ptr) = "ImGui_GetBackgroundDrawListEx"
 	Function _ImGui_GetForegroundDrawList:Byte Ptr() = "ImGui_GetForegroundDrawList"
+	Function _ImGui_GetForegroundDrawListEx:Byte Ptr(viewport:Byte Ptr) = "ImGui_GetForegroundDrawListEx"
 	Function _ImGui_IsRectVisibleBySize:Int(size:SImVec2) = "ImGui_IsRectVisibleBySize"
 	Function _ImGui_IsRectVisible:Int(rect_min:SImVec2, rect_max:SImVec2) = "ImGui_IsRectVisible"
 	Function _ImGui_GetTime:Double() = "ImGui_GetTime"
@@ -5439,6 +5880,12 @@ Extern
 	Function _ImGui_GetAllocatorFunctions(p_alloc_func:Byte Ptr, p_free_func:Byte Ptr, p_user_data:Byte Ptr) = "ImGui_GetAllocatorFunctions"
 	Function _ImGui_MemAlloc:Byte Ptr(size:size_t) = "ImGui_MemAlloc"
 	Function _ImGui_MemFree(handle:Byte Ptr) = "ImGui_MemFree"
+	Function _ImGui_UpdatePlatformWindows() = "ImGui_UpdatePlatformWindows"
+	Function _ImGui_RenderPlatformWindowsDefault() = "ImGui_RenderPlatformWindowsDefault"
+	Function _ImGui_RenderPlatformWindowsDefaultEx(platform_render_arg:Byte Ptr, renderer_render_arg:Byte Ptr) = "ImGui_RenderPlatformWindowsDefaultEx"
+	Function _ImGui_DestroyPlatformWindows() = "ImGui_DestroyPlatformWindows"
+	Function _ImGui_FindViewportByID:Byte Ptr(viewport_id:UInt) = "ImGui_FindViewportByID"
+	Function _ImGui_FindViewportByPlatformHandle:Byte Ptr(platform_handle:Byte Ptr) = "ImGui_FindViewportByPlatformHandle"
 	Function _ImVector_Construct(vector:Byte Ptr) = "ImVector_Construct"
 	Function _ImVector_Destruct(vector:Byte Ptr) = "ImVector_Destruct"
 	Function _ImGuiStyle_ScaleAllSizes(this:Byte Ptr, scale_factor:Float) = "ImGuiStyle_ScaleAllSizes"
@@ -5448,6 +5895,7 @@ Extern
 	Function _ImGuiIO_AddMouseButtonEvent(this:Byte Ptr, button:Int, down:Int) = "ImGuiIO_AddMouseButtonEvent"
 	Function _ImGuiIO_AddMouseWheelEvent(this:Byte Ptr, wheel_x:Float, wheel_y:Float) = "ImGuiIO_AddMouseWheelEvent"
 	Function _ImGuiIO_AddMouseSourceEvent(this:Byte Ptr, source:EImGuiMouseSource) = "ImGuiIO_AddMouseSourceEvent"
+	Function _ImGuiIO_AddMouseViewportEvent(this:Byte Ptr, id:UInt) = "ImGuiIO_AddMouseViewportEvent"
 	Function _ImGuiIO_AddFocusEvent(this:Byte Ptr, focused:Int) = "ImGuiIO_AddFocusEvent"
 	Function _ImGuiIO_AddInputCharacter(this:Byte Ptr, c:UInt) = "ImGuiIO_AddInputCharacter"
 	Function _ImGuiIO_AddInputCharacterUTF16(this:Byte Ptr, c:Short) = "ImGuiIO_AddInputCharacterUTF16"
@@ -5680,9 +6128,11 @@ Enum EImGuiWindowFlags Flags
 	_NoNavInputs = 65536
 	_NoNavFocus = 131072
 	_UnsavedDocument = 262144
+	_NoDocking = 524288
 	_NoNav = 196608
 	_NoDecoration = 43
 	_NoInputs = 197120
+	_DockNodeHost = 8388608
 	_ChildWindow = 16777216
 	_Tooltip = 33554432
 	_Popup = 67108864
@@ -5847,6 +6297,7 @@ Enum EImGuiFocusedFlags Flags
 	_RootWindow = 2
 	_AnyWindow = 4
 	_NoPopupHierarchy = 8
+	_DockHierarchy = 16
 	_RootAndChildWindows = 3
 End Enum
 
@@ -5856,6 +6307,7 @@ Enum EImGuiHoveredFlags Flags
 	_RootWindow = 2
 	_AnyWindow = 4
 	_NoPopupHierarchy = 8
+	_DockHierarchy = 16
 	_AllowWhenBlockedByPopup = 32
 	_AllowWhenBlockedByActiveItem = 128
 	_AllowWhenOverlappedByItem = 256
@@ -5871,6 +6323,26 @@ Enum EImGuiHoveredFlags Flags
 	_DelayShort = 32768
 	_DelayNormal = 65536
 	_NoSharedDelay = 131072
+End Enum
+
+Enum EImGuiDockNodeFlags Flags
+	_None = 0
+	_KeepAliveOnly = 1
+	_NoDockingOverCentralNode = 4
+	_PassthruCentralNode = 8
+	_NoDockingSplit = 16
+	_NoResize = 32
+	_AutoHideTabBar = 64
+	_NoUndocking = 128
+	_NoSplit = 16
+	_NoDockingInCentralNode = 4
+	' extensions from imgui_internal
+	_DockSpace = 1 Shl 10
+	_CentralNode = 1 Shl 11
+	_NoTabBar = 1 Shl 12
+	_HiddenTabBar = 1 Shl 13
+	_NoWindowMenuButton = 1 Shl 14
+	_NoCloseButton = 1 Shl 15
 End Enum
 
 Enum EImGuiDragDropFlags Flags
@@ -5908,188 +6380,188 @@ Enum EImGuiDataType
 End Enum
 
 Enum EImGuiDir
-	__None = -1
-	__Left = 0
-	__Right = 1
-	__Up = 2
-	__Down = 3
-	__COUNT = 4
+	_None = -1
+	_Left = 0
+	_Right = 1
+	_Up = 2
+	_Down = 3
+	_COUNT = 4
 End Enum
 
 Enum EImGuiSortDirection
-	__None = 0
-	__Ascending = 1
-	__Descending = 2
+	_None = 0
+	_Ascending = 1
+	_Descending = 2
 End Enum
 
 Enum EImGuiKey
-	__None = 0
-	__NamedKey_BEGIN = 512
-	__Tab = 512
-	__LeftArrow = 513
-	__RightArrow = 514
-	__UpArrow = 515
-	__DownArrow = 516
-	__PageUp = 517
-	__PageDown = 518
-	__Home = 519
-	__End = 520
-	__Insert = 521
-	__Delete = 522
-	__Backspace = 523
-	__Space = 524
-	__Enter = 525
-	__Escape = 526
-	__LeftCtrl = 527
-	__LeftShift = 528
-	__LeftAlt = 529
-	__LeftSuper = 530
-	__RightCtrl = 531
-	__RightShift = 532
-	__RightAlt = 533
-	__RightSuper = 534
-	__Menu = 535
-	__0 = 536
-	__1 = 537
-	__2 = 538
-	__3 = 539
-	__4 = 540
-	__5 = 541
-	__6 = 542
-	__7 = 543
-	__8 = 544
-	__9 = 545
-	__A = 546
-	__B = 547
-	__C = 548
-	__D = 549
-	__E = 550
-	__F = 551
-	__G = 552
-	__H = 553
-	__I = 554
-	__J = 555
-	__K = 556
-	__L = 557
-	__M = 558
-	__N = 559
-	__O = 560
-	__P = 561
-	__Q = 562
-	__R = 563
-	__S = 564
-	__T = 565
-	__U = 566
-	__V = 567
-	__W = 568
-	__X = 569
-	__Y = 570
-	__Z = 571
-	__F1 = 572
-	__F2 = 573
-	__F3 = 574
-	__F4 = 575
-	__F5 = 576
-	__F6 = 577
-	__F7 = 578
-	__F8 = 579
-	__F9 = 580
-	__F10 = 581
-	__F11 = 582
-	__F12 = 583
-	__F13 = 584
-	__F14 = 585
-	__F15 = 586
-	__F16 = 587
-	__F17 = 588
-	__F18 = 589
-	__F19 = 590
-	__F20 = 591
-	__F21 = 592
-	__F22 = 593
-	__F23 = 594
-	__F24 = 595
-	__Apostrophe = 596
-	__Comma = 597
-	__Minus = 598
-	__Period = 599
-	__Slash = 600
-	__Semicolon = 601
-	__Equal = 602
-	__LeftBracket = 603
-	__Backslash = 604
-	__RightBracket = 605
-	__GraveAccent = 606
-	__CapsLock = 607
-	__ScrollLock = 608
-	__NumLock = 609
-	__PrintScreen = 610
-	__Pause = 611
-	__Keypad0 = 612
-	__Keypad1 = 613
-	__Keypad2 = 614
-	__Keypad3 = 615
-	__Keypad4 = 616
-	__Keypad5 = 617
-	__Keypad6 = 618
-	__Keypad7 = 619
-	__Keypad8 = 620
-	__Keypad9 = 621
-	__KeypadDecimal = 622
-	__KeypadDivide = 623
-	__KeypadMultiply = 624
-	__KeypadSubtract = 625
-	__KeypadAdd = 626
-	__KeypadEnter = 627
-	__KeypadEqual = 628
-	__AppBack = 629
-	__AppForward = 630
-	__Oem102 = 631
-	__GamepadStart = 632
-	__GamepadBack = 633
-	__GamepadFaceLeft = 634
-	__GamepadFaceRight = 635
-	__GamepadFaceUp = 636
-	__GamepadFaceDown = 637
-	__GamepadDpadLeft = 638
-	__GamepadDpadRight = 639
-	__GamepadDpadUp = 640
-	__GamepadDpadDown = 641
-	__GamepadL1 = 642
-	__GamepadR1 = 643
-	__GamepadL2 = 644
-	__GamepadR2 = 645
-	__GamepadL3 = 646
-	__GamepadR3 = 647
-	__GamepadLStickLeft = 648
-	__GamepadLStickRight = 649
-	__GamepadLStickUp = 650
-	__GamepadLStickDown = 651
-	__GamepadRStickLeft = 652
-	__GamepadRStickRight = 653
-	__GamepadRStickUp = 654
-	__GamepadRStickDown = 655
-	__MouseLeft = 656
-	__MouseRight = 657
-	__MouseMiddle = 658
-	__MouseX1 = 659
-	__MouseX2 = 660
-	__MouseWheelX = 661
-	__MouseWheelY = 662
-	__ReservedForModCtrl = 663
-	__ReservedForModShift = 664
-	__ReservedForModAlt = 665
-	__ReservedForModSuper = 666
-	__NamedKey_END = 667
-	__NamedKey_COUNT = 155
-	ImGuiMod_None = 0
-	ImGuiMod_Ctrl = 4096
-	ImGuiMod_Shift = 8192
-	ImGuiMod_Alt = 16384
-	ImGuiMod_Super = 32768
-	ImGuiMod_Mask_ = 61440
-	__COUNT = 667
-	ImGuiMod_Shortcut = 4096
+	_None = 0
+	_NamedKey_BEGIN = 512
+	_Tab = 512
+	_LeftArrow = 513
+	_RightArrow = 514
+	_UpArrow = 515
+	_DownArrow = 516
+	_PageUp = 517
+	_PageDown = 518
+	_Home = 519
+	_End = 520
+	_Insert = 521
+	_Delete = 522
+	_Backspace = 523
+	_Space = 524
+	_Enter = 525
+	_Escape = 526
+	_LeftCtrl = 527
+	_LeftShift = 528
+	_LeftAlt = 529
+	_LeftSuper = 530
+	_RightCtrl = 531
+	_RightShift = 532
+	_RightAlt = 533
+	_RightSuper = 534
+	_Menu = 535
+	_0 = 536
+	_1 = 537
+	_2 = 538
+	_3 = 539
+	_4 = 540
+	_5 = 541
+	_6 = 542
+	_7 = 543
+	_8 = 544
+	_9 = 545
+	_A = 546
+	_B = 547
+	_C = 548
+	_D = 549
+	_E = 550
+	_F = 551
+	_G = 552
+	_H = 553
+	_I = 554
+	_J = 555
+	_K = 556
+	_L = 557
+	_M = 558
+	_N = 559
+	_O = 560
+	_P = 561
+	_Q = 562
+	_R = 563
+	_S = 564
+	_T = 565
+	_U = 566
+	_V = 567
+	_W = 568
+	_X = 569
+	_Y = 570
+	_Z = 571
+	_F1 = 572
+	_F2 = 573
+	_F3 = 574
+	_F4 = 575
+	_F5 = 576
+	_F6 = 577
+	_F7 = 578
+	_F8 = 579
+	_F9 = 580
+	_F10 = 581
+	_F11 = 582
+	_F12 = 583
+	_F13 = 584
+	_F14 = 585
+	_F15 = 586
+	_F16 = 587
+	_F17 = 588
+	_F18 = 589
+	_F19 = 590
+	_F20 = 591
+	_F21 = 592
+	_F22 = 593
+	_F23 = 594
+	_F24 = 595
+	_Apostrophe = 596
+	_Comma = 597
+	_Minus = 598
+	_Period = 599
+	_Slash = 600
+	_Semicolon = 601
+	_Equal = 602
+	_LeftBracket = 603
+	_Backslash = 604
+	_RightBracket = 605
+	_GraveAccent = 606
+	_CapsLock = 607
+	_ScrollLock = 608
+	_NumLock = 609
+	_PrintScreen = 610
+	_Pause = 611
+	_Keypad0 = 612
+	_Keypad1 = 613
+	_Keypad2 = 614
+	_Keypad3 = 615
+	_Keypad4 = 616
+	_Keypad5 = 617
+	_Keypad6 = 618
+	_Keypad7 = 619
+	_Keypad8 = 620
+	_Keypad9 = 621
+	_KeypadDecimal = 622
+	_KeypadDivide = 623
+	_KeypadMultiply = 624
+	_KeypadSubtract = 625
+	_KeypadAdd = 626
+	_KeypadEnter = 627
+	_KeypadEqual = 628
+	_AppBack = 629
+	_AppForward = 630
+	_Oem102 = 631
+	_GamepadStart = 632
+	_GamepadBack = 633
+	_GamepadFaceLeft = 634
+	_GamepadFaceRight = 635
+	_GamepadFaceUp = 636
+	_GamepadFaceDown = 637
+	_GamepadDpadLeft = 638
+	_GamepadDpadRight = 639
+	_GamepadDpadUp = 640
+	_GamepadDpadDown = 641
+	_GamepadL1 = 642
+	_GamepadR1 = 643
+	_GamepadL2 = 644
+	_GamepadR2 = 645
+	_GamepadL3 = 646
+	_GamepadR3 = 647
+	_GamepadLStickLeft = 648
+	_GamepadLStickRight = 649
+	_GamepadLStickUp = 650
+	_GamepadLStickDown = 651
+	_GamepadRStickLeft = 652
+	_GamepadRStickRight = 653
+	_GamepadRStickUp = 654
+	_GamepadRStickDown = 655
+	_MouseLeft = 656
+	_MouseRight = 657
+	_MouseMiddle = 658
+	_MouseX1 = 659
+	_MouseX2 = 660
+	_MouseWheelX = 661
+	_MouseWheelY = 662
+	_ReservedForModCtrl = 663
+	_ReservedForModShift = 664
+	_ReservedForModAlt = 665
+	_ReservedForModSuper = 666
+	_NamedKey_END = 667
+	_NamedKey_COUNT = 155
+	_Mod_None = 0
+	_Mod_Ctrl = 4096
+	_Mod_Shift = 8192
+	_Mod_Alt = 16384
+	_Mod_Super = 32768
+	_Mod_Mask_ = 61440
+	_COUNT = 667
+	_Mod_Shortcut = 4096
 End Enum
 
 Enum EImGuiInputFlags Flags
@@ -6113,10 +6585,14 @@ Enum EImGuiConfigFlags Flags
 	_NoMouse = 16
 	_NoMouseCursorChange = 32
 	_NoKeyboard = 64
+	_DockingEnable = 128
+	_ViewportsEnable = 1024
 	_IsSRGB = 1048576
 	_IsTouchScreen = 2097152
 	_NavEnableSetMousePos = 4
 	_NavNoCaptureKeyboard = 8
+	_DpiEnableScaleFonts = 16384
+	_DpiEnableScaleViewports = 32768
 End Enum
 
 Enum EImGuiBackendFlags Flags
@@ -6126,6 +6602,10 @@ Enum EImGuiBackendFlags Flags
 	_HasSetMousePos = 4
 	_RendererHasVtxOffset = 8
 	_RendererHasTextures = 16
+	_RendererHasViewports = 1024
+	_PlatformHasViewports = 2048
+	_HasMouseHoveredViewport = 4096
+	_HasParentViewport = 8192
 End Enum
 
 Enum EImGuiCol
@@ -6170,30 +6650,32 @@ Enum EImGuiCol
 	_TabDimmed = 38
 	_TabDimmedSelected = 39
 	_TabDimmedSelectedOverline = 40
-	_PlotLines = 41
-	_PlotLinesHovered = 42
-	_PlotHistogram = 43
-	_PlotHistogramHovered = 44
-	_TableHeaderBg = 45
-	_TableBorderStrong = 46
-	_TableBorderLight = 47
-	_TableRowBg = 48
-	_TableRowBgAlt = 49
-	_TextLink = 50
-	_TextSelectedBg = 51
-	_TreeLines = 52
-	_DragDropTarget = 53
-	_DragDropTargetBg = 54
-	_UnsavedMarker = 55
-	_NavCursor = 56
-	_NavWindowingHighlight = 57
-	_NavWindowingDimBg = 58
-	_ModalWindowDimBg = 59
-	_COUNT = 60
+	_DockingPreview = 41
+	_DockingEmptyBg = 42
+	_PlotLines = 43
+	_PlotLinesHovered = 44
+	_PlotHistogram = 45
+	_PlotHistogramHovered = 46
+	_TableHeaderBg = 47
+	_TableBorderStrong = 48
+	_TableBorderLight = 49
+	_TableRowBg = 50
+	_TableRowBgAlt = 51
+	_TextLink = 52
+	_TextSelectedBg = 53
+	_TreeLines = 54
+	_DragDropTarget = 55
+	_DragDropTargetBg = 56
+	_UnsavedMarker = 57
+	_NavCursor = 58
+	_NavWindowingHighlight = 59
+	_NavWindowingDimBg = 60
+	_ModalWindowDimBg = 61
+	_COUNT = 62
 	_TabActive = 36
 	_TabUnfocused = 38
 	_TabUnfocusedActive = 39
-	_NavHighlight = 56
+	_NavHighlight = 58
 End Enum
 
 Enum EImGuiStyleVar
@@ -6237,7 +6719,8 @@ Enum EImGuiStyleVar
 	_SeparatorTextBorderSize = 37
 	_SeparatorTextAlign = 38
 	_SeparatorTextPadding = 39
-	_COUNT = 40
+	_DockingSeparatorSize = 40
+	_COUNT = 41
 End Enum
 
 Enum EImGuiButtonFlags Flags
@@ -6323,10 +6806,10 @@ Enum EImGuiMouseCursor
 End Enum
 
 Enum EImGuiMouseSource
-	__Mouse = 0
-	__TouchScreen = 1
-	__Pen = 2
-	__COUNT = 3
+	_Mouse = 0
+	_TouchScreen = 1
+	_Pen = 2
+	_COUNT = 3
 End Enum
 
 Enum EImGuiCond
@@ -6447,9 +6930,9 @@ Enum EImGuiMultiSelectFlags Flags
 End Enum
 
 Enum EImGuiSelectionRequestType
-	__None = 0
-	__SetAll = 1
-	__SetRange = 2
+	_None = 0
+	_SetAll = 1
+	_SetRange = 2
 End Enum
 
 Enum EImDrawFlags Flags
@@ -6478,16 +6961,16 @@ Enum EImDrawListFlags Flags
 End Enum
 
 Enum EImTextureFormat
-	__RGBA32 = 0
-	__Alpha8 = 1
+	_RGBA32 = 0
+	_Alpha8 = 1
 End Enum
 
 Enum EImTextureStatus
-	__OK = 0
-	__Destroyed = 1
-	__WantCreate = 2
-	__WantUpdates = 3
-	__WantDestroy = 4
+	_OK = 0
+	_Destroyed = 1
+	_WantCreate = 2
+	_WantUpdates = 3
+	_WantDestroy = 4
 End Enum
 
 Enum EImFontAtlasFlags Flags
@@ -6509,5 +6992,16 @@ Enum EImGuiViewportFlags Flags
 	_IsPlatformWindow = 1
 	_IsPlatformMonitor = 2
 	_OwnedByApp = 4
+	_NoDecoration = 8
+	_NoTaskBarIcon = 16
+	_NoFocusOnAppearing = 32
+	_NoFocusOnClick = 64
+	_NoInputs = 128
+	_NoRendererClear = 256
+	_NoAutoMerge = 512
+	_TopMost = 1024
+	_CanHostOtherWindows = 2048
+	_IsMinimized = 4096
+	_IsFocused = 8192
 End Enum
 
