@@ -20,15 +20,19 @@
 '
 SuperStrict
 
+Import Pub.Freetype
+
 Import "imgui/*.h"
 Import "db_generated/*.h"
-
+Import "../../pub.mod/freetype.mod/include/*.h"
 
 Import "imgui/imgui.cpp"
 Import "imgui/imgui_demo.cpp"
 Import "imgui/imgui_draw.cpp"
 Import "imgui/imgui_tables.cpp"
 Import "imgui/imgui_widgets.cpp"
+
+Import "imgui/misc/freetype/imgui_freetype.cpp"
 
 Import "db_generated/dcimgui.cpp"
 Import "db_generated/dcimgui_internal.cpp"

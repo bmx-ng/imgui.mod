@@ -458,6 +458,121 @@ float bmx_imgui_viewport_get_dpi_scale(ImGuiViewport * viewport) {
 	return viewport->DpiScale;
 }
 
+ImFontAtlas * bmx_imgui_io_get_fonts(ImGuiIO * io) {
+	return io->Fonts;
+}
+
+ImFontConfig * bmx_imgui_font_config_new() {
+	ImFontConfig * config = (ImFontConfig *)malloc(sizeof(ImFontConfig));
+	return config;
+}
+
+void bmx_imgui_font_config_free(ImFontConfig * config) {
+	free(config);
+}
+
+void bmx_imgui_font_config_set_font_data(ImFontConfig * config, void * data, int size, int owned_by_atlas) {
+	config->FontData = data;
+	config->FontDataSize = size;
+	config->FontDataOwnedByAtlas = owned_by_atlas;
+}
+
+void bmx_imgui_font_config_set_merge_mode(ImFontConfig * config, int value) {
+	config->MergeMode = value;
+}
+
+int bmx_imgui_font_config_get_merge_mode(ImFontConfig * config) {
+	return config->MergeMode;
+}
+
+void bmx_imgui_font_config_set_pixel_snap_h(ImFontConfig * config, int value) {
+	config->PixelSnapH = value;
+}
+
+int bmx_imgui_font_config_get_pixel_snap_h(ImFontConfig * config) {
+	return config->PixelSnapH;
+}
+
+void bmx_imgui_font_config_set_oversample_h(ImFontConfig * config, int value) {
+	config->OversampleH = (ImS8)value;
+}
+
+int bmx_imgui_font_config_get_oversample_h(ImFontConfig * config) {
+	return config->OversampleH;
+}
+
+void bmx_imgui_font_config_set_oversample_v(ImFontConfig * config, int value) {
+	config->OversampleV = (ImS8)value;
+}
+
+int bmx_imgui_font_config_get_oversample_v(ImFontConfig * config) {
+	return config->OversampleV;
+}
+
+void bmx_imgui_font_config_set_elipsis_char(ImFontConfig * config, int value) {
+	config->EllipsisChar = (ImWchar)value;
+}
+
+int bmx_imgui_font_config_get_elipsis_char(ImFontConfig * config) {
+	return config->EllipsisChar;
+}
+
+void bmx_imgui_font_config_set_size_pixels(ImFontConfig * config, float value) {
+	config->SizePixels = value;
+}
+
+float bmx_imgui_font_config_get_size_pixels(ImFontConfig * config) {
+	return config->SizePixels;
+}
+
+void bmx_imgui_font_config_set_glyph_offset(ImFontConfig * config, ImVec2 offset) {
+	config->GlyphOffset = offset;
+}
+
+ImVec2 bmx_imgui_font_config_get_glyph_offset(ImFontConfig * config) {
+	return config->GlyphOffset;
+}
+
+void bmx_imgui_font_config_set_glyph_min_advance_x(ImFontConfig * config, float value) {
+	config->GlyphMinAdvanceX = value;
+}
+
+float bmx_imgui_font_config_get_glyph_min_advance_x(ImFontConfig * config) {
+	return config->GlyphMinAdvanceX;
+}
+
+void bmx_imgui_font_config_set_glyph_max_advance_x(ImFontConfig * config, float value) {
+	config->GlyphMaxAdvanceX = value;
+}
+
+float bmx_imgui_font_config_get_glyph_max_advance_x(ImFontConfig * config) {
+	return config->GlyphMaxAdvanceX;
+}
+
+void bmx_imgui_font_config_set_glyph_extra_advance_x(ImFontConfig * config, float value) {
+	config->GlyphExtraAdvanceX = value;
+}
+
+float bmx_imgui_font_config_get_glyph_extra_advance_x(ImFontConfig * config) {
+	return config->GlyphExtraAdvanceX;
+}
+
+void bmx_imgui_font_config_set_font_no(ImFontConfig * config, int value) {
+	config->FontNo = value;
+}
+
+int bmx_imgui_font_config_get_font_no(ImFontConfig * config) {
+	return config->FontNo;
+}
+
+void bmx_imgui_font_config_set_font_loader_flags(ImFontConfig * config, unsigned int value) {
+	config->FontLoaderFlags = value;
+}
+
+unsigned int bmx_imgui_font_config_get_font_loader_flags(ImFontConfig * config) {
+	return config->FontLoaderFlags;
+}
+
 
 int bmx_ImGui_ShowStyleSelector(BBString * label) {
 	const char * v0 = (const char *)bbStringToUTF8String(label);
