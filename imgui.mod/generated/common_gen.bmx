@@ -15,15 +15,6 @@ Type TImguiContext
 	End Function
 End Type
 
-Type TImguiFontAtlas
-	Field handle:Byte Ptr
-	Function _Create:TImguiFontAtlas(handle:Byte Ptr)
-		Local this:TImguiFontAtlas = New TImguiFontAtlas
-		this.handle = handle
-		Return this
-	End Function
-End Type
-
 Type TImFont
 	Field handle:Byte Ptr
 	Function _Create:TImFont(handle:Byte Ptr)
@@ -55,15 +46,6 @@ Type TImDrawList
 	Field handle:Byte Ptr
 	Function _Create:TImDrawList(handle:Byte Ptr)
 		Local this:TImDrawList = New TImDrawList
-		this.handle = handle
-		Return this
-	End Function
-End Type
-
-Type TImFontAtlas
-	Field handle:Byte Ptr
-	Function _Create:TImFontAtlas(handle:Byte Ptr)
-		Local this:TImFontAtlas = New TImFontAtlas
 		this.handle = handle
 		Return this
 	End Function
@@ -827,6 +809,13 @@ Type TImGuiIO
 	Method SetKeyRepeatRate(value:Float)
 		bmx_imgui_io_set_key_repeat_rate(handle, value)
 	End Method
+
+	Rem
+	bbdoc: Font atlas: load, rasterize and pack one or more fonts into a single texture.
+	End Rem
+	Method Fonts:TImFontAtlas()
+		Return TImFontAtlas._Create(bmx_imgui_io_get_fonts(handle))
+	End Method
 End Type
 
 Type TImGuiListClipper
@@ -856,6 +845,9 @@ Type TImDrawData
 	End Function
 End Type
 
+Rem
+bbdoc: Represents the Platform Window created by the application which is hosting our Dear ImGui windows.
+End Rem
 Type TImGuiViewport
 	Field handle:Byte Ptr
 	Function _Create:TImGuiViewport(handle:Byte Ptr)
@@ -922,6 +914,403 @@ Type TImGuiViewport
 
 End Type
 
+Rem
+bbdoc: A font input/source.
+End Rem
+Type TImFontConfig
+	Field handle:Byte Ptr
+	
+	Method New()
+		handle = bmx_imgui_font_config_new()
+	End Method
+
+	Method Delete()
+		If handle Then
+			bmx_imgui_font_config_free(handle)
+			handle = Null
+		End If
+	End Method
+
+	Rem
+	bbdoc: Sets TTF/OTF data with size.
+	about: By default ownership remains with the caller and it will not be freed. Set @owned_by_atlas to #True to transfer ownership to the
+	font atlas, which will call ImFree on the data when it is no longer needed.
+	End Rem
+	Method SetFontData(data:Byte Ptr, size:Int, owned_by_atlas:Int = False)
+		bmx_imgui_font_config_set_font_data(handle, data, size, owned_by_atlas)
+	End Method
+
+	Rem
+	bbdoc: Merge into previous ImFont, so you can combine multiple inputs font into one ImFont (e.g. ASCII font + icons + Japanese glyphs).
+	about: You may want to use GlyphOffset.y when merge font of different heights.
+	End Rem
+	Method SetMergeMode(value:Int)
+		bmx_imgui_font_config_set_merge_mode(handle, value)
+	End Method
+
+	Rem
+	bbdoc: Merge into previous ImFont, so you can combine multiple inputs font into one ImFont (e.g. ASCII font + icons + Japanese glyphs).
+	about: You may want to use GlyphOffset.y when merge font of different heights.
+	End Rem
+	Method GetMergeMode:Int()
+		Return bmx_imgui_font_config_get_merge_mode(handle)
+	End Method
+
+	Rem
+	bbdoc: Align every glyph AdvanceX to pixel boundaries.
+	about: Prevents fractional font size from working correctly! Useful e.g. if you are merging a non-pixel aligned font with the default font.
+	If enabled, OversampleH/V will default to 1.
+	End Rem
+	Method SetPixelSnapH(value:Int)
+		bmx_imgui_font_config_set_pixel_snap_h(handle, value)
+	End Method
+
+	Rem
+	bbdoc: Align every glyph AdvanceX to pixel boundaries.
+	about: Prevents fractional font size from working correctly! Useful e.g. if you are merging a non-pixel aligned font with the default font.
+	If enabled, OversampleH/V will default to 1.
+	End Rem
+	Method GetPixelSnapH:Int()
+		Return bmx_imgui_font_config_get_pixel_snap_h(handle)
+	End Method
+
+	Rem
+	bbdoc: Rasterize at higher quality for sub-pixel positioning. 0 == auto == 1 or 2 depending on size.
+	about: Note the difference between 2 and 3 is minimal. You can reduce this to 1 for large glyphs save memory.
+	Read https://github.com/nothings/stb/blob/master/tests/oversample/README.md for details.
+	End Rem
+	Method SetOversampleH(value:Int)
+		bmx_imgui_font_config_set_oversample_h(handle, value)
+	End Method
+
+	Rem
+	bbdoc: Rasterize at higher quality for sub-pixel positioning. 0 == auto == 1 or 2 depending on size.
+	about: Note the difference between 2 and 3 is minimal. You can reduce this to 1 for large glyphs save memory.
+	Read https://github.com/nothings/stb/blob/master/tests/oversample/README.md for details.
+	End Rem
+	Method GetOversampleH:Int()
+		Return bmx_imgui_font_config_get_oversample_h(handle)
+	End Method
+
+	Rem
+	bbdoc: Rasterize at higher quality for sub-pixel positioning. 0 == auto == 1.
+	about: This is not really useful as we don't use sub-pixel positions on the Y axis.
+	End Rem
+	Method SetOversampleV(value:Int)
+		bmx_imgui_font_config_set_oversample_v(handle, value)
+	End Method
+
+	Rem
+	bbdoc: Rasterize at higher quality for sub-pixel positioning. 0 == auto == 1.
+	about: This is not really useful as we don't use sub-pixel positions on the Y axis.
+	End Rem
+	Method GetOversampleV:Int()
+		Return bmx_imgui_font_config_get_oversample_v(handle)
+	End Method
+
+	Rem
+	bbdoc: Explicitly specify Unicode codepoint of ellipsis character.
+	about: When fonts are being merged first specified ellipsis will be used.
+	End Rem
+	Method SetElipsisChar(value:Int)
+		bmx_imgui_font_config_set_elipsis_char(handle, value)
+	End Method
+
+	Rem
+	bbdoc: Explicitly specify Unicode codepoint of ellipsis character.
+	about: When fonts are being merged first specified ellipsis will be used.
+	End Rem
+	Method GetElipsisChar:Int()
+		Return bmx_imgui_font_config_get_elipsis_char(handle)
+	End Method
+
+	Rem
+	bbdoc: Output size in pixels for rasterizer (more or less maps to the resulting font height).
+	End Rem
+	Method SetSizePixels(value:Float)
+		bmx_imgui_font_config_set_size_pixels(handle, value)
+	End Method
+
+	Rem
+	bbdoc: Output size in pixels for rasterizer (more or less maps to the resulting font height).
+	End Rem
+	Method GetSizePixels:Float()
+		Return bmx_imgui_font_config_get_size_pixels(handle)
+	End Method
+
+	Rem
+	bbdoc:  Offset (in pixels) all glyphs from this font input.
+	about: Absolute value for default size, other sizes will scale this value.
+	End Rem
+	Method SetGlyphOffset(offset:SImVec2)
+		bmx_imgui_font_config_set_glyph_offset(handle, offset)
+	End Method
+
+	Rem
+	bbdoc:  Offset (in pixels) all glyphs from this font input.
+	about: Absolute value for default size, other sizes will scale this value.
+	End Rem
+	Method GetGlyphOffset:SImVec2()
+		Return bmx_imgui_font_config_get_glyph_offset(handle)
+	End Method
+
+	Rem
+	bbdoc: Minimum AdvanceX for glyphs, set Min to align font icons, set both Min/Max to enforce mono-space font.
+	about: Absolute value for default size, other sizes will scale this value.
+	End Rem
+	Method SetGlyphMinAdvanceX(value:Float)
+		bmx_imgui_font_config_set_glyph_min_advance_x(handle, value)
+	End Method
+
+	Rem
+	bbdoc: Minimum AdvanceX for glyphs, set Min to align font icons, set both Min/Max to enforce mono-space font.
+	about: Absolute value for default size, other sizes will scale this value.
+	End Rem
+	Method GetGlyphMinAdvanceX:Float()
+		Return bmx_imgui_font_config_get_glyph_min_advance_x(handle)
+	End Method
+
+	Rem
+	bbdoc: Maximum AdvanceX for glyphs
+	End Rem
+	Method SetGlyphMaxAdvanceX(value:Float)
+		bmx_imgui_font_config_set_glyph_max_advance_x(handle, value)
+	End Method
+
+	Rem
+	bbdoc: Maximum AdvanceX for glyphs
+	End Rem
+	Method GetGlyphMaxAdvanceX:Float()
+		Return bmx_imgui_font_config_get_glyph_max_advance_x(handle)
+	End Method
+
+	Rem
+	bbdoc: Extra spacing (in pixels) between glyphs.
+	about: Please contact us if you are using this.
+	End Rem
+	Method SetGlyphExtraAdvanceX(value:Float)
+		bmx_imgui_font_config_set_glyph_extra_advance_x(handle, value)
+	End Method
+
+	Rem
+	bbdoc: Extra spacing (in pixels) between glyphs.
+	about: Please contact us if you are using this.
+	End Rem
+	Method GetGlyphExtraAdvanceX:Float()
+		Return bmx_imgui_font_config_get_glyph_extra_advance_x(handle)
+	End Method
+
+	Rem
+	bbdoc: Index of font within TTF/OTF file
+	End Rem
+	Method SetFontNo(value:Int)
+		bmx_imgui_font_config_set_font_no(handle, value)
+	End Method
+
+	Rem
+	bbdoc: Index of font within TTF/OTF file
+	End Rem
+	Method GetFontNo:Int()
+		Return bmx_imgui_font_config_get_font_no(handle)
+	End Method
+
+	Rem
+	bbdoc: Settings for custom font builder.
+	about: THIS IS BUILDER IMPLEMENTATION DEPENDENT. Leave as zero if unsure.
+	End Rem
+	Method SetFontLoaderFlags(value:UInt)
+		bmx_imgui_font_config_set_font_loader_flags(handle, value)
+	End Method
+
+	Rem
+	bbdoc: Settings for custom font builder.
+	about: THIS IS BUILDER IMPLEMENTATION DEPENDENT. Leave as zero if unsure.
+	End Rem
+	Method GetFontLoaderFlags:UInt()
+		Return bmx_imgui_font_config_get_font_loader_flags(handle)
+	End Method
+
+End Type
+
+
+Rem
+bbdoc: A structure to hold multiple fonts into a single texture.
+about: It is owned by ImGuiIO and will automatically be destroyed after calling ImGui::DestroyContext().
+End Rem
+Type TImFontAtlas
+	Field handle:Byte Ptr
+	Function _Create:TImFontAtlas(handle:Byte Ptr)
+		Local this:TImFontAtlas = New TImFontAtlas
+		this.handle = handle
+		Return this
+	End Function
+
+	Method AddFont:TImFont(font_cfg:TImFontConfig)
+		If font_cfg Then
+			Return TImFont._Create(_ImFontAtlas_AddFont(handle, font_cfg.handle))
+		Else
+			Return TImFont._Create(_ImFontAtlas_AddFont(handle, Null))
+		End If
+
+	End Method
+
+	Rem
+	bbdoc:  Selects between AddFontDefaultVector() and AddFontDefaultBitmap().
+	End Rem
+	Method AddFontDefault:TImFont(font_cfg:TImFontConfig)
+		If font_cfg Then
+			Return TImFont._Create(_ImFontAtlas_AddFontDefault(handle, font_cfg.handle))
+		Else
+			Return TImFont._Create(_ImFontAtlas_AddFontDefault(handle, Null))
+		End If
+
+	End Method
+
+	Rem
+	bbdoc:  Embedded scalable font. Recommended at any higher size.
+	End Rem
+	Method AddFontDefaultVector:TImFont(font_cfg:TImFontConfig)
+		If font_cfg Then
+			Return TImFont._Create(_ImFontAtlas_AddFontDefaultVector(handle, font_cfg.handle))
+		Else
+			Return TImFont._Create(_ImFontAtlas_AddFontDefaultVector(handle, Null))
+		End If
+
+	End Method
+
+	Rem
+	bbdoc:  Embedded classic pixel-clean font. Recommended at Size 13px with no scaling.
+	End Rem
+	Method AddFontDefaultBitmap:TImFont(font_cfg:TImFontConfig)
+		If font_cfg Then
+			Return TImFont._Create(_ImFontAtlas_AddFontDefaultBitmap(handle, font_cfg.handle))
+		Else
+			Return TImFont._Create(_ImFontAtlas_AddFontDefaultBitmap(handle, Null))
+		End If
+
+	End Method
+
+	Method AddFontFromFileTTF:TImFont(filename:String, size_pixels:Float, font_cfg:TImFontConfig, glyph_ranges:Byte Ptr)
+		If font_cfg Then
+			Return TImFont._Create(_ImFontAtlas_AddFontFromFileTTF(handle, filename, size_pixels, font_cfg.handle, glyph_ranges))
+		Else
+			Return TImFont._Create(_ImFontAtlas_AddFontFromFileTTF(handle, filename, size_pixels, Null, glyph_ranges))
+		End If
+
+	End Method
+
+	Rem
+	bbdoc:  Note: Transfer ownership of 'ttf_data' to ImFontAtlas! Will be deleted after destruction of the atlas. Set font_cfg->FontDataOwnedByAtlas=false to keep ownership of your data and it won't be freed.
+	End Rem
+	Method AddFontFromMemoryTTF:TImFont(font_data:Byte Ptr, font_data_size:Int, size_pixels:Float, font_cfg:TImFontConfig, glyph_ranges:Byte Ptr)
+		If font_cfg Then
+			Return TImFont._Create(_ImFontAtlas_AddFontFromMemoryTTF(handle, font_data, font_data_size, size_pixels, font_cfg.handle, glyph_ranges))
+		Else
+			Return TImFont._Create(_ImFontAtlas_AddFontFromMemoryTTF(handle, font_data, font_data_size, size_pixels, Null, glyph_ranges))
+		End If
+
+	End Method
+
+	Rem
+	bbdoc:  'compressed_font_data' still owned by caller. Compress with binary_to_compressed_c.cpp.
+	End Rem
+	Method AddFontFromMemoryCompressedTTF:TImFont(compressed_font_data:Byte Ptr, compressed_font_data_size:Int, size_pixels:Float, font_cfg:TImFontConfig, glyph_ranges:Byte Ptr)
+		If font_cfg Then
+			Return TImFont._Create(_ImFontAtlas_AddFontFromMemoryCompressedTTF(handle, compressed_font_data, compressed_font_data_size, size_pixels, font_cfg.handle, glyph_ranges))
+		Else
+			Return TImFont._Create(_ImFontAtlas_AddFontFromMemoryCompressedTTF(handle, compressed_font_data, compressed_font_data_size, size_pixels, Null, glyph_ranges))
+		End If
+
+	End Method
+
+	Rem
+	bbdoc:  'compressed_font_data_base85' still owned by caller. Compress with binary_to_compressed_c.cpp with -base85 parameter.
+	End Rem
+	Method AddFontFromMemoryCompressedBase85TTF:TImFont(compressed_font_data_base85:String, size_pixels:Float, font_cfg:TImFontConfig, glyph_ranges:Byte Ptr)
+		If font_cfg Then
+			Return TImFont._Create(_ImFontAtlas_AddFontFromMemoryCompressedBase85TTF(handle, compressed_font_data_base85, size_pixels, font_cfg.handle, glyph_ranges))
+		Else
+			Return TImFont._Create(_ImFontAtlas_AddFontFromMemoryCompressedBase85TTF(handle, compressed_font_data_base85, size_pixels, Null, glyph_ranges))
+		End If
+
+	End Method
+
+	Method RemoveFont(font:TImFont)
+		_ImFontAtlas_RemoveFont(handle, font.handle)
+	End Method
+
+	Rem
+	bbdoc:  Clear everything (input fonts, output glyphs/textures).
+	End Rem
+	Method Clear()
+		_ImFontAtlas_Clear(handle)
+	End Method
+
+	Rem
+	bbdoc:  Compact cached glyphs and texture.
+	End Rem
+	Method CompactCache()
+		_ImFontAtlas_CompactCache(handle)
+	End Method
+
+	Rem
+	bbdoc:  Change font loader at runtime.
+	End Rem
+	Method SetFontLoader(font_loader:Byte Ptr)
+		_ImFontAtlas_SetFontLoader(handle, font_loader)
+	End Method
+
+	Rem
+	bbdoc:  [OBSOLETE] Clear input data (all ImFontConfig structures including sizes, TTF data, glyph ranges, etc.) = all the data used to build the texture and fonts.
+	End Rem
+	Method ClearInputData()
+		_ImFontAtlas_ClearInputData(handle)
+	End Method
+
+	Rem
+	bbdoc:  [OBSOLETE] Clear input+output font data (same as ClearInputData() + glyphs storage, UV coordinates).
+	End Rem
+	Method ClearFonts()
+		_ImFontAtlas_ClearFonts(handle)
+	End Method
+
+	Rem
+	bbdoc:  [OBSOLETE] Clear CPU-side copy of the texture data. Saves RAM once the texture has been copied to graphics memory.
+	End Rem
+	Method ClearTexData()
+		_ImFontAtlas_ClearTexData(handle)
+	End Method
+
+	Rem
+	bbdoc:  Basic Latin, Extended Latin
+	End Rem
+	Method GetGlyphRangesDefault:Byte Ptr()
+		Return _ImFontAtlas_GetGlyphRangesDefault(handle)
+	End Method
+
+	Rem
+	bbdoc:  Register a rectangle. Return -1 (ImFontAtlasRectId_Invalid) on error.
+	End Rem
+	Method AddCustomRect:Int(width:Int, height:Int, out_r:Byte Ptr)
+		Return _ImFontAtlas_AddCustomRect(handle, width, height, out_r)
+	End Method
+
+	Rem
+	bbdoc:  Unregister a rectangle. Existing pixels will stay in texture until resized / garbage collected.
+	End Rem
+	Method RemoveCustomRect(id:Int)
+		_ImFontAtlas_RemoveCustomRect(handle, id)
+	End Method
+
+	Rem
+	bbdoc:  Get rectangle coordinates for current texture. Valid immediately, never store this (read above)!
+	End Rem
+	Method GetCustomRect:Int(id:Int, out_r:Byte Ptr)
+		Return _ImFontAtlas_GetCustomRect(handle, id, out_r)
+	End Method
+
+End Type
+
 
 Struct SImVec2
 	Field x:Float
@@ -953,7 +1342,7 @@ Struct SImTextureRef
 End Struct
 
 
-Function ImGui_CreateContext:TImGuiContext(atlas:TImguiFontAtlas = Null)
+Function ImGui_CreateContext:TImGuiContext(atlas:TImFontAtlas = Null)
 	If atlas Then
 		Return TImGuiContext._Create(_ImGui_CreateContext(atlas.handle))
 	Else
@@ -1003,6 +1392,17 @@ about: @bufSize is the size of the buffer in characters.
 End Rem
 Function ImGui_InputText:Int(label:String, buf:String Var, bufSize:Int, flags:EImGuiInputTextFlags)
 	Return _ImGui_InputText(label, buf, Size_T(bufSize), flags)
+End Function
+
+Rem
+bbdoc: Use NULL as a shortcut to keep current font. Use 0.0 to keep current size.
+End Rem
+Function ImGui_PushFontFloat(font:TImFont, font_size_base_unscaled:Float)
+	If font Then
+		_ImGui_PushFontFloat(font.handle, font_size_base_unscaled)
+	Else
+		_ImGui_PushFontFloat(Null, font_size_base_unscaled)
+	End If
 End Function
 
 
@@ -1437,13 +1837,6 @@ bbdoc:  adjust scrolling amount to make given position visible. Generally GetCur
 End Rem
 Function ImGui_SetScrollFromPosY(local_y:Float, center_y_ratio:Float)
 	_ImGui_SetScrollFromPosY(local_y, center_y_ratio)
-End Function
-
-Rem
-bbdoc:  Use NULL as a shortcut to keep current font. Use 0.0f to keep current size.
-End Rem
-Function ImGui_PushFontFloat(font:TImFont, font_size_base_unscaled:Float)
-	_ImGui_PushFontFloat(font.handle, font_size_base_unscaled)
 End Function
 
 Function ImGui_PopFont()
@@ -5106,130 +5499,6 @@ Function ImFontGlyphRangesBuilder_BuildRanges(this:Byte Ptr, out_ranges:Byte Ptr
 	_ImFontGlyphRangesBuilder_BuildRanges(this, out_ranges)
 End Function
 
-Function ImFontAtlas_AddFont:TImFont(this:TImFontAtlas, font_cfg:Byte Ptr)
-	Return TImFont._Create(_ImFontAtlas_AddFont(this.handle, font_cfg))
-End Function
-
-Rem
-bbdoc:  Selects between AddFontDefaultVector() and AddFontDefaultBitmap().
-End Rem
-Function ImFontAtlas_AddFontDefault:TImFont(this:TImFontAtlas, font_cfg:Byte Ptr)
-	Return TImFont._Create(_ImFontAtlas_AddFontDefault(this.handle, font_cfg))
-End Function
-
-Rem
-bbdoc:  Embedded scalable font. Recommended at any higher size.
-End Rem
-Function ImFontAtlas_AddFontDefaultVector:TImFont(this:TImFontAtlas, font_cfg:Byte Ptr)
-	Return TImFont._Create(_ImFontAtlas_AddFontDefaultVector(this.handle, font_cfg))
-End Function
-
-Rem
-bbdoc:  Embedded classic pixel-clean font. Recommended at Size 13px with no scaling.
-End Rem
-Function ImFontAtlas_AddFontDefaultBitmap:TImFont(this:TImFontAtlas, font_cfg:Byte Ptr)
-	Return TImFont._Create(_ImFontAtlas_AddFontDefaultBitmap(this.handle, font_cfg))
-End Function
-
-Function ImFontAtlas_AddFontFromFileTTF:TImFont(this:TImFontAtlas, filename:String, size_pixels:Float, font_cfg:Byte Ptr, glyph_ranges:Byte Ptr)
-	Return TImFont._Create(_ImFontAtlas_AddFontFromFileTTF(this.handle, filename, size_pixels, font_cfg, glyph_ranges))
-End Function
-
-Rem
-bbdoc:  Note: Transfer ownership of 'ttf_data' to ImFontAtlas! Will be deleted after destruction of the atlas. Set font_cfg->FontDataOwnedByAtlas=false to keep ownership of your data and it won't be freed.
-End Rem
-Function ImFontAtlas_AddFontFromMemoryTTF:TImFont(this:TImFontAtlas, font_data:Byte Ptr, font_data_size:Int, size_pixels:Float, font_cfg:Byte Ptr, glyph_ranges:Byte Ptr)
-	Return TImFont._Create(_ImFontAtlas_AddFontFromMemoryTTF(this.handle, font_data, font_data_size, size_pixels, font_cfg, glyph_ranges))
-End Function
-
-Rem
-bbdoc:  'compressed_font_data' still owned by caller. Compress with binary_to_compressed_c.cpp.
-End Rem
-Function ImFontAtlas_AddFontFromMemoryCompressedTTF:TImFont(this:TImFontAtlas, compressed_font_data:Byte Ptr, compressed_font_data_size:Int, size_pixels:Float, font_cfg:Byte Ptr, glyph_ranges:Byte Ptr)
-	Return TImFont._Create(_ImFontAtlas_AddFontFromMemoryCompressedTTF(this.handle, compressed_font_data, compressed_font_data_size, size_pixels, font_cfg, glyph_ranges))
-End Function
-
-Rem
-bbdoc:  'compressed_font_data_base85' still owned by caller. Compress with binary_to_compressed_c.cpp with -base85 parameter.
-End Rem
-Function ImFontAtlas_AddFontFromMemoryCompressedBase85TTF:TImFont(this:TImFontAtlas, compressed_font_data_base85:String, size_pixels:Float, font_cfg:Byte Ptr, glyph_ranges:Byte Ptr)
-	Return TImFont._Create(_ImFontAtlas_AddFontFromMemoryCompressedBase85TTF(this.handle, compressed_font_data_base85, size_pixels, font_cfg, glyph_ranges))
-End Function
-
-Function ImFontAtlas_RemoveFont(this:TImFontAtlas, font:TImFont)
-	_ImFontAtlas_RemoveFont(this.handle, font.handle)
-End Function
-
-Rem
-bbdoc:  Clear everything (input fonts, output glyphs/textures).
-End Rem
-Function ImFontAtlas_Clear(this:TImFontAtlas)
-	_ImFontAtlas_Clear(this.handle)
-End Function
-
-Rem
-bbdoc:  Compact cached glyphs and texture.
-End Rem
-Function ImFontAtlas_CompactCache(this:TImFontAtlas)
-	_ImFontAtlas_CompactCache(this.handle)
-End Function
-
-Rem
-bbdoc:  Change font loader at runtime.
-End Rem
-Function ImFontAtlas_SetFontLoader(this:TImFontAtlas, font_loader:Byte Ptr)
-	_ImFontAtlas_SetFontLoader(this.handle, font_loader)
-End Function
-
-Rem
-bbdoc:  [OBSOLETE] Clear input data (all ImFontConfig structures including sizes, TTF data, glyph ranges, etc.) = all the data used to build the texture and fonts.
-End Rem
-Function ImFontAtlas_ClearInputData(this:TImFontAtlas)
-	_ImFontAtlas_ClearInputData(this.handle)
-End Function
-
-Rem
-bbdoc:  [OBSOLETE] Clear input+output font data (same as ClearInputData() + glyphs storage, UV coordinates).
-End Rem
-Function ImFontAtlas_ClearFonts(this:TImFontAtlas)
-	_ImFontAtlas_ClearFonts(this.handle)
-End Function
-
-Rem
-bbdoc:  [OBSOLETE] Clear CPU-side copy of the texture data. Saves RAM once the texture has been copied to graphics memory.
-End Rem
-Function ImFontAtlas_ClearTexData(this:TImFontAtlas)
-	_ImFontAtlas_ClearTexData(this.handle)
-End Function
-
-Rem
-bbdoc:  Basic Latin, Extended Latin
-End Rem
-Function ImFontAtlas_GetGlyphRangesDefault:Byte Ptr(this:TImFontAtlas)
-	Return _ImFontAtlas_GetGlyphRangesDefault(this.handle)
-End Function
-
-Rem
-bbdoc:  Register a rectangle. Return -1 (ImFontAtlasRectId_Invalid) on error.
-End Rem
-Function ImFontAtlas_AddCustomRect:Int(this:TImFontAtlas, width:Int, height:Int, out_r:Byte Ptr)
-	Return _ImFontAtlas_AddCustomRect(this.handle, width, height, out_r)
-End Function
-
-Rem
-bbdoc:  Unregister a rectangle. Existing pixels will stay in texture until resized / garbage collected.
-End Rem
-Function ImFontAtlas_RemoveCustomRect(this:TImFontAtlas, id:Int)
-	_ImFontAtlas_RemoveCustomRect(this.handle, id)
-End Function
-
-Rem
-bbdoc:  Get rectangle coordinates for current texture. Valid immediately, never store this (read above)!
-End Rem
-Function ImFontAtlas_GetCustomRect:Int(this:TImFontAtlas, id:Int, out_r:Byte Ptr)
-	Return _ImFontAtlas_GetCustomRect(this.handle, id, out_r)
-End Function
-
 Function ImFontBaked_ClearOutputData(this:Byte Ptr)
 	_ImFontBaked_ClearOutputData(this)
 End Function
@@ -5392,6 +5661,35 @@ Extern
 	Function bmx_imgui_viewport_get_work_pos:SImVec2(handle:Byte Ptr)
 	Function bmx_imgui_viewport_get_work_size:SImVec2(handle:Byte Ptr)
 	Function bmx_imgui_viewport_get_dpi_scale:Float(handle:Byte Ptr)
+	Function bmx_imgui_io_get_fonts:Byte Ptr(handle:Byte Ptr)
+	Function bmx_imgui_font_config_new:Byte Ptr()
+	Function bmx_imgui_font_config_free(handle:Byte Ptr)
+	Function bmx_imgui_font_config_set_font_data(handle:Byte Ptr, data:Byte Ptr, size:Int, owned_by_atlas:Int)
+	Function bmx_imgui_font_config_set_merge_mode(handle:Byte Ptr, value:Int)
+	Function bmx_imgui_font_config_get_merge_mode:Int(handle:Byte Ptr)
+	Function bmx_imgui_font_config_set_pixel_snap_h(handle:Byte Ptr, value:Int)
+	Function bmx_imgui_font_config_get_pixel_snap_h:Int(handle:Byte Ptr)
+	Function bmx_imgui_font_config_set_oversample_h(handle:Byte Ptr, value:Int)
+	Function bmx_imgui_font_config_get_oversample_h:Int(handle:Byte Ptr)
+	Function bmx_imgui_font_config_set_oversample_v(handle:Byte Ptr, value:Int)
+	Function bmx_imgui_font_config_get_oversample_v:Int(handle:Byte Ptr)
+	Function bmx_imgui_font_config_set_elipsis_char(handle:Byte Ptr, value:Int)
+	Function bmx_imgui_font_config_get_elipsis_char:Int(handle:Byte Ptr)
+	Function bmx_imgui_font_config_set_size_pixels(handle:Byte Ptr, value:Float)
+	Function bmx_imgui_font_config_get_size_pixels:Float(handle:Byte Ptr)
+	Function bmx_imgui_font_config_set_glyph_offset(handle:Byte Ptr, offset:SImVec2)
+	Function bmx_imgui_font_config_get_glyph_offset:SImVec2(handle:Byte Ptr)
+	Function bmx_imgui_font_config_set_glyph_min_advance_x(handle:Byte Ptr, value:Float)
+	Function bmx_imgui_font_config_get_glyph_min_advance_x:Float(handle:Byte Ptr)
+	Function bmx_imgui_font_config_set_glyph_max_advance_x(handle:Byte Ptr, value:Float)
+	Function bmx_imgui_font_config_get_glyph_max_advance_x:Float(handle:Byte Ptr)
+	Function bmx_imgui_font_config_set_glyph_extra_advance_x(handle:Byte Ptr, value:Float)
+	Function bmx_imgui_font_config_get_glyph_extra_advance_x:Float(handle:Byte Ptr)
+	Function bmx_imgui_font_config_set_font_no(handle:Byte Ptr, value:Int)
+	Function bmx_imgui_font_config_get_font_no:Int(handle:Byte Ptr)
+	Function bmx_imgui_font_config_set_font_loader_flags(handle:Byte Ptr, value:UInt)
+	Function bmx_imgui_font_config_get_font_loader_flags:UInt(handle:Byte Ptr)
+
 
 	Function _ImTextureRef_GetTexID:ULong(this:Byte Ptr) = "ImTextureRef_GetTexID"
 	Function _ImGui_CreateContext:Byte Ptr(shared_font_atlas:Byte Ptr) = "ImGui_CreateContext"

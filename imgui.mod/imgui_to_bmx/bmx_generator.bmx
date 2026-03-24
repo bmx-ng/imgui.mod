@@ -24,6 +24,7 @@ Type TIGFunction
 	Field has_imstr_helper:Int
 	Field is_unformatted_helper:Int
 	Field is_static:Int
+	Field original_class:String
 	Field comments:TIGComments
 	Field conditionals:TIGConditional[]
 	Field is_internal:Int
@@ -338,7 +339,7 @@ Type TCodeGenerator
 
 		' functions
 		stream.WriteString("""
-		Function ImGui_CreateContext:TImGuiContext(atlas:TImguiFontAtlas = Null)
+		Function ImGui_CreateContext:TImGuiContext(atlas:TImFontAtlas = Null)
 			If atlas Then
 				Return TImGuiContext._Create(_ImGui_CreateContext(atlas.handle))
 			Else
@@ -390,6 +391,17 @@ Type TCodeGenerator
 			Return _ImGui_InputText(label, buf, Size_T(bufSize), flags)
 		End Function
 
+		Rem
+		bbdoc: Use NULL as a shortcut to keep current font. Use 0.0 to keep current size.
+		End Rem
+		Function ImGui_PushFontFloat(font:TImFont, font_size_base_unscaled:Float)
+			If font Then
+				_ImGui_PushFontFloat(font.handle, font_size_base_unscaled)
+			Else
+				_ImGui_PushFontFloat(Null, font_size_base_unscaled)
+			End If
+		End Function
+
 		""")
 
 		stream.WriteString("~n~n")
@@ -403,7 +415,7 @@ Type TCodeGenerator
 			' skip functions that we implement directly
 			Select func.name
 				Case "ImGui_CreateContext", "ImGui_DestroyContext", "ImGui_SetCurrentContext", "ImGui_StyleColorsDark", ..
-					"ImGui_StyleColorsLight", "ImGui_StyleColorsClassic", "ImGui_InputText"
+					"ImGui_StyleColorsLight", "ImGui_StyleColorsClassic", "ImGui_InputText", "ImGui_PushFontFloat"
 					Continue
 			End Select
 
@@ -414,379 +426,31 @@ Type TCodeGenerator
 					Continue
 			End Select
 
-			' comments
-			If func.comments Then
-				stream.WriteString("Rem~n")
-
-				stream.WriteString("bbdoc: ")
-				If func.comments.attached Then
-					stream.WriteString(func.comments.attached.Replace("//", ""))
-					stream.WriteString("~n")
-				Else
-					stream.WriteString("~n")
-				End If
-
-				stream.WriteString("End Rem~n")
+			' skip, since this will be embedded within a Type as a method
+			If func.original_class = "ImFontAtlas" Then
+				Continue
 			End If
+
+			' comments
+			WriteBbdocComments(stream, func.comments)
 
 			stream.WriteString("Function " + func.name)
 			
 			' return type
 			Local bmxFunc:Int = False
-			Local returnType:String
-			If func.return_type Then
-				If func.return_type.declaration = "const char*" Then
-					returnType = ":String"
-					bmxFunc = True
-				Else If func.return_type.declaration = "ImGuiContext*" Then
-					returnType = ":TImGuiContext"
-				Else If func.return_type.declaration = "ImFontAtlas*" Or func.return_type.declaration = "const ImFontAtlas*" Then
-					returnType = ":TImFontAtlas"
-				Else If func.return_type.declaration = "ImFont*" Or func.return_type.declaration = "const ImFont*" Then
-					returnType = ":TImFont"
-				Else If func.return_type.declaration = "ImDrawList*" Or func.return_type.declaration = "const ImDrawList*" Then
-					returnType = ":TImDrawList"
-				Else If func.return_type.declaration = "ImGuiTextFilter*" Or func.return_type.declaration = "const ImGuiTextFilter*" Then
-					returnType = ":TImGuiTextFilter"
-				Else If func.return_type.declaration = "ImGuiTextBuffer*" Or func.return_type.declaration = "const ImGuiTextBuffer*" Then
-					returnType = ":TImGuiTextBuffer"
-				Else If func.return_type.declaration = "ImGuiStyle*" Then
-					returnType = ":TImGuiStyle"
-				Else If func.return_type.declaration = "ImGuiIO*" Then
-					returnType = ":TImGuiIO"
-				Else If func.return_type.declaration = "ImGuiListClipper*" Then
-					returnType = ":TImGuiListClipper"
-				Else If func.return_type.declaration = "ImGuiPayload*" Or func.return_type.declaration = "const ImGuiPayload*" Then
-					returnType = ":TImGuiPayload"
-				Else If func.return_type.declaration = "ImDrawData*" Then
-					returnType = ":TImDrawData"
-				Else If func.return_type.declaration = "ImGuiViewport*" Or func.return_type.declaration = "const ImGuiViewport*" Then
-					returnType = ":TImGuiViewport"
-				Else If func.return_type.declaration.EndsWith("*") Then
-					returnType = ":Byte Ptr"
-				Else
-					Select func.return_type.declaration
-						Case "void"
-							returnType = ""
-						Case "bool"
-							returnType = ":Int"
-						Case "char"
-							returnType = ":Byte"
-						Case "unsigned char"
-							returnType = ":Byte"
-						Case "short"
-							returnType = ":Short"
-						Case "unsigned short"
-							returnType = ":UShort"
-						Case "int"
-							returnType = ":Int"
-						Case "unsigned int"
-							returnType = ":UInt"
-						Case "long"
-							returnType = ":Long"
-						Case "unsigned long"
-							returnType = ":ULong"
-						Case "float"
-							returnType = ":Float"
-						Case "double"
-							returnType = ":Double"
-						Case "ImGuiID"
-							returnType = ":UInt"
-						Case "ImU32"
-							returnType = ":UInt"
-						Case "ImTextureID"
-							returnType = ":ULong"
-						Case "ImColor"
-							returnType = ":UInt"
-						Case "ImTextureRef"
-							returnType = ":SImTextureRef"
-						Case "ImFontAtlasRectId"
-							returnType = ":Int"
-						Default
-							If enumMap.ContainsKey(func.return_type.declaration) Then
-								returnType = ":" + enumMap[func.return_type.declaration]
-							Else if func.return_type.declaration = "ImVec2" Then
-								returnType = ":SImVec2"
-							Else if func.return_type.declaration = "ImVec4" Then
-								returnType = ":SImVec4"
-							Else
-								' TODO : probably map to a proper type
-								returnType = ":" + func.return_type.declaration
-							End If
-					End Select
-				End If
-			End If
+			Local returnType:String = GetBmxFunctionReturnType(func, bmxFunc)
 
 			stream.WriteString(returnType)
-
-
 
 			stream.WriteString("(")
 
 			' args - function definition
-			Local index:Int
-			For Local arg:TIGArgument = eachin func.arguments
-
-				' we don't support var args
-				If arg.is_varargs Or arg.arg_type.declaration = "va_list" Then
-					bmxFunc = True
-					Continue
-				End If
-
-				If index Then
-					stream.WriteString(", ")
-				End If
-
-				Local prefix:String
-				Local argType:String
-				If arg.arg_type Then
-					If arg.arg_type.declaration = "const char*" Then
-						argType = ":String"
-						bmxFunc = True
-					Else If arg.arg_type.declaration = "ImFontAtlas*" Or arg.arg_type.declaration = "const ImFontAtlas*" Then
-						argType = ":TImFontAtlas"
-					Else If arg.arg_type.declaration = "ImFont*" Or arg.arg_type.declaration = "const ImFont*" Then
-						argType = ":TImFont"
-					Else If arg.arg_type.declaration = "ImDrawList*" Or arg.arg_type.declaration = "const ImDrawList*" Then
-						argType = ":TImDrawList"
-					Else If arg.arg_type.declaration = "const ImGuiTextFilter*" Or arg.arg_type.declaration = "ImGuiTextFilter*" Then
-						argType = ":TImGuiTextFilter"
-					Else If arg.arg_type.declaration = "const ImGuiTextBuffer*" Or arg.arg_type.declaration = "ImGuiTextBuffer*" Then
-						argType = ":TImGuiTextBuffer"
-					Else If arg.arg_type.declaration = "ImGuiStyle*" Then
-						argType = ":TImGuiStyle"
-					Else If arg.arg_type.declaration = "ImGuiIO*" Then
-						argType = ":TImGuiIO"
-					Else If arg.arg_type.declaration = "ImGuiListClipper*" Then
-						argType = ":TImGuiListClipper"
-					Else If arg.arg_type.declaration = "ImGuiPayload*" Or arg.arg_type.declaration = "const ImGuiPayload*" Then
-						argType = ":TImGuiPayload"
-					Else If arg.arg_type.declaration = "ImDrawData*" Then
-						argType = ":TImDrawData"
-					Else If arg.arg_type.declaration = "ImGuiViewport*" Or arg.arg_type.declaration = "const ImGuiViewport*" Then
-						argType = ":TImGuiViewport"
-					Else If arg.arg_type.declaration = "bool*" Then
-						argType = ":Int Var"
-					Else If arg.arg_type.declaration = "int*" Then
-						argType = ":Int Var"
-					Else If arg.arg_type.declaration = "float*" Then
-						argType = ":Float Var"
-					Else If arg.arg_type.declaration = "unsigned int*" Then
-						argType = ":UInt Var"
-					Else If arg.arg_type.declaration = "const char*const[]" Then
-						argType = ":String[]"
-						bmxFunc = True
-					Else If arg.arg_type.declaration = "float (*values_getter)(void* data, int idx)" Then
-						argType = ":Byte Ptr"
-					Else If arg.arg_type.declaration = "const char* (*getter)(void* user_data, int idx)" Then
-						argType = ":Byte Ptr"
-					Else If arg.arg_type.declaration = "ImGuiSizeCallback" Then
-						argType = ":Byte Ptr"
-					Else If arg.arg_type.declaration = "ImGuiInputTextCallback" Then
-						argType = ":Byte Ptr"
-					Else If arg.arg_type.declaration = "ImDrawCallback" Then
-						argType = ":Byte Ptr"
-					Else If arg.arg_type.declaration = "ImGuiSelectionUserData" Then
-						argType = ":Long"
-					Else If arg.arg_type.declaration = "ImGuiMemAllocFunc" Then
-						argType = ":Byte Ptr"
-					Else If arg.arg_type.declaration = "ImGuiMemFreeFunc" Then
-						argType = ":Byte Ptr"
-					Else If arg.arg_type.declaration = "ImTextureRef" Then
-						argType = ":SImTextureRef"
-					Else If arg.arg_type.declaration.EndsWith("*") Then
-						argType = ":Byte Ptr"
-					Else
-						Select arg.arg_type.declaration
-							Case "void"
-								argType = ""
-							Case "bool"
-								argType = ":Int"
-							Case "char"
-								argType = ":Byte"
-							Case "unsigned char"
-								argType = ":Byte"
-							Case "short"
-								argType = ":Short"
-							Case "unsigned short"
-								argType = ":UShort"
-							Case "int"
-								argType = ":Int"
-							Case "unsigned int"
-								argType = ":UInt"
-							Case "long"
-								argType = ":Long"
-							Case "unsigned long"
-								argType = ":ULong"
-							Case "float"
-								argType = ":Float"
-							Case "double"
-								argType = ":Double"
-							Case "ImGuiID"
-								argType = ":UInt"
-							Case "ImU32"
-								argType = ":UInt"
-							Case "ImTextureID"
-								argType = ":ULong"
-							Case "ImGuiKeyChord"
-								argType = ":Int"
-							Case "ImWchar16"
-								argType = ":Short"
-							Case "ImColor"
-								argType = ":UInt"
-							Case "ImDrawIdx"
-								argType = ":Short"
-							Case "ImWchar"
-								argType = ":Short"
-							Case "ImFontAtlasRectId"
-								argType = ":Int"
-							Default
-								If enumMap.ContainsKey(arg.arg_type.declaration) Then
-									argType = ":" + enumMap[arg.arg_type.declaration]
-								Else if arg.arg_type.declaration.EndsWith("]") Then
-									prefix = "StaticArray "
-									argType = ":" + arg.arg_type.declaration
-								Else if arg.arg_type.declaration = "ImVec2" Then
-									argType = ":SImVec2"
-								Else if arg.arg_type.declaration = "ImVec4" Then
-									argType = ":SImVec4"
-								Else
-									' TODO : probably map to a proper type
-									argType = ":" + arg.arg_type.declaration
-								End If
-						End Select
-					End If
-				End If
-
-				Local name:String = arg.name
-
-				If name = "repeat" Then
-					name = "rep"
-				Else If name = "self" Then
-					name = "this"
-				Else If name = "step" Then
-					name = "stp"
-				Else If name = "type" Then
-					name = "kind"
-				Else If name = "ptr" Then
-					name = "handle"
-				End If
-
-				stream.WriteString(prefix + name + argType)
-
-				index :+ 1
-			Next
+			WriteBmxFuncMethodDefinitionArgs(stream, func, bmxFunc)
 			
 			stream.WriteString(")~n")
 
 			' body
-			Local wrapped:Int = False
-			If func.return_type And returnType Then
-				stream.WriteString("~tReturn ")
-
-				If func.return_type.declaration = "ImGuiContext*" Then
-					stream.WriteString("TImGuiContext._Create(")
-					wrapped = True
-				Else If func.return_type.declaration = "ImDrawList*" Or func.return_type.declaration = "const ImDrawList*" Then
-					stream.WriteString("TImDrawList._Create(")
-					wrapped = True
-				Else If func.return_type.declaration = "ImGuiStyle*" Then
-					stream.WriteString("TImGuiStyle._Create(")
-					wrapped = True
-				Else If func.return_type.declaration = "ImFont*" Then
-					stream.WriteString("TImFont._Create(")
-					wrapped = True
-				Else If func.return_type.declaration = "ImGuiIO*" Then
-					stream.WriteString("TImGuiIO._Create(")
-					wrapped = True
-				Else If func.return_type.declaration = "ImGuiListClipper*" Then
-					stream.WriteString("TImGuiListClipper._Create(")
-					wrapped = True
-				Else If func.return_type.declaration = "ImGuiPayload*" Or func.return_type.declaration = "const ImGuiPayload*" Then
-					stream.WriteString("TImGuiPayload._Create(")
-					wrapped = True
-				Else If func.return_type.declaration = "ImDrawData*" Then
-					stream.WriteString("TImDrawData._Create(")
-					wrapped = True
-				Else If func.return_type.declaration = "ImGuiViewport*" Or func.return_type.declaration = "const ImGuiViewport*" Then
-					stream.WriteString("TImGuiViewport._Create(")
-					wrapped = True
-				End If
-			Else
-				stream.WriteString("~t")
-			End If
-
-			stream.WriteString("_")
-			stream.WriteString(func.name)
-			stream.WriteString("(")
-
-			' args
-
-			index = 0
-			For Local arg:TIGArgument = eachin func.arguments
-
-				' we don't support var args
-				If arg.is_varargs Or arg.arg_type.declaration = "va_list" Then
-					bmxFunc = True
-					Continue
-				End If
-
-				If index Then
-					stream.WriteString(", ")
-				End If
-
-				Local name:String = arg.name
-
-				If name = "repeat" Then
-					name = "rep"
-				Else If name = "self" Then
-					name = "this"
-				Else If name = "step" Then
-					name = "stp"
-				Else If name = "type" Then
-					name = "kind"
-				Else If name = "ptr" Then
-					name = "handle"
-				End If
-
-				If arg.arg_type Then
-					If arg.arg_type.declaration = "ImGuiContext*" Then
-						name = name + ".handle"
-					Else If arg.arg_type.declaration = "ImFontAtlas*" Or arg.arg_type.declaration = "const ImFontAtlas*" Then
-						name = name + ".handle"
-					Else If arg.arg_type.declaration = "ImFont*" Or arg.arg_type.declaration = "const ImFont*" Then
-						name = name + ".handle"
-					Else If arg.arg_type.declaration = "ImDrawList*" Or arg.arg_type.declaration = "const ImDrawList*" Then
-						name = name + ".handle"
-					Else If arg.arg_type.declaration = "ImGuiStyle*" Then
-						name = name + ".handle"
-					Else If arg.arg_type.declaration = "ImGuiIO*" Then
-						name = name + ".handle"
-					Else If arg.arg_type.declaration = "ImGuiListClipper*" Then
-						name = name + ".handle"
-					Else If arg.arg_type.declaration = "ImGuiPayload*" Or arg.arg_type.declaration = "const ImGuiPayload*" Then
-						name = name + ".handle"
-					Else If arg.arg_type.declaration = "ImGuiTextFilter*" Or arg.arg_type.declaration = "const ImGuiTextFilter*" Then
-						name = name + ".handle"
-					Else If arg.arg_type.declaration = "ImGuiTextBuffer*" Or arg.arg_type.declaration = "const ImGuiTextBuffer*" Then
-						name = name + ".handle"
-					Else If arg.arg_type.declaration = "ImDrawData*" Then
-						name = name + ".handle"
-					Else If arg.arg_type.declaration = "ImGuiViewport*" Or arg.arg_type.declaration = "const ImGuiViewport*" Then
-						name = name + ".handle"
-					End If
-				End If
-
-				stream.WriteString(name)
-
-				index :+ 1
-			Next
-			
-			stream.WriteString(")")
-
-			If wrapped Then
-				stream.WriteString(")")
-			End If
+			WriteBmxFunctionBody(stream, func, returnType)
 			
 			stream.WriteString("~n")
 			stream.WriteString("End Function~n")
@@ -794,6 +458,419 @@ Type TCodeGenerator
 		Next
 
 		stream.WriteString("~n")
+	End Method
+
+	Method GetBmxMethodNameFromFunction:String(func:TIGFunction)
+		Local pos:Int = func.name.Find("_")
+		If pos > -1 And pos < func.name.Length - 1 Then
+			Return func.name[(pos + 1)..]
+		End If
+		Return func.name
+	End Method
+
+	Method WriteBbdocComments(stream:TStream, comments:TIGComments, inMethod:Int = False)
+		If comments Then
+			Local indent:String = ""
+			If inMethod Then
+				indent = "~t"
+			End If
+
+			stream.WriteString(indent)
+			stream.WriteString("Rem~n")
+
+			stream.WriteString(indent)
+			stream.WriteString("bbdoc: ")
+			If comments.attached Then
+				stream.WriteString(comments.attached.Replace("//", ""))
+				stream.WriteString("~n")
+			Else
+				stream.WriteString("~n")
+			End If
+
+			stream.WriteString(indent)
+			stream.WriteString("End Rem~n")
+		End If
+	End Method
+
+	Method GetBmxFunctionReturnType:String(func:TIGFunction, bmxFunc:Int Var)
+		Local returnType:String
+		If func.return_type Then
+			If func.return_type.declaration = "const char*" Then
+				returnType = ":String"
+				bmxFunc = True
+			Else If func.return_type.declaration = "ImGuiContext*" Then
+				returnType = ":TImGuiContext"
+			Else If func.return_type.declaration = "ImFontAtlas*" Or func.return_type.declaration = "const ImFontAtlas*" Then
+				returnType = ":TImFontAtlas"
+			Else If func.return_type.declaration = "ImFont*" Or func.return_type.declaration = "const ImFont*" Then
+				returnType = ":TImFont"
+			Else If func.return_type.declaration = "ImDrawList*" Or func.return_type.declaration = "const ImDrawList*" Then
+				returnType = ":TImDrawList"
+			Else If func.return_type.declaration = "ImGuiTextFilter*" Or func.return_type.declaration = "const ImGuiTextFilter*" Then
+				returnType = ":TImGuiTextFilter"
+			Else If func.return_type.declaration = "ImGuiTextBuffer*" Or func.return_type.declaration = "const ImGuiTextBuffer*" Then
+				returnType = ":TImGuiTextBuffer"
+			Else If func.return_type.declaration = "ImGuiStyle*" Then
+				returnType = ":TImGuiStyle"
+			Else If func.return_type.declaration = "ImGuiIO*" Then
+				returnType = ":TImGuiIO"
+			Else If func.return_type.declaration = "ImGuiListClipper*" Then
+				returnType = ":TImGuiListClipper"
+			Else If func.return_type.declaration = "ImGuiPayload*" Or func.return_type.declaration = "const ImGuiPayload*" Then
+				returnType = ":TImGuiPayload"
+			Else If func.return_type.declaration = "ImDrawData*" Then
+				returnType = ":TImDrawData"
+			Else If func.return_type.declaration = "ImGuiViewport*" Or func.return_type.declaration = "const ImGuiViewport*" Then
+				returnType = ":TImGuiViewport"
+			Else If func.return_type.declaration = "ImFontConfig*" Or func.return_type.declaration = "const ImFontConfig*" Then
+				returnType = ":TImFontConfig"
+			Else If func.return_type.declaration.EndsWith("*") Then
+				returnType = ":Byte Ptr"
+			Else
+				Select func.return_type.declaration
+					Case "void"
+						returnType = ""
+					Case "bool"
+						returnType = ":Int"
+					Case "char"
+						returnType = ":Byte"
+					Case "unsigned char"
+						returnType = ":Byte"
+					Case "short"
+						returnType = ":Short"
+					Case "unsigned short"
+						returnType = ":UShort"
+					Case "int"
+						returnType = ":Int"
+					Case "unsigned int"
+						returnType = ":UInt"
+					Case "long"
+						returnType = ":Long"
+					Case "unsigned long"
+						returnType = ":ULong"
+					Case "float"
+						returnType = ":Float"
+					Case "double"
+						returnType = ":Double"
+					Case "ImGuiID"
+						returnType = ":UInt"
+					Case "ImU32"
+						returnType = ":UInt"
+					Case "ImTextureID"
+						returnType = ":ULong"
+					Case "ImColor"
+						returnType = ":UInt"
+					Case "ImTextureRef"
+						returnType = ":SImTextureRef"
+					Case "ImFontAtlasRectId"
+						returnType = ":Int"
+					Default
+						If enumMap.ContainsKey(func.return_type.declaration) Then
+							returnType = ":" + enumMap[func.return_type.declaration]
+						Else if func.return_type.declaration = "ImVec2" Then
+							returnType = ":SImVec2"
+						Else if func.return_type.declaration = "ImVec4" Then
+							returnType = ":SImVec4"
+						Else
+							' TODO : probably map to a proper type
+							returnType = ":" + func.return_type.declaration
+						End If
+				End Select
+			End If
+		End If
+		Return returnType
+	End Method
+
+	Method WriteBmxFuncMethodDefinitionArgs(stream:TStream, func:TIGFunction, bmxFunc:Int Var, inMethod:Int = False)
+		Local index:Int
+		For Local arg:TIGArgument = eachin func.arguments
+
+			' we don't support var args
+			If arg.is_varargs Or arg.arg_type.declaration = "va_list" Then
+				bmxFunc = True
+				Continue
+			End If
+
+			If inMethod And arg.name = "self" Then
+				Continue
+			End If
+
+			If index Then
+				stream.WriteString(", ")
+			End If
+
+			Local prefix:String
+			Local argType:String
+			If arg.arg_type Then
+				If arg.arg_type.declaration = "const char*" Then
+					argType = ":String"
+					bmxFunc = True
+				Else If arg.arg_type.declaration = "ImFontAtlas*" Or arg.arg_type.declaration = "const ImFontAtlas*" Then
+					argType = ":TImFontAtlas"
+				Else If arg.arg_type.declaration = "ImFont*" Or arg.arg_type.declaration = "const ImFont*" Then
+					argType = ":TImFont"
+				Else If arg.arg_type.declaration = "ImDrawList*" Or arg.arg_type.declaration = "const ImDrawList*" Then
+					argType = ":TImDrawList"
+				Else If arg.arg_type.declaration = "const ImGuiTextFilter*" Or arg.arg_type.declaration = "ImGuiTextFilter*" Then
+					argType = ":TImGuiTextFilter"
+				Else If arg.arg_type.declaration = "const ImGuiTextBuffer*" Or arg.arg_type.declaration = "ImGuiTextBuffer*" Then
+					argType = ":TImGuiTextBuffer"
+				Else If arg.arg_type.declaration = "ImGuiStyle*" Then
+					argType = ":TImGuiStyle"
+				Else If arg.arg_type.declaration = "ImGuiIO*" Then
+					argType = ":TImGuiIO"
+				Else If arg.arg_type.declaration = "ImGuiListClipper*" Then
+					argType = ":TImGuiListClipper"
+				Else If arg.arg_type.declaration = "ImGuiPayload*" Or arg.arg_type.declaration = "const ImGuiPayload*" Then
+					argType = ":TImGuiPayload"
+				Else If arg.arg_type.declaration = "ImDrawData*" Then
+					argType = ":TImDrawData"
+				Else If arg.arg_type.declaration = "ImGuiViewport*" Or arg.arg_type.declaration = "const ImGuiViewport*" Then
+					argType = ":TImGuiViewport"
+				Else If arg.arg_type.declaration = "ImFontConfig*" Or arg.arg_type.declaration = "const ImFontConfig*" Then
+					argType = ":TImFontConfig"
+				Else If arg.arg_type.declaration = "bool*" Then
+					argType = ":Int Var"
+				Else If arg.arg_type.declaration = "int*" Then
+					argType = ":Int Var"
+				Else If arg.arg_type.declaration = "float*" Then
+					argType = ":Float Var"
+				Else If arg.arg_type.declaration = "unsigned int*" Then
+					argType = ":UInt Var"
+				Else If arg.arg_type.declaration = "const char*const[]" Then
+					argType = ":String[]"
+					bmxFunc = True
+				Else If arg.arg_type.declaration = "float (*values_getter)(void* data, int idx)" Then
+					argType = ":Byte Ptr"
+				Else If arg.arg_type.declaration = "const char* (*getter)(void* user_data, int idx)" Then
+					argType = ":Byte Ptr"
+				Else If arg.arg_type.declaration = "ImGuiSizeCallback" Then
+					argType = ":Byte Ptr"
+				Else If arg.arg_type.declaration = "ImGuiInputTextCallback" Then
+					argType = ":Byte Ptr"
+				Else If arg.arg_type.declaration = "ImDrawCallback" Then
+					argType = ":Byte Ptr"
+				Else If arg.arg_type.declaration = "ImGuiSelectionUserData" Then
+					argType = ":Long"
+				Else If arg.arg_type.declaration = "ImGuiMemAllocFunc" Then
+					argType = ":Byte Ptr"
+				Else If arg.arg_type.declaration = "ImGuiMemFreeFunc" Then
+					argType = ":Byte Ptr"
+				Else If arg.arg_type.declaration = "ImTextureRef" Then
+					argType = ":SImTextureRef"
+				Else If arg.arg_type.declaration.EndsWith("*") Then
+					argType = ":Byte Ptr"
+				Else
+					Select arg.arg_type.declaration
+						Case "void"
+							argType = ""
+						Case "bool"
+							argType = ":Int"
+						Case "char"
+							argType = ":Byte"
+						Case "unsigned char"
+							argType = ":Byte"
+						Case "short"
+							argType = ":Short"
+						Case "unsigned short"
+							argType = ":UShort"
+						Case "int"
+							argType = ":Int"
+						Case "unsigned int"
+							argType = ":UInt"
+						Case "long"
+							argType = ":Long"
+						Case "unsigned long"
+							argType = ":ULong"
+						Case "float"
+							argType = ":Float"
+						Case "double"
+							argType = ":Double"
+						Case "ImGuiID"
+							argType = ":UInt"
+						Case "ImU32"
+							argType = ":UInt"
+						Case "ImTextureID"
+							argType = ":ULong"
+						Case "ImGuiKeyChord"
+							argType = ":Int"
+						Case "ImWchar16"
+							argType = ":Short"
+						Case "ImColor"
+							argType = ":UInt"
+						Case "ImDrawIdx"
+							argType = ":Short"
+						Case "ImWchar"
+							argType = ":Short"
+						Case "ImFontAtlasRectId"
+							argType = ":Int"
+						Default
+							If enumMap.ContainsKey(arg.arg_type.declaration) Then
+								argType = ":" + enumMap[arg.arg_type.declaration]
+							Else if arg.arg_type.declaration.EndsWith("]") Then
+								prefix = "StaticArray "
+								argType = ":" + arg.arg_type.declaration
+							Else if arg.arg_type.declaration = "ImVec2" Then
+								argType = ":SImVec2"
+							Else if arg.arg_type.declaration = "ImVec4" Then
+								argType = ":SImVec4"
+							Else
+								' TODO : probably map to a proper type
+								argType = ":" + arg.arg_type.declaration
+							End If
+					End Select
+				End If
+			End If
+
+			Local name:String = arg.name
+
+			If name = "repeat" Then
+				name = "rep"
+			Else If name = "self" Then
+				name = "this"
+			Else If name = "step" Then
+				name = "stp"
+			Else If name = "type" Then
+				name = "kind"
+			Else If name = "ptr" Then
+				name = "handle"
+			End If
+
+			stream.WriteString(prefix + name + argType)
+
+			index :+ 1
+		Next
+	End Method
+
+	Method WriteBmxFunctionBody(stream:TStream, func:TIGFunction, returnType:String, indentLevel:Int = 1, inMethod:Int = False, nullConfig:Int = False)
+		Local index:Int
+		Local bmxFunc:Int = False
+		Local wrapped:Int = False
+		Local isConfigArg:Int = False
+
+		Local indent:String = "~t".Replicate(indentLevel)
+		If func.return_type And returnType Then
+			
+			stream.WriteString(indent)
+			stream.WriteString("Return ")
+
+			If func.return_type.declaration = "ImGuiContext*" Then
+				stream.WriteString("TImGuiContext._Create(")
+				wrapped = True
+			Else If func.return_type.declaration = "ImDrawList*" Or func.return_type.declaration = "const ImDrawList*" Then
+				stream.WriteString("TImDrawList._Create(")
+				wrapped = True
+			Else If func.return_type.declaration = "ImGuiStyle*" Then
+				stream.WriteString("TImGuiStyle._Create(")
+				wrapped = True
+			Else If func.return_type.declaration = "ImFont*" Then
+				stream.WriteString("TImFont._Create(")
+				wrapped = True
+			Else If func.return_type.declaration = "ImGuiIO*" Then
+				stream.WriteString("TImGuiIO._Create(")
+				wrapped = True
+			Else If func.return_type.declaration = "ImGuiListClipper*" Then
+				stream.WriteString("TImGuiListClipper._Create(")
+				wrapped = True
+			Else If func.return_type.declaration = "ImGuiPayload*" Or func.return_type.declaration = "const ImGuiPayload*" Then
+				stream.WriteString("TImGuiPayload._Create(")
+				wrapped = True
+			Else If func.return_type.declaration = "ImDrawData*" Then
+				stream.WriteString("TImDrawData._Create(")
+				wrapped = True
+			Else If func.return_type.declaration = "ImGuiViewport*" Or func.return_type.declaration = "const ImGuiViewport*" Then
+				stream.WriteString("TImGuiViewport._Create(")
+				wrapped = True
+			End If
+		Else
+			stream.WriteString(indent)
+		End If
+
+		stream.WriteString("_")
+		stream.WriteString(func.name)
+		stream.WriteString("(")
+
+		' args
+
+		index = 0
+		For Local arg:TIGArgument = eachin func.arguments
+
+			isConfigArg = False
+
+			' we don't support var args
+			If arg.is_varargs Or arg.arg_type.declaration = "va_list" Then
+				bmxFunc = True
+				Continue
+			End If
+
+			If index Then
+				stream.WriteString(", ")
+			End If
+
+			Local name:String = arg.name
+
+			If name = "repeat" Then
+				name = "rep"
+			Else If name = "self" Then
+				name = "this"
+			Else If name = "step" Then
+				name = "stp"
+			Else If name = "type" Then
+				name = "kind"
+			Else If name = "ptr" Then
+				name = "handle"
+			End If
+
+			If arg.arg_type Then
+				If arg.arg_type.declaration = "ImGuiContext*" Then
+					name = name + ".handle"
+				Else If arg.arg_type.declaration = "ImFontAtlas*" Or arg.arg_type.declaration = "const ImFontAtlas*" Then
+					name = name + ".handle"
+				Else If arg.arg_type.declaration = "ImFont*" Or arg.arg_type.declaration = "const ImFont*" Then
+					name = name + ".handle"
+				Else If arg.arg_type.declaration = "ImDrawList*" Or arg.arg_type.declaration = "const ImDrawList*" Then
+					name = name + ".handle"
+				Else If arg.arg_type.declaration = "ImGuiStyle*" Then
+					name = name + ".handle"
+				Else If arg.arg_type.declaration = "ImGuiIO*" Then
+					name = name + ".handle"
+				Else If arg.arg_type.declaration = "ImGuiListClipper*" Then
+					name = name + ".handle"
+				Else If arg.arg_type.declaration = "ImGuiPayload*" Or arg.arg_type.declaration = "const ImGuiPayload*" Then
+					name = name + ".handle"
+				Else If arg.arg_type.declaration = "ImGuiTextFilter*" Or arg.arg_type.declaration = "const ImGuiTextFilter*" Then
+					name = name + ".handle"
+				Else If arg.arg_type.declaration = "ImGuiTextBuffer*" Or arg.arg_type.declaration = "const ImGuiTextBuffer*" Then
+					name = name + ".handle"
+				Else If arg.arg_type.declaration = "ImDrawData*" Then
+					name = name + ".handle"
+				Else If arg.arg_type.declaration = "ImGuiViewport*" Or arg.arg_type.declaration = "const ImGuiViewport*" Then
+					name = name + ".handle"
+				Else If arg.arg_type.declaration = "ImFontConfig*" Or arg.arg_type.declaration = "const ImFontConfig*" Then
+					name = name + ".handle"
+					isConfigArg = True
+				End If
+			End If
+
+			' use handle for self parameters in methods, as the handle is the actual value being passed to the C function
+			If inMethod And arg.name = "self" Then
+				name = "handle"
+			End If
+
+			If isConfigArg And nullConfig Then
+				stream.WriteString("Null")
+			Else
+				stream.WriteString(name)
+			End If
+
+			index :+ 1
+		Next
+		
+		stream.WriteString(")")
+
+		If wrapped Then
+			stream.WriteString(")")
+		End If
 	End Method
 
 	Method FunctionRequired:Int(func:TIGFunction)
@@ -946,6 +1023,35 @@ Type TCodeGenerator
 			~tFunction bmx_imgui_viewport_get_work_pos:SImVec2(handle:Byte Ptr)
 			~tFunction bmx_imgui_viewport_get_work_size:SImVec2(handle:Byte Ptr)
 			~tFunction bmx_imgui_viewport_get_dpi_scale:Float(handle:Byte Ptr)
+			~tFunction bmx_imgui_io_get_fonts:Byte Ptr(handle:Byte Ptr)
+			~tFunction bmx_imgui_font_config_new:Byte Ptr()
+			~tFunction bmx_imgui_font_config_free(handle:Byte Ptr)
+			~tFunction bmx_imgui_font_config_set_font_data(handle:Byte Ptr, data:Byte Ptr, size:Int, owned_by_atlas:Int)
+			~tFunction bmx_imgui_font_config_set_merge_mode(handle:Byte Ptr, value:Int)
+			~tFunction bmx_imgui_font_config_get_merge_mode:Int(handle:Byte Ptr)
+			~tFunction bmx_imgui_font_config_set_pixel_snap_h(handle:Byte Ptr, value:Int)
+			~tFunction bmx_imgui_font_config_get_pixel_snap_h:Int(handle:Byte Ptr)
+			~tFunction bmx_imgui_font_config_set_oversample_h(handle:Byte Ptr, value:Int)
+			~tFunction bmx_imgui_font_config_get_oversample_h:Int(handle:Byte Ptr)
+			~tFunction bmx_imgui_font_config_set_oversample_v(handle:Byte Ptr, value:Int)
+			~tFunction bmx_imgui_font_config_get_oversample_v:Int(handle:Byte Ptr)
+			~tFunction bmx_imgui_font_config_set_elipsis_char(handle:Byte Ptr, value:Int)
+			~tFunction bmx_imgui_font_config_get_elipsis_char:Int(handle:Byte Ptr)
+			~tFunction bmx_imgui_font_config_set_size_pixels(handle:Byte Ptr, value:Float)
+			~tFunction bmx_imgui_font_config_get_size_pixels:Float(handle:Byte Ptr)
+			~tFunction bmx_imgui_font_config_set_glyph_offset(handle:Byte Ptr, offset:SImVec2)
+			~tFunction bmx_imgui_font_config_get_glyph_offset:SImVec2(handle:Byte Ptr)
+			~tFunction bmx_imgui_font_config_set_glyph_min_advance_x(handle:Byte Ptr, value:Float)
+			~tFunction bmx_imgui_font_config_get_glyph_min_advance_x:Float(handle:Byte Ptr)
+			~tFunction bmx_imgui_font_config_set_glyph_max_advance_x(handle:Byte Ptr, value:Float)
+			~tFunction bmx_imgui_font_config_get_glyph_max_advance_x:Float(handle:Byte Ptr)
+			~tFunction bmx_imgui_font_config_set_glyph_extra_advance_x(handle:Byte Ptr, value:Float)
+			~tFunction bmx_imgui_font_config_get_glyph_extra_advance_x:Float(handle:Byte Ptr)
+			~tFunction bmx_imgui_font_config_set_font_no(handle:Byte Ptr, value:Int)
+			~tFunction bmx_imgui_font_config_get_font_no:Int(handle:Byte Ptr)
+			~tFunction bmx_imgui_font_config_set_font_loader_flags(handle:Byte Ptr, value:UInt)
+			~tFunction bmx_imgui_font_config_get_font_loader_flags:UInt(handle:Byte Ptr)
+
 			""")
 		stream.WriteString("~n~n")
 
@@ -1693,6 +1799,121 @@ Type TCodeGenerator
 			return viewport->DpiScale;
 		}
 
+		ImFontAtlas * bmx_imgui_io_get_fonts(ImGuiIO * io) {
+			return io->Fonts;
+		}
+
+		ImFontConfig * bmx_imgui_font_config_new() {
+			ImFontConfig * config = (ImFontConfig *)malloc(sizeof(ImFontConfig));
+			return config;
+		}
+
+		void bmx_imgui_font_config_free(ImFontConfig * config) {
+			free(config);
+		}
+
+		void bmx_imgui_font_config_set_font_data(ImFontConfig * config, void * data, int size, int owned_by_atlas) {
+			config->FontData = data;
+			config->FontDataSize = size;
+			config->FontDataOwnedByAtlas = owned_by_atlas;
+		}
+
+		void bmx_imgui_font_config_set_merge_mode(ImFontConfig * config, int value) {
+			config->MergeMode = value;
+		}
+
+		int bmx_imgui_font_config_get_merge_mode(ImFontConfig * config) {
+			return config->MergeMode;
+		}
+
+		void bmx_imgui_font_config_set_pixel_snap_h(ImFontConfig * config, int value) {
+			config->PixelSnapH = value;
+		}
+
+		int bmx_imgui_font_config_get_pixel_snap_h(ImFontConfig * config) {
+			return config->PixelSnapH;
+		}
+
+		void bmx_imgui_font_config_set_oversample_h(ImFontConfig * config, int value) {
+			config->OversampleH = (ImS8)value;
+		}
+
+		int bmx_imgui_font_config_get_oversample_h(ImFontConfig * config) {
+			return config->OversampleH;
+		}
+
+		void bmx_imgui_font_config_set_oversample_v(ImFontConfig * config, int value) {
+			config->OversampleV = (ImS8)value;
+		}
+
+		int bmx_imgui_font_config_get_oversample_v(ImFontConfig * config) {
+			return config->OversampleV;
+		}
+
+		void bmx_imgui_font_config_set_elipsis_char(ImFontConfig * config, int value) {
+			config->EllipsisChar = (ImWchar)value;
+		}
+
+		int bmx_imgui_font_config_get_elipsis_char(ImFontConfig * config) {
+			return config->EllipsisChar;
+		}
+
+		void bmx_imgui_font_config_set_size_pixels(ImFontConfig * config, float value) {
+			config->SizePixels = value;
+		}
+
+		float bmx_imgui_font_config_get_size_pixels(ImFontConfig * config) {
+			return config->SizePixels;
+		}
+
+		void bmx_imgui_font_config_set_glyph_offset(ImFontConfig * config, ImVec2 offset) {
+			config->GlyphOffset = offset;
+		}
+
+		ImVec2 bmx_imgui_font_config_get_glyph_offset(ImFontConfig * config) {
+			return config->GlyphOffset;
+		}
+
+		void bmx_imgui_font_config_set_glyph_min_advance_x(ImFontConfig * config, float value) {
+			config->GlyphMinAdvanceX = value;
+		}
+
+		float bmx_imgui_font_config_get_glyph_min_advance_x(ImFontConfig * config) {
+			return config->GlyphMinAdvanceX;
+		}
+
+		void bmx_imgui_font_config_set_glyph_max_advance_x(ImFontConfig * config, float value) {
+			config->GlyphMaxAdvanceX = value;
+		}
+
+		float bmx_imgui_font_config_get_glyph_max_advance_x(ImFontConfig * config) {
+			return config->GlyphMaxAdvanceX;
+		}
+
+		void bmx_imgui_font_config_set_glyph_extra_advance_x(ImFontConfig * config, float value) {
+			config->GlyphExtraAdvanceX = value;
+		}
+
+		float bmx_imgui_font_config_get_glyph_extra_advance_x(ImFontConfig * config) {
+			return config->GlyphExtraAdvanceX;
+		}
+
+		void bmx_imgui_font_config_set_font_no(ImFontConfig * config, int value) {
+			config->FontNo = value;
+		}
+
+		int bmx_imgui_font_config_get_font_no(ImFontConfig * config) {
+			return config->FontNo;
+		}
+
+		void bmx_imgui_font_config_set_font_loader_flags(ImFontConfig * config, unsigned int value) {
+			config->FontLoaderFlags = value;
+		}
+
+		unsigned int bmx_imgui_font_config_get_font_loader_flags(ImFontConfig * config) {
+			return config->FontLoaderFlags;
+		}
+
 		""")
 
 		stream.WriteString("~n~n")
@@ -1957,15 +2178,6 @@ Type TCodeGenerator
 			End Function
 		End Type
 
-		Type TImguiFontAtlas
-			Field handle:Byte Ptr
-			Function _Create:TImguiFontAtlas(handle:Byte Ptr)
-				Local this:TImguiFontAtlas = New TImguiFontAtlas
-				this.handle = handle
-				Return this
-			End Function
-		End Type
-
 		Type TImFont
 			Field handle:Byte Ptr
 			Function _Create:TImFont(handle:Byte Ptr)
@@ -1997,15 +2209,6 @@ Type TCodeGenerator
 			Field handle:Byte Ptr
 			Function _Create:TImDrawList(handle:Byte Ptr)
 				Local this:TImDrawList = New TImDrawList
-				this.handle = handle
-				Return this
-			End Function
-		End Type
-
-		Type TImFontAtlas
-			Field handle:Byte Ptr
-			Function _Create:TImFontAtlas(handle:Byte Ptr)
-				Local this:TImFontAtlas = New TImFontAtlas
 				this.handle = handle
 				Return this
 			End Function
@@ -2769,6 +2972,13 @@ Type TCodeGenerator
 			Method SetKeyRepeatRate(value:Float)
 				bmx_imgui_io_set_key_repeat_rate(handle, value)
 			End Method
+
+			Rem
+			bbdoc: Font atlas: load, rasterize and pack one or more fonts into a single texture.
+			End Rem
+			Method Fonts:TImFontAtlas()
+				Return TImFontAtlas._Create(bmx_imgui_io_get_fonts(handle))
+			End Method
 		End Type
 
 		Type TImGuiListClipper
@@ -2798,6 +3008,9 @@ Type TCodeGenerator
 			End Function
 		End Type
 
+		Rem
+		bbdoc: Represents the Platform Window created by the application which is hosting our Dear ImGui windows.
+		End Rem
 		Type TImGuiViewport
 			Field handle:Byte Ptr
 			Function _Create:TImGuiViewport(handle:Byte Ptr)
@@ -2864,7 +3077,313 @@ Type TCodeGenerator
 
 		End Type
 
+		Rem
+		bbdoc: A font input/source.
+		End Rem
+		Type TImFontConfig
+			Field handle:Byte Ptr
+			
+			Method New()
+				handle = bmx_imgui_font_config_new()
+			End Method
+
+			Method Delete()
+				If handle Then
+					bmx_imgui_font_config_free(handle)
+					handle = Null
+				End If
+			End Method
+
+			Rem
+			bbdoc: Sets TTF/OTF data with size.
+			about: By default ownership remains with the caller and it will not be freed. Set @owned_by_atlas to #True to transfer ownership to the
+			font atlas, which will call ImFree on the data when it is no longer needed.
+			End Rem
+			Method SetFontData(data:Byte Ptr, size:Int, owned_by_atlas:Int = False)
+				bmx_imgui_font_config_set_font_data(handle, data, size, owned_by_atlas)
+			End Method
+
+			Rem
+			bbdoc: Merge into previous ImFont, so you can combine multiple inputs font into one ImFont (e.g. ASCII font + icons + Japanese glyphs).
+			about: You may want to use GlyphOffset.y when merge font of different heights.
+			End Rem
+			Method SetMergeMode(value:Int)
+				bmx_imgui_font_config_set_merge_mode(handle, value)
+			End Method
+
+			Rem
+			bbdoc: Merge into previous ImFont, so you can combine multiple inputs font into one ImFont (e.g. ASCII font + icons + Japanese glyphs).
+			about: You may want to use GlyphOffset.y when merge font of different heights.
+			End Rem
+			Method GetMergeMode:Int()
+				Return bmx_imgui_font_config_get_merge_mode(handle)
+			End Method
+
+			Rem
+			bbdoc: Align every glyph AdvanceX to pixel boundaries.
+			about: Prevents fractional font size from working correctly! Useful e.g. if you are merging a non-pixel aligned font with the default font.
+			If enabled, OversampleH/V will default to 1.
+			End Rem
+			Method SetPixelSnapH(value:Int)
+				bmx_imgui_font_config_set_pixel_snap_h(handle, value)
+			End Method
+
+			Rem
+			bbdoc: Align every glyph AdvanceX to pixel boundaries.
+			about: Prevents fractional font size from working correctly! Useful e.g. if you are merging a non-pixel aligned font with the default font.
+			If enabled, OversampleH/V will default to 1.
+			End Rem
+			Method GetPixelSnapH:Int()
+				Return bmx_imgui_font_config_get_pixel_snap_h(handle)
+			End Method
+
+			Rem
+			bbdoc: Rasterize at higher quality for sub-pixel positioning. 0 == auto == 1 or 2 depending on size.
+			about: Note the difference between 2 and 3 is minimal. You can reduce this to 1 for large glyphs save memory.
+			Read https://github.com/nothings/stb/blob/master/tests/oversample/README.md for details.
+			End Rem
+			Method SetOversampleH(value:Int)
+				bmx_imgui_font_config_set_oversample_h(handle, value)
+			End Method
+
+			Rem
+			bbdoc: Rasterize at higher quality for sub-pixel positioning. 0 == auto == 1 or 2 depending on size.
+			about: Note the difference between 2 and 3 is minimal. You can reduce this to 1 for large glyphs save memory.
+			Read https://github.com/nothings/stb/blob/master/tests/oversample/README.md for details.
+			End Rem
+			Method GetOversampleH:Int()
+				Return bmx_imgui_font_config_get_oversample_h(handle)
+			End Method
+
+			Rem
+			bbdoc: Rasterize at higher quality for sub-pixel positioning. 0 == auto == 1.
+			about: This is not really useful as we don't use sub-pixel positions on the Y axis.
+			End Rem
+			Method SetOversampleV(value:Int)
+				bmx_imgui_font_config_set_oversample_v(handle, value)
+			End Method
+
+			Rem
+			bbdoc: Rasterize at higher quality for sub-pixel positioning. 0 == auto == 1.
+			about: This is not really useful as we don't use sub-pixel positions on the Y axis.
+			End Rem
+			Method GetOversampleV:Int()
+				Return bmx_imgui_font_config_get_oversample_v(handle)
+			End Method
+
+			Rem
+			bbdoc: Explicitly specify Unicode codepoint of ellipsis character.
+			about: When fonts are being merged first specified ellipsis will be used.
+			End Rem
+			Method SetElipsisChar(value:Int)
+				bmx_imgui_font_config_set_elipsis_char(handle, value)
+			End Method
+
+			Rem
+			bbdoc: Explicitly specify Unicode codepoint of ellipsis character.
+			about: When fonts are being merged first specified ellipsis will be used.
+			End Rem
+			Method GetElipsisChar:Int()
+				Return bmx_imgui_font_config_get_elipsis_char(handle)
+			End Method
+
+			Rem
+			bbdoc: Output size in pixels for rasterizer (more or less maps to the resulting font height).
+			End Rem
+			Method SetSizePixels(value:Float)
+				bmx_imgui_font_config_set_size_pixels(handle, value)
+			End Method
+
+			Rem
+			bbdoc: Output size in pixels for rasterizer (more or less maps to the resulting font height).
+			End Rem
+			Method GetSizePixels:Float()
+				Return bmx_imgui_font_config_get_size_pixels(handle)
+			End Method
+
+			Rem
+			bbdoc:  Offset (in pixels) all glyphs from this font input.
+			about: Absolute value for default size, other sizes will scale this value.
+			End Rem
+			Method SetGlyphOffset(offset:SImVec2)
+				bmx_imgui_font_config_set_glyph_offset(handle, offset)
+			End Method
+
+			Rem
+			bbdoc:  Offset (in pixels) all glyphs from this font input.
+			about: Absolute value for default size, other sizes will scale this value.
+			End Rem
+			Method GetGlyphOffset:SImVec2()
+				Return bmx_imgui_font_config_get_glyph_offset(handle)
+			End Method
+
+			Rem
+			bbdoc: Minimum AdvanceX for glyphs, set Min to align font icons, set both Min/Max to enforce mono-space font.
+			about: Absolute value for default size, other sizes will scale this value.
+			End Rem
+			Method SetGlyphMinAdvanceX(value:Float)
+				bmx_imgui_font_config_set_glyph_min_advance_x(handle, value)
+			End Method
+
+			Rem
+			bbdoc: Minimum AdvanceX for glyphs, set Min to align font icons, set both Min/Max to enforce mono-space font.
+			about: Absolute value for default size, other sizes will scale this value.
+			End Rem
+			Method GetGlyphMinAdvanceX:Float()
+				Return bmx_imgui_font_config_get_glyph_min_advance_x(handle)
+			End Method
+
+			Rem
+			bbdoc: Maximum AdvanceX for glyphs
+			End Rem
+			Method SetGlyphMaxAdvanceX(value:Float)
+				bmx_imgui_font_config_set_glyph_max_advance_x(handle, value)
+			End Method
+
+			Rem
+			bbdoc: Maximum AdvanceX for glyphs
+			End Rem
+			Method GetGlyphMaxAdvanceX:Float()
+				Return bmx_imgui_font_config_get_glyph_max_advance_x(handle)
+			End Method
+
+			Rem
+			bbdoc: Extra spacing (in pixels) between glyphs.
+			about: Please contact us if you are using this.
+			End Rem
+			Method SetGlyphExtraAdvanceX(value:Float)
+				bmx_imgui_font_config_set_glyph_extra_advance_x(handle, value)
+			End Method
+
+			Rem
+			bbdoc: Extra spacing (in pixels) between glyphs.
+			about: Please contact us if you are using this.
+			End Rem
+			Method GetGlyphExtraAdvanceX:Float()
+				Return bmx_imgui_font_config_get_glyph_extra_advance_x(handle)
+			End Method
+
+			Rem
+			bbdoc: Index of font within TTF/OTF file
+			End Rem
+			Method SetFontNo(value:Int)
+				bmx_imgui_font_config_set_font_no(handle, value)
+			End Method
+
+			Rem
+			bbdoc: Index of font within TTF/OTF file
+			End Rem
+			Method GetFontNo:Int()
+				Return bmx_imgui_font_config_get_font_no(handle)
+			End Method
+
+			Rem
+			bbdoc: Settings for custom font builder.
+			about: THIS IS BUILDER IMPLEMENTATION DEPENDENT. Leave as zero if unsure.
+			End Rem
+			Method SetFontLoaderFlags(value:UInt)
+				bmx_imgui_font_config_set_font_loader_flags(handle, value)
+			End Method
+
+			Rem
+			bbdoc: Settings for custom font builder.
+			about: THIS IS BUILDER IMPLEMENTATION DEPENDENT. Leave as zero if unsure.
+			End Rem
+			Method GetFontLoaderFlags:UInt()
+				Return bmx_imgui_font_config_get_font_loader_flags(handle)
+			End Method
+
+		End Type
+
 		""")
+
+		stream.WriteString("~n~n")
+
+		' ImFontAtlas
+		stream.WriteString("""
+		Rem
+		bbdoc: A structure to hold multiple fonts into a single texture.
+		about: It is owned by ImGuiIO and will automatically be destroyed after calling ImGui::DestroyContext().
+		End Rem
+		Type TImFontAtlas
+			Field handle:Byte Ptr
+			Function _Create:TImFontAtlas(handle:Byte Ptr)
+				Local this:TImFontAtlas = New TImFontAtlas
+				this.handle = handle
+				Return this
+			End Function
+		""")
+
+		stream.WriteString("~n~n")
+
+		' for any method that accepts a TImFontConfig, the config is always optional, which means
+		' we need to generate something like this:
+		'
+		' If config Then
+		'     call_with_config(handle, config.handle)
+		' Else
+		'     call_without_config(handle, Null)
+		' End If
+		'
+
+		' ImFontAtlas methods
+		For Local func:TIGFunction = eachin model.functions
+			If Not FunctionRequired(func) Then Continue
+
+			If func.original_class = "ImFontAtlas" Then
+
+				Local bmxFunc:Int
+				Local returnType:String = GetBmxFunctionReturnType(func, bmxFunc)
+
+				WriteBbdocComments(stream, func.comments, True)
+				
+				stream.WriteString("~tMethod ")
+				stream.WriteString(GetBmxMethodNameFromFunction(func))
+				stream.WriteString(returnType)
+				stream.WriteString("(")
+
+				' args
+				WriteBmxFuncMethodDefinitionArgs(stream, func, bmxFunc, True)
+
+				stream.WriteString(")~n")
+
+				' do we have a config arg?
+				Local includesConfigArg:Int = False
+				Local variableName:String
+				For Local arg:TIGArgument = eachin func.arguments
+					If arg.arg_type.declaration = "ImFontConfig*" Or arg.arg_type.declaration = "const ImFontConfig*" Then
+						variableName = arg.name
+						includesConfigArg = True
+						Exit
+					End If
+				Next
+
+				Local indent:Int = 2
+
+				If includesConfigArg Then
+					indent = 3
+					stream.WriteString("~t~tIf ")
+					stream.WriteString(variableName)
+					stream.WriteString(" Then~n")
+				End If
+
+				' main call
+				WriteBmxFunctionBody(stream, func, returnType, indent, True)
+
+				If includesConfigArg Then
+					stream.WriteString("~n")
+					stream.WriteString("~t~tElse~n")
+					WriteBmxFunctionBody(stream, func, returnType, indent, True, True)
+					stream.WriteString("~n")
+					stream.WriteString("~t~tEnd If~n")
+				End If
+
+				stream.WriteString("~n")
+				stream.WriteString("~tEnd Method~n~n")
+			End If
+		Next
+
+		stream.WriteString("End Type~n")
 
 		stream.WriteString("~n~n")
 	End Method
