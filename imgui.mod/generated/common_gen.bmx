@@ -1469,21 +1469,21 @@ End Function
 Rem
 bbdoc:  create Demo window. demonstrate most ImGui features. call this to learn about the library! try to make it always available in your application!
 End Rem
-Function ImGui_ShowDemoWindow(p_open:Int Var)
+Function ImGui_ShowDemoWindow(p_open:Int Ptr)
 	_ImGui_ShowDemoWindow(p_open)
 End Function
 
 Rem
 bbdoc:  create Metrics/Debugger window. display Dear ImGui internals: windows, draw commands, various internal state, etc.
 End Rem
-Function ImGui_ShowMetricsWindow(p_open:Int Var)
+Function ImGui_ShowMetricsWindow(p_open:Int Ptr)
 	_ImGui_ShowMetricsWindow(p_open)
 End Function
 
 Rem
 bbdoc:  create Debug Log window. display a simplified log of important dear imgui events.
 End Rem
-Function ImGui_ShowDebugLogWindow(p_open:Int Var)
+Function ImGui_ShowDebugLogWindow(p_open:Int Ptr)
 	_ImGui_ShowDebugLogWindow(p_open)
 End Function
 
@@ -1497,14 +1497,14 @@ End Function
 Rem
 bbdoc:  create Stack Tool window. hover items with mouse to query information about the source of their unique ID.
 End Rem
-Function ImGui_ShowIDStackToolWindowEx(p_open:Int Var)
+Function ImGui_ShowIDStackToolWindowEx(p_open:Int Ptr)
 	_ImGui_ShowIDStackToolWindowEx(p_open)
 End Function
 
 Rem
 bbdoc:  create About window. display Dear ImGui version, credits and build/system information.
 End Rem
-Function ImGui_ShowAboutWindow(p_open:Int Var)
+Function ImGui_ShowAboutWindow(p_open:Int Ptr)
 	_ImGui_ShowAboutWindow(p_open)
 End Function
 
@@ -1546,7 +1546,7 @@ End Function
 Rem
 bbdoc: 
 End Rem
-Function ImGui_Begin:Int(name:String, p_open:Int Var, flags:EImGuiWindowFlags)
+Function ImGui_Begin:Int(name:String, p_open:Int Ptr, flags:EImGuiWindowFlags)
 	Return _ImGui_Begin(name, p_open, flags)
 End Function
 
@@ -2386,15 +2386,15 @@ Function ImGui_ArrowButton:Int(str_id:String, dir:EImGuiDir)
 	Return _ImGui_ArrowButton(str_id, dir)
 End Function
 
-Function ImGui_Checkbox:Int(label:String, v:Int Var)
+Function ImGui_Checkbox:Int(label:String, v:Int Ptr)
 	Return _ImGui_Checkbox(label, v)
 End Function
 
-Function ImGui_CheckboxFlagsIntPtr:Int(label:String, flags:Int Var, flags_value:Int)
+Function ImGui_CheckboxFlagsIntPtr:Int(label:String, flags:Int Ptr, flags_value:Int)
 	Return _ImGui_CheckboxFlagsIntPtr(label, flags, flags_value)
 End Function
 
-Function ImGui_CheckboxFlagsUintPtr:Int(label:String, flags:UInt Var, flags_value:UInt)
+Function ImGui_CheckboxFlagsUintPtr:Int(label:String, flags:UInt Ptr, flags_value:UInt)
 	Return _ImGui_CheckboxFlagsUintPtr(label, flags, flags_value)
 End Function
 
@@ -2408,7 +2408,7 @@ End Function
 Rem
 bbdoc:  shortcut to handle the above pattern when value is an integer
 End Rem
-Function ImGui_RadioButtonIntPtr:Int(label:String, v:Int Var, v_button:Int)
+Function ImGui_RadioButtonIntPtr:Int(label:String, v:Int Ptr, v_button:Int)
 	Return _ImGui_RadioButtonIntPtr(label, v, v_button)
 End Function
 
@@ -2494,50 +2494,50 @@ End Function
 Rem
 bbdoc:  Implied popup_max_height_in_items = -1
 End Rem
-Function ImGui_ComboChar:Int(label:String, current_item:Int Var, items:String[], items_count:Int)
+Function ImGui_ComboChar:Int(label:String, current_item:Int Ptr, items:String[], items_count:Int)
 	Return _ImGui_ComboChar(label, current_item, items, items_count)
 End Function
 
-Function ImGui_ComboCharEx:Int(label:String, current_item:Int Var, items:String[], items_count:Int, popup_max_height_in_items:Int)
+Function ImGui_ComboCharEx:Int(label:String, current_item:Int Ptr, items:String[], items_count:Int, popup_max_height_in_items:Int)
 	Return _ImGui_ComboCharEx(label, current_item, items, items_count, popup_max_height_in_items)
 End Function
 
 Rem
 bbdoc:  Implied popup_max_height_in_items = -1
 End Rem
-Function ImGui_Combo:Int(label:String, current_item:Int Var, items_separated_by_zeros:String)
+Function ImGui_Combo:Int(label:String, current_item:Int Ptr, items_separated_by_zeros:String)
 	Return _ImGui_Combo(label, current_item, items_separated_by_zeros)
 End Function
 
 Rem
 bbdoc:  Separate items with \0 within a string, end item-list with \0\0. e.g. "One\0Two\0Three\0"
 End Rem
-Function ImGui_ComboEx:Int(label:String, current_item:Int Var, items_separated_by_zeros:String, popup_max_height_in_items:Int)
+Function ImGui_ComboEx:Int(label:String, current_item:Int Ptr, items_separated_by_zeros:String, popup_max_height_in_items:Int)
 	Return _ImGui_ComboEx(label, current_item, items_separated_by_zeros, popup_max_height_in_items)
 End Function
 
 Rem
 bbdoc:  Implied popup_max_height_in_items = -1
 End Rem
-Function ImGui_ComboCallback:Int(label:String, current_item:Int Var, getter:Byte Ptr, user_data:Byte Ptr, items_count:Int)
+Function ImGui_ComboCallback:Int(label:String, current_item:Int Ptr, getter:Byte Ptr, user_data:Byte Ptr, items_count:Int)
 	Return _ImGui_ComboCallback(label, current_item, getter, user_data, items_count)
 End Function
 
-Function ImGui_ComboCallbackEx:Int(label:String, current_item:Int Var, getter:Byte Ptr, user_data:Byte Ptr, items_count:Int, popup_max_height_in_items:Int)
+Function ImGui_ComboCallbackEx:Int(label:String, current_item:Int Ptr, getter:Byte Ptr, user_data:Byte Ptr, items_count:Int, popup_max_height_in_items:Int)
 	Return _ImGui_ComboCallbackEx(label, current_item, getter, user_data, items_count, popup_max_height_in_items)
 End Function
 
 Rem
 bbdoc:  Implied v_speed = 1.0f, v_min = 0.0f, v_max = 0.0f, format = "%.3f", flags = 0
 End Rem
-Function ImGui_DragFloat:Int(label:String, v:Float Var)
+Function ImGui_DragFloat:Int(label:String, v:Float Ptr)
 	Return _ImGui_DragFloat(label, v)
 End Function
 
 Rem
 bbdoc:  If v_min >= v_max we have no bound
 End Rem
-Function ImGui_DragFloatEx:Int(label:String, v:Float Var, v_speed:Float, v_min:Float, v_max:Float, format:String, flags:EImGuiSliderFlags)
+Function ImGui_DragFloatEx:Int(label:String, v:Float Ptr, v_speed:Float, v_min:Float, v_max:Float, format:String, flags:EImGuiSliderFlags)
 	Return _ImGui_DragFloatEx(label, v, v_speed, v_min, v_max, format, flags)
 End Function
 
@@ -2577,25 +2577,25 @@ End Function
 Rem
 bbdoc:  Implied v_speed = 1.0f, v_min = 0.0f, v_max = 0.0f, format = "%.3f", format_max = NULL, flags = 0
 End Rem
-Function ImGui_DragFloatRange2:Int(label:String, v_current_min:Float Var, v_current_max:Float Var)
+Function ImGui_DragFloatRange2:Int(label:String, v_current_min:Float Ptr, v_current_max:Float Ptr)
 	Return _ImGui_DragFloatRange2(label, v_current_min, v_current_max)
 End Function
 
-Function ImGui_DragFloatRange2Ex:Int(label:String, v_current_min:Float Var, v_current_max:Float Var, v_speed:Float, v_min:Float, v_max:Float, format:String, format_max:String, flags:EImGuiSliderFlags)
+Function ImGui_DragFloatRange2Ex:Int(label:String, v_current_min:Float Ptr, v_current_max:Float Ptr, v_speed:Float, v_min:Float, v_max:Float, format:String, format_max:String, flags:EImGuiSliderFlags)
 	Return _ImGui_DragFloatRange2Ex(label, v_current_min, v_current_max, v_speed, v_min, v_max, format, format_max, flags)
 End Function
 
 Rem
 bbdoc:  Implied v_speed = 1.0f, v_min = 0, v_max = 0, format = "%d", flags = 0
 End Rem
-Function ImGui_DragInt:Int(label:String, v:Int Var)
+Function ImGui_DragInt:Int(label:String, v:Int Ptr)
 	Return _ImGui_DragInt(label, v)
 End Function
 
 Rem
 bbdoc:  If v_min >= v_max we have no bound
 End Rem
-Function ImGui_DragIntEx:Int(label:String, v:Int Var, v_speed:Float, v_min:Int, v_max:Int, format:String, flags:EImGuiSliderFlags)
+Function ImGui_DragIntEx:Int(label:String, v:Int Ptr, v_speed:Float, v_min:Int, v_max:Int, format:String, flags:EImGuiSliderFlags)
 	Return _ImGui_DragIntEx(label, v, v_speed, v_min, v_max, format, flags)
 End Function
 
@@ -2635,11 +2635,11 @@ End Function
 Rem
 bbdoc:  Implied v_speed = 1.0f, v_min = 0, v_max = 0, format = "%d", format_max = NULL, flags = 0
 End Rem
-Function ImGui_DragIntRange2:Int(label:String, v_current_min:Int Var, v_current_max:Int Var)
+Function ImGui_DragIntRange2:Int(label:String, v_current_min:Int Ptr, v_current_max:Int Ptr)
 	Return _ImGui_DragIntRange2(label, v_current_min, v_current_max)
 End Function
 
-Function ImGui_DragIntRange2Ex:Int(label:String, v_current_min:Int Var, v_current_max:Int Var, v_speed:Float, v_min:Int, v_max:Int, format:String, format_max:String, flags:EImGuiSliderFlags)
+Function ImGui_DragIntRange2Ex:Int(label:String, v_current_min:Int Ptr, v_current_max:Int Ptr, v_speed:Float, v_min:Int, v_max:Int, format:String, format_max:String, flags:EImGuiSliderFlags)
 	Return _ImGui_DragIntRange2Ex(label, v_current_min, v_current_max, v_speed, v_min, v_max, format, format_max, flags)
 End Function
 
@@ -2668,14 +2668,14 @@ End Function
 Rem
 bbdoc:  Implied format = "%.3f", flags = 0
 End Rem
-Function ImGui_SliderFloat:Int(label:String, v:Float Var, v_min:Float, v_max:Float)
+Function ImGui_SliderFloat:Int(label:String, v:Float Ptr, v_min:Float, v_max:Float)
 	Return _ImGui_SliderFloat(label, v, v_min, v_max)
 End Function
 
 Rem
 bbdoc:  adjust format to decorate the value with a prefix or a suffix for in-slider labels or unit display.
 End Rem
-Function ImGui_SliderFloatEx:Int(label:String, v:Float Var, v_min:Float, v_max:Float, format:String, flags:EImGuiSliderFlags)
+Function ImGui_SliderFloatEx:Int(label:String, v:Float Ptr, v_min:Float, v_max:Float, format:String, flags:EImGuiSliderFlags)
 	Return _ImGui_SliderFloatEx(label, v, v_min, v_max, format, flags)
 End Function
 
@@ -2715,22 +2715,22 @@ End Function
 Rem
 bbdoc:  Implied v_degrees_min = -360.0f, v_degrees_max = +360.0f, format = "%.0f deg", flags = 0
 End Rem
-Function ImGui_SliderAngle:Int(label:String, v_rad:Float Var)
+Function ImGui_SliderAngle:Int(label:String, v_rad:Float Ptr)
 	Return _ImGui_SliderAngle(label, v_rad)
 End Function
 
-Function ImGui_SliderAngleEx:Int(label:String, v_rad:Float Var, v_degrees_min:Float, v_degrees_max:Float, format:String, flags:EImGuiSliderFlags)
+Function ImGui_SliderAngleEx:Int(label:String, v_rad:Float Ptr, v_degrees_min:Float, v_degrees_max:Float, format:String, flags:EImGuiSliderFlags)
 	Return _ImGui_SliderAngleEx(label, v_rad, v_degrees_min, v_degrees_max, format, flags)
 End Function
 
 Rem
 bbdoc:  Implied format = "%d", flags = 0
 End Rem
-Function ImGui_SliderInt:Int(label:String, v:Int Var, v_min:Int, v_max:Int)
+Function ImGui_SliderInt:Int(label:String, v:Int Ptr, v_min:Int, v_max:Int)
 	Return _ImGui_SliderInt(label, v, v_min, v_max)
 End Function
 
-Function ImGui_SliderIntEx:Int(label:String, v:Int Var, v_min:Int, v_max:Int, format:String, flags:EImGuiSliderFlags)
+Function ImGui_SliderIntEx:Int(label:String, v:Int Ptr, v_min:Int, v_max:Int, format:String, flags:EImGuiSliderFlags)
 	Return _ImGui_SliderIntEx(label, v, v_min, v_max, format, flags)
 End Function
 
@@ -2792,22 +2792,22 @@ End Function
 Rem
 bbdoc:  Implied format = "%.3f", flags = 0
 End Rem
-Function ImGui_VSliderFloat:Int(label:String, size:SImVec2, v:Float Var, v_min:Float, v_max:Float)
+Function ImGui_VSliderFloat:Int(label:String, size:SImVec2, v:Float Ptr, v_min:Float, v_max:Float)
 	Return _ImGui_VSliderFloat(label, size, v, v_min, v_max)
 End Function
 
-Function ImGui_VSliderFloatEx:Int(label:String, size:SImVec2, v:Float Var, v_min:Float, v_max:Float, format:String, flags:EImGuiSliderFlags)
+Function ImGui_VSliderFloatEx:Int(label:String, size:SImVec2, v:Float Ptr, v_min:Float, v_max:Float, format:String, flags:EImGuiSliderFlags)
 	Return _ImGui_VSliderFloatEx(label, size, v, v_min, v_max, format, flags)
 End Function
 
 Rem
 bbdoc:  Implied format = "%d", flags = 0
 End Rem
-Function ImGui_VSliderInt:Int(label:String, size:SImVec2, v:Int Var, v_min:Int, v_max:Int)
+Function ImGui_VSliderInt:Int(label:String, size:SImVec2, v:Int Ptr, v_min:Int, v_max:Int)
 	Return _ImGui_VSliderInt(label, size, v, v_min, v_max)
 End Function
 
-Function ImGui_VSliderIntEx:Int(label:String, size:SImVec2, v:Int Var, v_min:Int, v_max:Int, format:String, flags:EImGuiSliderFlags)
+Function ImGui_VSliderIntEx:Int(label:String, size:SImVec2, v:Int Ptr, v_min:Int, v_max:Int, format:String, flags:EImGuiSliderFlags)
 	Return _ImGui_VSliderIntEx(label, size, v, v_min, v_max, format, flags)
 End Function
 
@@ -2851,11 +2851,11 @@ End Function
 Rem
 bbdoc:  Implied step = 0.0f, step_fast = 0.0f, format = "%.3f", flags = 0
 End Rem
-Function ImGui_InputFloat:Int(label:String, v:Float Var)
+Function ImGui_InputFloat:Int(label:String, v:Float Ptr)
 	Return _ImGui_InputFloat(label, v)
 End Function
 
-Function ImGui_InputFloatEx:Int(label:String, v:Float Var, stp:Float, step_fast:Float, format:String, flags:EImGuiInputTextFlags)
+Function ImGui_InputFloatEx:Int(label:String, v:Float Ptr, stp:Float, step_fast:Float, format:String, flags:EImGuiInputTextFlags)
 	Return _ImGui_InputFloatEx(label, v, stp, step_fast, format, flags)
 End Function
 
@@ -2895,11 +2895,11 @@ End Function
 Rem
 bbdoc:  Implied step = 1, step_fast = 100, flags = 0
 End Rem
-Function ImGui_InputInt:Int(label:String, v:Int Var)
+Function ImGui_InputInt:Int(label:String, v:Int Ptr)
 	Return _ImGui_InputInt(label, v)
 End Function
 
-Function ImGui_InputIntEx:Int(label:String, v:Int Var, stp:Int, step_fast:Int, flags:EImGuiInputTextFlags)
+Function ImGui_InputIntEx:Int(label:String, v:Int Ptr, stp:Int, step_fast:Int, flags:EImGuiInputTextFlags)
 	Return _ImGui_InputIntEx(label, v, stp, step_fast, flags)
 End Function
 
@@ -3075,7 +3075,7 @@ End Function
 Rem
 bbdoc:  when 'p_visible != NULL': if '*p_visible==true' display an additional small close button on upper right of the header which will set the bool to false when clicked, if '*p_visible==false' don't display the header.
 End Rem
-Function ImGui_CollapsingHeaderBoolPtr:Int(label:String, p_visible:Int Var, flags:EImGuiTreeNodeFlags)
+Function ImGui_CollapsingHeaderBoolPtr:Int(label:String, p_visible:Int Ptr, flags:EImGuiTreeNodeFlags)
 	Return _ImGui_CollapsingHeaderBoolPtr(label, p_visible, flags)
 End Function
 
@@ -3110,14 +3110,14 @@ End Function
 Rem
 bbdoc:  Implied size = ImVec2(0, 0)
 End Rem
-Function ImGui_SelectableBoolPtr:Int(label:String, p_selected:Int Var, flags:EImGuiSelectableFlags)
+Function ImGui_SelectableBoolPtr:Int(label:String, p_selected:Int Ptr, flags:EImGuiSelectableFlags)
 	Return _ImGui_SelectableBoolPtr(label, p_selected, flags)
 End Function
 
 Rem
 bbdoc:  "bool* p_selected" point to the selection state (read-write), as a convenient helper.
 End Rem
-Function ImGui_SelectableBoolPtrEx:Int(label:String, p_selected:Int Var, flags:EImGuiSelectableFlags, size:SImVec2)
+Function ImGui_SelectableBoolPtrEx:Int(label:String, p_selected:Int Ptr, flags:EImGuiSelectableFlags, size:SImVec2)
 	Return _ImGui_SelectableBoolPtrEx(label, p_selected, flags, size)
 End Function
 
@@ -3161,18 +3161,18 @@ Function ImGui_EndListBox()
 	_ImGui_EndListBox()
 End Function
 
-Function ImGui_ListBox:Int(label:String, current_item:Int Var, items:String[], items_count:Int, height_in_items:Int)
+Function ImGui_ListBox:Int(label:String, current_item:Int Ptr, items:String[], items_count:Int, height_in_items:Int)
 	Return _ImGui_ListBox(label, current_item, items, items_count, height_in_items)
 End Function
 
 Rem
 bbdoc:  Implied height_in_items = -1
 End Rem
-Function ImGui_ListBoxCallback:Int(label:String, current_item:Int Var, getter:Byte Ptr, user_data:Byte Ptr, items_count:Int)
+Function ImGui_ListBoxCallback:Int(label:String, current_item:Int Ptr, getter:Byte Ptr, user_data:Byte Ptr, items_count:Int)
 	Return _ImGui_ListBoxCallback(label, current_item, getter, user_data, items_count)
 End Function
 
-Function ImGui_ListBoxCallbackEx:Int(label:String, current_item:Int Var, getter:Byte Ptr, user_data:Byte Ptr, items_count:Int, height_in_items:Int)
+Function ImGui_ListBoxCallbackEx:Int(label:String, current_item:Int Ptr, getter:Byte Ptr, user_data:Byte Ptr, items_count:Int, height_in_items:Int)
 	Return _ImGui_ListBoxCallbackEx(label, current_item, getter, user_data, items_count, height_in_items)
 End Function
 
@@ -3286,7 +3286,7 @@ End Function
 Rem
 bbdoc:  return true when activated + toggle (*p_selected) if p_selected != NULL
 End Rem
-Function ImGui_MenuItemBoolPtr:Int(label:String, shortcut:String, p_selected:Int Var, enabled:Int)
+Function ImGui_MenuItemBoolPtr:Int(label:String, shortcut:String, p_selected:Int Ptr, enabled:Int)
 	Return _ImGui_MenuItemBoolPtr(label, shortcut, p_selected, enabled)
 End Function
 
@@ -3343,7 +3343,7 @@ End Function
 Rem
 bbdoc:  return true if the modal is open, and you can start outputting to it.
 End Rem
-Function ImGui_BeginPopupModal:Int(name:String, p_open:Int Var, flags:EImGuiWindowFlags)
+Function ImGui_BeginPopupModal:Int(name:String, p_open:Int Ptr, flags:EImGuiWindowFlags)
 	Return _ImGui_BeginPopupModal(name, p_open, flags)
 End Function
 
@@ -3653,7 +3653,7 @@ End Function
 Rem
 bbdoc:  create a Tab. Returns true if the Tab is selected.
 End Rem
-Function ImGui_BeginTabItem:Int(label:String, p_open:Int Var, flags:EImGuiTabItemFlags)
+Function ImGui_BeginTabItem:Int(label:String, p_open:Int Ptr, flags:EImGuiTabItemFlags)
 	Return _ImGui_BeginTabItem(label, p_open, flags)
 End Function
 
@@ -4123,11 +4123,11 @@ Function ImGui_ColorConvertFloat4ToU32:UInt(in:SImVec4)
 	Return _ImGui_ColorConvertFloat4ToU32(in)
 End Function
 
-Function ImGui_ColorConvertRGBtoHSV(r:Float, g:Float, b:Float, out_h:Float Var, out_s:Float Var, out_v:Float Var)
+Function ImGui_ColorConvertRGBtoHSV(r:Float, g:Float, b:Float, out_h:Float Ptr, out_s:Float Ptr, out_v:Float Ptr)
 	_ImGui_ColorConvertRGBtoHSV(r, g, b, out_h, out_s, out_v)
 End Function
 
-Function ImGui_ColorConvertHSVtoRGB(h:Float, s:Float, v:Float, out_r:Float Var, out_g:Float Var, out_b:Float Var)
+Function ImGui_ColorConvertHSVtoRGB(h:Float, s:Float, v:Float, out_r:Float Ptr, out_g:Float Ptr, out_b:Float Ptr)
 	_ImGui_ColorConvertHSVtoRGB(h, s, v, out_r, out_g, out_b)
 End Function
 
@@ -5703,12 +5703,12 @@ Extern
 	Function _ImGui_EndFrame() = "ImGui_EndFrame"
 	Function _ImGui_Render() = "ImGui_Render"
 	Function _ImGui_GetDrawData:Byte Ptr() = "ImGui_GetDrawData"
-	Function _ImGui_ShowDemoWindow(p_open:Int Var) = "ImGui_ShowDemoWindow"
-	Function _ImGui_ShowMetricsWindow(p_open:Int Var) = "ImGui_ShowMetricsWindow"
-	Function _ImGui_ShowDebugLogWindow(p_open:Int Var) = "ImGui_ShowDebugLogWindow"
+	Function _ImGui_ShowDemoWindow(p_open:Int Ptr) = "ImGui_ShowDemoWindow"
+	Function _ImGui_ShowMetricsWindow(p_open:Int Ptr) = "ImGui_ShowMetricsWindow"
+	Function _ImGui_ShowDebugLogWindow(p_open:Int Ptr) = "ImGui_ShowDebugLogWindow"
 	Function _ImGui_ShowIDStackToolWindow() = "ImGui_ShowIDStackToolWindow"
-	Function _ImGui_ShowIDStackToolWindowEx(p_open:Int Var) = "ImGui_ShowIDStackToolWindowEx"
-	Function _ImGui_ShowAboutWindow(p_open:Int Var) = "ImGui_ShowAboutWindow"
+	Function _ImGui_ShowIDStackToolWindowEx(p_open:Int Ptr) = "ImGui_ShowIDStackToolWindowEx"
+	Function _ImGui_ShowAboutWindow(p_open:Int Ptr) = "ImGui_ShowAboutWindow"
 	Function _ImGui_ShowStyleEditor(ref:Byte Ptr) = "ImGui_ShowStyleEditor"
 	Function _ImGui_ShowStyleSelector:Int(label:String) = "bmx_ImGui_ShowStyleSelector"
 	Function _ImGui_ShowFontSelector(label:String) = "bmx_ImGui_ShowFontSelector"
@@ -5717,7 +5717,7 @@ Extern
 	Function _ImGui_StyleColorsDark(dst:Byte Ptr) = "ImGui_StyleColorsDark"
 	Function _ImGui_StyleColorsLight(dst:Byte Ptr) = "ImGui_StyleColorsLight"
 	Function _ImGui_StyleColorsClassic(dst:Byte Ptr) = "ImGui_StyleColorsClassic"
-	Function _ImGui_Begin:Int(name:String, p_open:Int Var, flags:EImGuiWindowFlags) = "bmx_ImGui_Begin"
+	Function _ImGui_Begin:Int(name:String, p_open:Int Ptr, flags:EImGuiWindowFlags) = "bmx_ImGui_Begin"
 	Function _ImGui_End() = "ImGui_End"
 	Function _ImGui_BeginChild:Int(str_id:String, size:SImVec2, child_flags:EImGuiChildFlags, window_flags:EImGuiWindowFlags) = "bmx_ImGui_BeginChild"
 	Function _ImGui_BeginChildID:Int(id:UInt, size:SImVec2, child_flags:EImGuiChildFlags, window_flags:EImGuiWindowFlags) = "ImGui_BeginChildID"
@@ -5847,11 +5847,11 @@ Extern
 	Function _ImGui_SmallButton:Int(label:String) = "bmx_ImGui_SmallButton"
 	Function _ImGui_InvisibleButton:Int(str_id:String, size:SImVec2, flags:EImGuiButtonFlags) = "bmx_ImGui_InvisibleButton"
 	Function _ImGui_ArrowButton:Int(str_id:String, dir:EImGuiDir) = "bmx_ImGui_ArrowButton"
-	Function _ImGui_Checkbox:Int(label:String, v:Int Var) = "bmx_ImGui_Checkbox"
-	Function _ImGui_CheckboxFlagsIntPtr:Int(label:String, flags:Int Var, flags_value:Int) = "bmx_ImGui_CheckboxFlagsIntPtr"
-	Function _ImGui_CheckboxFlagsUintPtr:Int(label:String, flags:UInt Var, flags_value:UInt) = "bmx_ImGui_CheckboxFlagsUintPtr"
+	Function _ImGui_Checkbox:Int(label:String, v:Int Ptr) = "bmx_ImGui_Checkbox"
+	Function _ImGui_CheckboxFlagsIntPtr:Int(label:String, flags:Int Ptr, flags_value:Int) = "bmx_ImGui_CheckboxFlagsIntPtr"
+	Function _ImGui_CheckboxFlagsUintPtr:Int(label:String, flags:UInt Ptr, flags_value:UInt) = "bmx_ImGui_CheckboxFlagsUintPtr"
 	Function _ImGui_RadioButton:Int(label:String, active:Int) = "bmx_ImGui_RadioButton"
-	Function _ImGui_RadioButtonIntPtr:Int(label:String, v:Int Var, v_button:Int) = "bmx_ImGui_RadioButtonIntPtr"
+	Function _ImGui_RadioButtonIntPtr:Int(label:String, v:Int Ptr, v_button:Int) = "bmx_ImGui_RadioButtonIntPtr"
 	Function _ImGui_ProgressBar(fraction:Float, size_arg:SImVec2, overlay:String) = "bmx_ImGui_ProgressBar"
 	Function _ImGui_Bullet() = "ImGui_Bullet"
 	Function _ImGui_TextLink:Int(label:String) = "bmx_ImGui_TextLink"
@@ -5865,48 +5865,48 @@ Extern
 	Function _ImGui_ImageButtonEx:Int(str_id:String, tex_ref:SImTextureRef, image_size:SImVec2, uv0:SImVec2, uv1:SImVec2, bg_col:SImVec4, tint_col:SImVec4) = "bmx_ImGui_ImageButtonEx"
 	Function _ImGui_BeginCombo:Int(label:String, preview_value:String, flags:EImGuiComboFlags) = "bmx_ImGui_BeginCombo"
 	Function _ImGui_EndCombo() = "ImGui_EndCombo"
-	Function _ImGui_ComboChar:Int(label:String, current_item:Int Var, items:String[], items_count:Int) = "bmx_ImGui_ComboChar"
-	Function _ImGui_ComboCharEx:Int(label:String, current_item:Int Var, items:String[], items_count:Int, popup_max_height_in_items:Int) = "bmx_ImGui_ComboCharEx"
-	Function _ImGui_Combo:Int(label:String, current_item:Int Var, items_separated_by_zeros:String) = "bmx_ImGui_Combo"
-	Function _ImGui_ComboEx:Int(label:String, current_item:Int Var, items_separated_by_zeros:String, popup_max_height_in_items:Int) = "bmx_ImGui_ComboEx"
-	Function _ImGui_ComboCallback:Int(label:String, current_item:Int Var, getter:Byte Ptr, user_data:Byte Ptr, items_count:Int) = "bmx_ImGui_ComboCallback"
-	Function _ImGui_ComboCallbackEx:Int(label:String, current_item:Int Var, getter:Byte Ptr, user_data:Byte Ptr, items_count:Int, popup_max_height_in_items:Int) = "bmx_ImGui_ComboCallbackEx"
-	Function _ImGui_DragFloat:Int(label:String, v:Float Var) = "bmx_ImGui_DragFloat"
-	Function _ImGui_DragFloatEx:Int(label:String, v:Float Var, v_speed:Float, v_min:Float, v_max:Float, format:String, flags:EImGuiSliderFlags) = "bmx_ImGui_DragFloatEx"
+	Function _ImGui_ComboChar:Int(label:String, current_item:Int Ptr, items:String[], items_count:Int) = "bmx_ImGui_ComboChar"
+	Function _ImGui_ComboCharEx:Int(label:String, current_item:Int Ptr, items:String[], items_count:Int, popup_max_height_in_items:Int) = "bmx_ImGui_ComboCharEx"
+	Function _ImGui_Combo:Int(label:String, current_item:Int Ptr, items_separated_by_zeros:String) = "bmx_ImGui_Combo"
+	Function _ImGui_ComboEx:Int(label:String, current_item:Int Ptr, items_separated_by_zeros:String, popup_max_height_in_items:Int) = "bmx_ImGui_ComboEx"
+	Function _ImGui_ComboCallback:Int(label:String, current_item:Int Ptr, getter:Byte Ptr, user_data:Byte Ptr, items_count:Int) = "bmx_ImGui_ComboCallback"
+	Function _ImGui_ComboCallbackEx:Int(label:String, current_item:Int Ptr, getter:Byte Ptr, user_data:Byte Ptr, items_count:Int, popup_max_height_in_items:Int) = "bmx_ImGui_ComboCallbackEx"
+	Function _ImGui_DragFloat:Int(label:String, v:Float Ptr) = "bmx_ImGui_DragFloat"
+	Function _ImGui_DragFloatEx:Int(label:String, v:Float Ptr, v_speed:Float, v_min:Float, v_max:Float, format:String, flags:EImGuiSliderFlags) = "bmx_ImGui_DragFloatEx"
 	Function _ImGui_DragFloat2:Int(label:String, StaticArray v:float[2]) = "bmx_ImGui_DragFloat2"
 	Function _ImGui_DragFloat2Ex:Int(label:String, StaticArray v:float[2], v_speed:Float, v_min:Float, v_max:Float, format:String, flags:EImGuiSliderFlags) = "bmx_ImGui_DragFloat2Ex"
 	Function _ImGui_DragFloat3:Int(label:String, StaticArray v:float[3]) = "bmx_ImGui_DragFloat3"
 	Function _ImGui_DragFloat3Ex:Int(label:String, StaticArray v:float[3], v_speed:Float, v_min:Float, v_max:Float, format:String, flags:EImGuiSliderFlags) = "bmx_ImGui_DragFloat3Ex"
 	Function _ImGui_DragFloat4:Int(label:String, StaticArray v:float[4]) = "bmx_ImGui_DragFloat4"
 	Function _ImGui_DragFloat4Ex:Int(label:String, StaticArray v:float[4], v_speed:Float, v_min:Float, v_max:Float, format:String, flags:EImGuiSliderFlags) = "bmx_ImGui_DragFloat4Ex"
-	Function _ImGui_DragFloatRange2:Int(label:String, v_current_min:Float Var, v_current_max:Float Var) = "bmx_ImGui_DragFloatRange2"
-	Function _ImGui_DragFloatRange2Ex:Int(label:String, v_current_min:Float Var, v_current_max:Float Var, v_speed:Float, v_min:Float, v_max:Float, format:String, format_max:String, flags:EImGuiSliderFlags) = "bmx_ImGui_DragFloatRange2Ex"
-	Function _ImGui_DragInt:Int(label:String, v:Int Var) = "bmx_ImGui_DragInt"
-	Function _ImGui_DragIntEx:Int(label:String, v:Int Var, v_speed:Float, v_min:Int, v_max:Int, format:String, flags:EImGuiSliderFlags) = "bmx_ImGui_DragIntEx"
+	Function _ImGui_DragFloatRange2:Int(label:String, v_current_min:Float Ptr, v_current_max:Float Ptr) = "bmx_ImGui_DragFloatRange2"
+	Function _ImGui_DragFloatRange2Ex:Int(label:String, v_current_min:Float Ptr, v_current_max:Float Ptr, v_speed:Float, v_min:Float, v_max:Float, format:String, format_max:String, flags:EImGuiSliderFlags) = "bmx_ImGui_DragFloatRange2Ex"
+	Function _ImGui_DragInt:Int(label:String, v:Int Ptr) = "bmx_ImGui_DragInt"
+	Function _ImGui_DragIntEx:Int(label:String, v:Int Ptr, v_speed:Float, v_min:Int, v_max:Int, format:String, flags:EImGuiSliderFlags) = "bmx_ImGui_DragIntEx"
 	Function _ImGui_DragInt2:Int(label:String, StaticArray v:int[2]) = "bmx_ImGui_DragInt2"
 	Function _ImGui_DragInt2Ex:Int(label:String, StaticArray v:int[2], v_speed:Float, v_min:Int, v_max:Int, format:String, flags:EImGuiSliderFlags) = "bmx_ImGui_DragInt2Ex"
 	Function _ImGui_DragInt3:Int(label:String, StaticArray v:int[3]) = "bmx_ImGui_DragInt3"
 	Function _ImGui_DragInt3Ex:Int(label:String, StaticArray v:int[3], v_speed:Float, v_min:Int, v_max:Int, format:String, flags:EImGuiSliderFlags) = "bmx_ImGui_DragInt3Ex"
 	Function _ImGui_DragInt4:Int(label:String, StaticArray v:int[4]) = "bmx_ImGui_DragInt4"
 	Function _ImGui_DragInt4Ex:Int(label:String, StaticArray v:int[4], v_speed:Float, v_min:Int, v_max:Int, format:String, flags:EImGuiSliderFlags) = "bmx_ImGui_DragInt4Ex"
-	Function _ImGui_DragIntRange2:Int(label:String, v_current_min:Int Var, v_current_max:Int Var) = "bmx_ImGui_DragIntRange2"
-	Function _ImGui_DragIntRange2Ex:Int(label:String, v_current_min:Int Var, v_current_max:Int Var, v_speed:Float, v_min:Int, v_max:Int, format:String, format_max:String, flags:EImGuiSliderFlags) = "bmx_ImGui_DragIntRange2Ex"
+	Function _ImGui_DragIntRange2:Int(label:String, v_current_min:Int Ptr, v_current_max:Int Ptr) = "bmx_ImGui_DragIntRange2"
+	Function _ImGui_DragIntRange2Ex:Int(label:String, v_current_min:Int Ptr, v_current_max:Int Ptr, v_speed:Float, v_min:Int, v_max:Int, format:String, format_max:String, flags:EImGuiSliderFlags) = "bmx_ImGui_DragIntRange2Ex"
 	Function _ImGui_DragScalar:Int(label:String, data_type:EImGuiDataType, p_data:Byte Ptr) = "bmx_ImGui_DragScalar"
 	Function _ImGui_DragScalarEx:Int(label:String, data_type:EImGuiDataType, p_data:Byte Ptr, v_speed:Float, p_min:Byte Ptr, p_max:Byte Ptr, format:String, flags:EImGuiSliderFlags) = "bmx_ImGui_DragScalarEx"
 	Function _ImGui_DragScalarN:Int(label:String, data_type:EImGuiDataType, p_data:Byte Ptr, components:Int) = "bmx_ImGui_DragScalarN"
 	Function _ImGui_DragScalarNEx:Int(label:String, data_type:EImGuiDataType, p_data:Byte Ptr, components:Int, v_speed:Float, p_min:Byte Ptr, p_max:Byte Ptr, format:String, flags:EImGuiSliderFlags) = "bmx_ImGui_DragScalarNEx"
-	Function _ImGui_SliderFloat:Int(label:String, v:Float Var, v_min:Float, v_max:Float) = "bmx_ImGui_SliderFloat"
-	Function _ImGui_SliderFloatEx:Int(label:String, v:Float Var, v_min:Float, v_max:Float, format:String, flags:EImGuiSliderFlags) = "bmx_ImGui_SliderFloatEx"
+	Function _ImGui_SliderFloat:Int(label:String, v:Float Ptr, v_min:Float, v_max:Float) = "bmx_ImGui_SliderFloat"
+	Function _ImGui_SliderFloatEx:Int(label:String, v:Float Ptr, v_min:Float, v_max:Float, format:String, flags:EImGuiSliderFlags) = "bmx_ImGui_SliderFloatEx"
 	Function _ImGui_SliderFloat2:Int(label:String, StaticArray v:float[2], v_min:Float, v_max:Float) = "bmx_ImGui_SliderFloat2"
 	Function _ImGui_SliderFloat2Ex:Int(label:String, StaticArray v:float[2], v_min:Float, v_max:Float, format:String, flags:EImGuiSliderFlags) = "bmx_ImGui_SliderFloat2Ex"
 	Function _ImGui_SliderFloat3:Int(label:String, StaticArray v:float[3], v_min:Float, v_max:Float) = "bmx_ImGui_SliderFloat3"
 	Function _ImGui_SliderFloat3Ex:Int(label:String, StaticArray v:float[3], v_min:Float, v_max:Float, format:String, flags:EImGuiSliderFlags) = "bmx_ImGui_SliderFloat3Ex"
 	Function _ImGui_SliderFloat4:Int(label:String, StaticArray v:float[4], v_min:Float, v_max:Float) = "bmx_ImGui_SliderFloat4"
 	Function _ImGui_SliderFloat4Ex:Int(label:String, StaticArray v:float[4], v_min:Float, v_max:Float, format:String, flags:EImGuiSliderFlags) = "bmx_ImGui_SliderFloat4Ex"
-	Function _ImGui_SliderAngle:Int(label:String, v_rad:Float Var) = "bmx_ImGui_SliderAngle"
-	Function _ImGui_SliderAngleEx:Int(label:String, v_rad:Float Var, v_degrees_min:Float, v_degrees_max:Float, format:String, flags:EImGuiSliderFlags) = "bmx_ImGui_SliderAngleEx"
-	Function _ImGui_SliderInt:Int(label:String, v:Int Var, v_min:Int, v_max:Int) = "bmx_ImGui_SliderInt"
-	Function _ImGui_SliderIntEx:Int(label:String, v:Int Var, v_min:Int, v_max:Int, format:String, flags:EImGuiSliderFlags) = "bmx_ImGui_SliderIntEx"
+	Function _ImGui_SliderAngle:Int(label:String, v_rad:Float Ptr) = "bmx_ImGui_SliderAngle"
+	Function _ImGui_SliderAngleEx:Int(label:String, v_rad:Float Ptr, v_degrees_min:Float, v_degrees_max:Float, format:String, flags:EImGuiSliderFlags) = "bmx_ImGui_SliderAngleEx"
+	Function _ImGui_SliderInt:Int(label:String, v:Int Ptr, v_min:Int, v_max:Int) = "bmx_ImGui_SliderInt"
+	Function _ImGui_SliderIntEx:Int(label:String, v:Int Ptr, v_min:Int, v_max:Int, format:String, flags:EImGuiSliderFlags) = "bmx_ImGui_SliderIntEx"
 	Function _ImGui_SliderInt2:Int(label:String, StaticArray v:int[2], v_min:Int, v_max:Int) = "bmx_ImGui_SliderInt2"
 	Function _ImGui_SliderInt2Ex:Int(label:String, StaticArray v:int[2], v_min:Int, v_max:Int, format:String, flags:EImGuiSliderFlags) = "bmx_ImGui_SliderInt2Ex"
 	Function _ImGui_SliderInt3:Int(label:String, StaticArray v:int[3], v_min:Int, v_max:Int) = "bmx_ImGui_SliderInt3"
@@ -5917,10 +5917,10 @@ Extern
 	Function _ImGui_SliderScalarEx:Int(label:String, data_type:EImGuiDataType, p_data:Byte Ptr, p_min:Byte Ptr, p_max:Byte Ptr, format:String, flags:EImGuiSliderFlags) = "bmx_ImGui_SliderScalarEx"
 	Function _ImGui_SliderScalarN:Int(label:String, data_type:EImGuiDataType, p_data:Byte Ptr, components:Int, p_min:Byte Ptr, p_max:Byte Ptr) = "bmx_ImGui_SliderScalarN"
 	Function _ImGui_SliderScalarNEx:Int(label:String, data_type:EImGuiDataType, p_data:Byte Ptr, components:Int, p_min:Byte Ptr, p_max:Byte Ptr, format:String, flags:EImGuiSliderFlags) = "bmx_ImGui_SliderScalarNEx"
-	Function _ImGui_VSliderFloat:Int(label:String, size:SImVec2, v:Float Var, v_min:Float, v_max:Float) = "bmx_ImGui_VSliderFloat"
-	Function _ImGui_VSliderFloatEx:Int(label:String, size:SImVec2, v:Float Var, v_min:Float, v_max:Float, format:String, flags:EImGuiSliderFlags) = "bmx_ImGui_VSliderFloatEx"
-	Function _ImGui_VSliderInt:Int(label:String, size:SImVec2, v:Int Var, v_min:Int, v_max:Int) = "bmx_ImGui_VSliderInt"
-	Function _ImGui_VSliderIntEx:Int(label:String, size:SImVec2, v:Int Var, v_min:Int, v_max:Int, format:String, flags:EImGuiSliderFlags) = "bmx_ImGui_VSliderIntEx"
+	Function _ImGui_VSliderFloat:Int(label:String, size:SImVec2, v:Float Ptr, v_min:Float, v_max:Float) = "bmx_ImGui_VSliderFloat"
+	Function _ImGui_VSliderFloatEx:Int(label:String, size:SImVec2, v:Float Ptr, v_min:Float, v_max:Float, format:String, flags:EImGuiSliderFlags) = "bmx_ImGui_VSliderFloatEx"
+	Function _ImGui_VSliderInt:Int(label:String, size:SImVec2, v:Int Ptr, v_min:Int, v_max:Int) = "bmx_ImGui_VSliderInt"
+	Function _ImGui_VSliderIntEx:Int(label:String, size:SImVec2, v:Int Ptr, v_min:Int, v_max:Int, format:String, flags:EImGuiSliderFlags) = "bmx_ImGui_VSliderIntEx"
 	Function _ImGui_VSliderScalar:Int(label:String, size:SImVec2, data_type:EImGuiDataType, p_data:Byte Ptr, p_min:Byte Ptr, p_max:Byte Ptr) = "bmx_ImGui_VSliderScalar"
 	Function _ImGui_VSliderScalarEx:Int(label:String, size:SImVec2, data_type:EImGuiDataType, p_data:Byte Ptr, p_min:Byte Ptr, p_max:Byte Ptr, format:String, flags:EImGuiSliderFlags) = "bmx_ImGui_VSliderScalarEx"
 	Function _ImGui_InputTextEx:Int(label:String, buf:Byte Ptr, buf_size:size_t, flags:EImGuiInputTextFlags, callback:Byte Ptr, user_data:Byte Ptr) = "bmx_ImGui_InputTextEx"
@@ -5928,16 +5928,16 @@ Extern
 	Function _ImGui_InputTextMultilineEx:Int(label:String, buf:Byte Ptr, buf_size:size_t, size:SImVec2, flags:EImGuiInputTextFlags, callback:Byte Ptr, user_data:Byte Ptr) = "bmx_ImGui_InputTextMultilineEx"
 	Function _ImGui_InputTextWithHint:Int(label:String, hint:String, buf:Byte Ptr, buf_size:size_t, flags:EImGuiInputTextFlags) = "bmx_ImGui_InputTextWithHint"
 	Function _ImGui_InputTextWithHintEx:Int(label:String, hint:String, buf:Byte Ptr, buf_size:size_t, flags:EImGuiInputTextFlags, callback:Byte Ptr, user_data:Byte Ptr) = "bmx_ImGui_InputTextWithHintEx"
-	Function _ImGui_InputFloat:Int(label:String, v:Float Var) = "bmx_ImGui_InputFloat"
-	Function _ImGui_InputFloatEx:Int(label:String, v:Float Var, stp:Float, step_fast:Float, format:String, flags:EImGuiInputTextFlags) = "bmx_ImGui_InputFloatEx"
+	Function _ImGui_InputFloat:Int(label:String, v:Float Ptr) = "bmx_ImGui_InputFloat"
+	Function _ImGui_InputFloatEx:Int(label:String, v:Float Ptr, stp:Float, step_fast:Float, format:String, flags:EImGuiInputTextFlags) = "bmx_ImGui_InputFloatEx"
 	Function _ImGui_InputFloat2:Int(label:String, StaticArray v:float[2]) = "bmx_ImGui_InputFloat2"
 	Function _ImGui_InputFloat2Ex:Int(label:String, StaticArray v:float[2], format:String, flags:EImGuiInputTextFlags) = "bmx_ImGui_InputFloat2Ex"
 	Function _ImGui_InputFloat3:Int(label:String, StaticArray v:float[3]) = "bmx_ImGui_InputFloat3"
 	Function _ImGui_InputFloat3Ex:Int(label:String, StaticArray v:float[3], format:String, flags:EImGuiInputTextFlags) = "bmx_ImGui_InputFloat3Ex"
 	Function _ImGui_InputFloat4:Int(label:String, StaticArray v:float[4]) = "bmx_ImGui_InputFloat4"
 	Function _ImGui_InputFloat4Ex:Int(label:String, StaticArray v:float[4], format:String, flags:EImGuiInputTextFlags) = "bmx_ImGui_InputFloat4Ex"
-	Function _ImGui_InputInt:Int(label:String, v:Int Var) = "bmx_ImGui_InputInt"
-	Function _ImGui_InputIntEx:Int(label:String, v:Int Var, stp:Int, step_fast:Int, flags:EImGuiInputTextFlags) = "bmx_ImGui_InputIntEx"
+	Function _ImGui_InputInt:Int(label:String, v:Int Ptr) = "bmx_ImGui_InputInt"
+	Function _ImGui_InputIntEx:Int(label:String, v:Int Ptr, stp:Int, step_fast:Int, flags:EImGuiInputTextFlags) = "bmx_ImGui_InputIntEx"
 	Function _ImGui_InputInt2:Int(label:String, StaticArray v:int[2], flags:EImGuiInputTextFlags) = "bmx_ImGui_InputInt2"
 	Function _ImGui_InputInt3:Int(label:String, StaticArray v:int[3], flags:EImGuiInputTextFlags) = "bmx_ImGui_InputInt3"
 	Function _ImGui_InputInt4:Int(label:String, StaticArray v:int[4], flags:EImGuiInputTextFlags) = "bmx_ImGui_InputInt4"
@@ -5969,13 +5969,13 @@ Extern
 	Function _ImGui_TreePop() = "ImGui_TreePop"
 	Function _ImGui_GetTreeNodeToLabelSpacing:Float() = "ImGui_GetTreeNodeToLabelSpacing"
 	Function _ImGui_CollapsingHeader:Int(label:String, flags:EImGuiTreeNodeFlags) = "bmx_ImGui_CollapsingHeader"
-	Function _ImGui_CollapsingHeaderBoolPtr:Int(label:String, p_visible:Int Var, flags:EImGuiTreeNodeFlags) = "bmx_ImGui_CollapsingHeaderBoolPtr"
+	Function _ImGui_CollapsingHeaderBoolPtr:Int(label:String, p_visible:Int Ptr, flags:EImGuiTreeNodeFlags) = "bmx_ImGui_CollapsingHeaderBoolPtr"
 	Function _ImGui_SetNextItemOpen(is_open:Int, cond:EImGuiCond) = "ImGui_SetNextItemOpen"
 	Function _ImGui_SetNextItemStorageID(storage_id:UInt) = "ImGui_SetNextItemStorageID"
 	Function _ImGui_Selectable:Int(label:String) = "bmx_ImGui_Selectable"
 	Function _ImGui_SelectableEx:Int(label:String, selected:Int, flags:EImGuiSelectableFlags, size:SImVec2) = "bmx_ImGui_SelectableEx"
-	Function _ImGui_SelectableBoolPtr:Int(label:String, p_selected:Int Var, flags:EImGuiSelectableFlags) = "bmx_ImGui_SelectableBoolPtr"
-	Function _ImGui_SelectableBoolPtrEx:Int(label:String, p_selected:Int Var, flags:EImGuiSelectableFlags, size:SImVec2) = "bmx_ImGui_SelectableBoolPtrEx"
+	Function _ImGui_SelectableBoolPtr:Int(label:String, p_selected:Int Ptr, flags:EImGuiSelectableFlags) = "bmx_ImGui_SelectableBoolPtr"
+	Function _ImGui_SelectableBoolPtrEx:Int(label:String, p_selected:Int Ptr, flags:EImGuiSelectableFlags, size:SImVec2) = "bmx_ImGui_SelectableBoolPtrEx"
 	Function _ImGui_BeginMultiSelect:Byte Ptr(flags:EImGuiMultiSelectFlags) = "ImGui_BeginMultiSelect"
 	Function _ImGui_BeginMultiSelectEx:Byte Ptr(flags:EImGuiMultiSelectFlags, selection_size:Int, items_count:Int) = "ImGui_BeginMultiSelectEx"
 	Function _ImGui_EndMultiSelect:Byte Ptr() = "ImGui_EndMultiSelect"
@@ -5983,9 +5983,9 @@ Extern
 	Function _ImGui_IsItemToggledSelection:Int() = "ImGui_IsItemToggledSelection"
 	Function _ImGui_BeginListBox:Int(label:String, size:SImVec2) = "bmx_ImGui_BeginListBox"
 	Function _ImGui_EndListBox() = "ImGui_EndListBox"
-	Function _ImGui_ListBox:Int(label:String, current_item:Int Var, items:String[], items_count:Int, height_in_items:Int) = "bmx_ImGui_ListBox"
-	Function _ImGui_ListBoxCallback:Int(label:String, current_item:Int Var, getter:Byte Ptr, user_data:Byte Ptr, items_count:Int) = "bmx_ImGui_ListBoxCallback"
-	Function _ImGui_ListBoxCallbackEx:Int(label:String, current_item:Int Var, getter:Byte Ptr, user_data:Byte Ptr, items_count:Int, height_in_items:Int) = "bmx_ImGui_ListBoxCallbackEx"
+	Function _ImGui_ListBox:Int(label:String, current_item:Int Ptr, items:String[], items_count:Int, height_in_items:Int) = "bmx_ImGui_ListBox"
+	Function _ImGui_ListBoxCallback:Int(label:String, current_item:Int Ptr, getter:Byte Ptr, user_data:Byte Ptr, items_count:Int) = "bmx_ImGui_ListBoxCallback"
+	Function _ImGui_ListBoxCallbackEx:Int(label:String, current_item:Int Ptr, getter:Byte Ptr, user_data:Byte Ptr, items_count:Int, height_in_items:Int) = "bmx_ImGui_ListBoxCallbackEx"
 	Function _ImGui_PlotLines(label:String, values:Byte Ptr, values_count:Int) = "bmx_ImGui_PlotLines"
 	Function _ImGui_PlotLinesEx(label:String, values:Byte Ptr, values_count:Int, values_offset:Int, overlay_text:String, scale_min:Float, scale_max:Float, graph_size:SImVec2, stride:Int) = "bmx_ImGui_PlotLinesEx"
 	Function _ImGui_PlotLinesCallback(label:String, values_getter:Byte Ptr, data:Byte Ptr, values_count:Int) = "bmx_ImGui_PlotLinesCallback"
@@ -6003,7 +6003,7 @@ Extern
 	Function _ImGui_EndMenu() = "ImGui_EndMenu"
 	Function _ImGui_MenuItem:Int(label:String) = "bmx_ImGui_MenuItem"
 	Function _ImGui_MenuItemEx:Int(label:String, shortcut:String, selected:Int, enabled:Int) = "bmx_ImGui_MenuItemEx"
-	Function _ImGui_MenuItemBoolPtr:Int(label:String, shortcut:String, p_selected:Int Var, enabled:Int) = "bmx_ImGui_MenuItemBoolPtr"
+	Function _ImGui_MenuItemBoolPtr:Int(label:String, shortcut:String, p_selected:Int Ptr, enabled:Int) = "bmx_ImGui_MenuItemBoolPtr"
 	Function _ImGui_BeginTooltip:Int() = "ImGui_BeginTooltip"
 	Function _ImGui_EndTooltip() = "ImGui_EndTooltip"
 	Function _ImGui_SetTooltip(fmt:String) = "bmx_ImGui_SetTooltip"
@@ -6012,7 +6012,7 @@ Extern
 	Function _ImGui_SetItemTooltip(fmt:String) = "bmx_ImGui_SetItemTooltip"
 	Function _ImGui_SetItemTooltipV(fmt:String) = "bmx_ImGui_SetItemTooltipV"
 	Function _ImGui_BeginPopup:Int(str_id:String, flags:EImGuiWindowFlags) = "bmx_ImGui_BeginPopup"
-	Function _ImGui_BeginPopupModal:Int(name:String, p_open:Int Var, flags:EImGuiWindowFlags) = "bmx_ImGui_BeginPopupModal"
+	Function _ImGui_BeginPopupModal:Int(name:String, p_open:Int Ptr, flags:EImGuiWindowFlags) = "bmx_ImGui_BeginPopupModal"
 	Function _ImGui_EndPopup() = "ImGui_EndPopup"
 	Function _ImGui_OpenPopup(str_id:String, popup_flags:EImGuiPopupFlags) = "bmx_ImGui_OpenPopup"
 	Function _ImGui_OpenPopupID(id:UInt, popup_flags:EImGuiPopupFlags) = "ImGui_OpenPopupID"
@@ -6058,7 +6058,7 @@ Extern
 	Function _ImGui_GetColumnsCount:Int() = "ImGui_GetColumnsCount"
 	Function _ImGui_BeginTabBar:Int(str_id:String, flags:EImGuiTabBarFlags) = "bmx_ImGui_BeginTabBar"
 	Function _ImGui_EndTabBar() = "ImGui_EndTabBar"
-	Function _ImGui_BeginTabItem:Int(label:String, p_open:Int Var, flags:EImGuiTabItemFlags) = "bmx_ImGui_BeginTabItem"
+	Function _ImGui_BeginTabItem:Int(label:String, p_open:Int Ptr, flags:EImGuiTabItemFlags) = "bmx_ImGui_BeginTabItem"
 	Function _ImGui_EndTabItem() = "ImGui_EndTabItem"
 	Function _ImGui_TabItemButton:Int(label:String, flags:EImGuiTabItemFlags) = "bmx_ImGui_TabItemButton"
 	Function _ImGui_SetTabItemClosed(tab_or_docked_window_label:String) = "bmx_ImGui_SetTabItemClosed"
@@ -6129,8 +6129,8 @@ Extern
 	Function _ImGui_CalcTextSizeEx:SImVec2(text:String, text_end:String, hide_text_after_double_hash:Int, wrap_width:Float) = "bmx_ImGui_CalcTextSizeEx"
 	Function _ImGui_ColorConvertU32ToFloat4:SImVec4(in:UInt) = "ImGui_ColorConvertU32ToFloat4"
 	Function _ImGui_ColorConvertFloat4ToU32:UInt(in:SImVec4) = "ImGui_ColorConvertFloat4ToU32"
-	Function _ImGui_ColorConvertRGBtoHSV(r:Float, g:Float, b:Float, out_h:Float Var, out_s:Float Var, out_v:Float Var) = "ImGui_ColorConvertRGBtoHSV"
-	Function _ImGui_ColorConvertHSVtoRGB(h:Float, s:Float, v:Float, out_r:Float Var, out_g:Float Var, out_b:Float Var) = "ImGui_ColorConvertHSVtoRGB"
+	Function _ImGui_ColorConvertRGBtoHSV(r:Float, g:Float, b:Float, out_h:Float Ptr, out_s:Float Ptr, out_v:Float Ptr) = "ImGui_ColorConvertRGBtoHSV"
+	Function _ImGui_ColorConvertHSVtoRGB(h:Float, s:Float, v:Float, out_r:Float Ptr, out_g:Float Ptr, out_b:Float Ptr) = "ImGui_ColorConvertHSVtoRGB"
 	Function _ImGui_IsKeyDown:Int(key:EImGuiKey) = "ImGui_IsKeyDown"
 	Function _ImGui_IsKeyPressed:Int(key:EImGuiKey) = "ImGui_IsKeyPressed"
 	Function _ImGui_IsKeyPressedEx:Int(key:EImGuiKey, rep:Int) = "ImGui_IsKeyPressedEx"

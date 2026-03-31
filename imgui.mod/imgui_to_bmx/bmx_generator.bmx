@@ -630,13 +630,13 @@ Type TCodeGenerator
 				Else If arg.arg_type.declaration = "ImFontConfig*" Or arg.arg_type.declaration = "const ImFontConfig*" Then
 					argType = ":TImFontConfig"
 				Else If arg.arg_type.declaration = "bool*" Then
-					argType = ":Int Var"
+					argType = ":Int Ptr"
 				Else If arg.arg_type.declaration = "int*" Then
-					argType = ":Int Var"
+					argType = ":Int Ptr"
 				Else If arg.arg_type.declaration = "float*" Then
-					argType = ":Float Var"
+					argType = ":Float Ptr"
 				Else If arg.arg_type.declaration = "unsigned int*" Then
-					argType = ":UInt Var"
+					argType = ":UInt Ptr"
 				Else If arg.arg_type.declaration = "const char*const[]" Then
 					argType = ":String[]"
 					bmxFunc = True
@@ -1153,13 +1153,13 @@ Type TCodeGenerator
 						argType = ":String"
 						bmxFunc = True
 					Else If arg.arg_type.declaration = "bool*" Then
-						argType = ":Int Var"
+						argType = ":Int Ptr"
 					Else If arg.arg_type.declaration = "int*" Then
-						argType = ":Int Var"
+						argType = ":Int Ptr"
 					Else If arg.arg_type.declaration = "float*" Then
-						argType = ":Float Var"
+						argType = ":Float Ptr"
 					Else If arg.arg_type.declaration = "unsigned int*" Then
-						argType = ":UInt Var"
+						argType = ":UInt Ptr"
 					Else If arg.arg_type.declaration = "const char*const[]" Then
 						argType = ":String[]"
 						bmxFunc = True
