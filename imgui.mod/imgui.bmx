@@ -38,6 +38,6 @@ ModuleInfo "CPP_OPTS: -std=c++11"
 ModuleInfo "C_OPTS: -std=c99"
 ModuleInfo "CC_OPTS: -DIMGUI_ENABLE_FREETYPE"
 
-Import "imgui_internal.bmx"
+Import "imgui_image.bmx"
 
 
