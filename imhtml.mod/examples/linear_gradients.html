@@ -1,0 +1,78 @@
+<html>
+    <head>
+    <style>
+        body {
+        margin: 20px;
+        font-family: sans-serif;
+        background: #20242a;
+        color: white;
+        }
+
+        .swatch {
+        width: 320px;
+        height: 100px;
+        margin-bottom: 20px;
+        padding: 12px;
+        box-sizing: border-box;
+        border: 2px solid #ffffff40;
+        border-radius: 16px;
+        color: white;
+        font-size: 18px;
+        }
+
+        .horizontal {
+        background: linear-gradient(to right, #ff4d4d, #4d79ff);
+        }
+
+        .vertical {
+        background: linear-gradient(to bottom, #38b000, #ffd60a);
+        }
+
+        .diagonal {
+        background: linear-gradient(45deg, #ff006e, #8338ec, #3a86ff);
+        }
+
+        .hard-stops {
+        background: linear-gradient(
+            to right,
+            #ff0000 0%,
+            #ff0000 33%,
+            #00ff00 33%,
+            #00ff00 66%,
+            #0000ff 66%,
+            #0000ff 100%
+        );
+        }
+
+        .soft-multistop {
+        background: linear-gradient(
+            to right,
+            #ff0000 0%,
+            #ffff00 25%,
+            #00ff00 50%,
+            #00ffff 75%,
+            #0000ff 100%
+        );
+        }
+
+        .rounded-diagonal {
+        width: 320px;
+        height: 120px;
+        padding: 12px;
+        border: 2px solid #ffffff40;
+        border-radius: 32px;
+        background: linear-gradient(135deg, #f72585, #7209b7, #3a0ca3, #4361ee);
+        color: white;
+        font-size: 18px;
+        }
+    </style>
+    </head>
+    <body>
+        <div class="swatch horizontal">Horizontal</div>
+        <div class="swatch vertical">Vertical</div>
+        <div class="swatch diagonal">Diagonal</div>
+        <div class="swatch hard-stops">Hard stops</div>
+        <div class="swatch soft-multistop">Soft multi-stop</div>
+        <div class="rounded-diagonal">Rounded diagonal</div>
+    </body>
+</html>
