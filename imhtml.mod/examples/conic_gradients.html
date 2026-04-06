@@ -1,0 +1,43 @@
+<html>
+<head>
+  <style>
+    body {
+      margin: 20px;
+      background: #20242a;
+      color: white;
+      font-family: sans-serif;
+    }
+
+    .swatch {
+      width: 240px;
+      height: 240px;
+      margin-bottom: 20px;
+      border: 2px solid #ffffff40;
+      border-radius: 28px;
+      padding: 12px;
+    }
+
+    .basic {
+      background: conic-gradient(red, yellow, lime, cyan, blue, magenta, red);
+    }
+
+    .offset {
+      background: conic-gradient(from 45deg at 35% 35%, red, blue, green, red);
+    }
+
+    .hard {
+      background: conic-gradient(red 0deg 120deg, green 120deg 240deg, blue 240deg 360deg);
+    }
+
+    .smooth {
+      background: conic-gradient(from 90deg, #ff006e, #8338ec, #3a86ff, #06d6a0, #ffbe0b, #fb5607, #ff006e);
+    }
+  </style>
+</head>
+<body>
+  <div class="swatch basic">Basic</div>
+  <div class="swatch offset">Offset</div>
+  <div class="swatch hard">Hard</div>
+  <div class="swatch smooth">Smooth</div>
+</body>
+</html>

@@ -1,0 +1,43 @@
+<html>
+<head>
+  <style>
+    body {
+      margin: 20px;
+      background: #20242a;
+      color: white;
+      font-family: sans-serif;
+    }
+
+    .swatch {
+      width: 320px;
+      height: 140px;
+      margin-bottom: 20px;
+      border: 2px solid #ffffff40;
+      border-radius: 24px;
+      padding: 12px;
+    }
+
+    .basic {
+      background: radial-gradient(circle, red 0%, blue 100%);
+    }
+
+    .offset {
+      background: radial-gradient(circle at 30% 30%, #ffff00, #ff00ff, #0000ff);
+    }
+
+    .ellipse {
+      background: radial-gradient(ellipse at center, #00ffcc 0%, #0044ff 100%);
+    }
+
+    .hard {
+      background: radial-gradient(circle, #ff0000 0%, #ff0000 35%, #00ff00 35%, #00ff00 70%, #0000ff 70%, #0000ff 100%);
+    }
+  </style>
+</head>
+<body>
+  <div class="swatch basic">Basic</div>
+  <div class="swatch offset">Offset</div>
+  <div class="swatch ellipse">Ellipse</div>
+  <div class="swatch hard">Hard</div>
+</body>
+</html>
