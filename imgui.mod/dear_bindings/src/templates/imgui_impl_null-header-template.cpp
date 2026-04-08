@@ -1,5 +1,5 @@
 #include "%IMGUI_INCLUDE_DIR%imgui.h"
-#include "%BACKEND_INCLUDE_DIR%imgui_impl_glfw.h"
+#include "%BACKEND_INCLUDE_DIR%imgui_impl_null.h"
 
 #include <stdio.h>
 
