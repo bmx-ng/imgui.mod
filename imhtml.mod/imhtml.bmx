@@ -25,11 +25,13 @@ bbdoc: A canvas for rendering HTML content in ImGui.
 End Rem
 Module ImGui.ImHtml
 
-ModuleInfo "Version: 1.00"
+ModuleInfo "Version: 1.01"
 ModuleInfo "License: MIT"
-ModuleInfo "Copyright: ImHtml - "
+ModuleInfo "Copyright: ImHTML - 2025 Daniel Schmidt"
 ModuleInfo "Copyright: BlitzMax wrapper - 2026 Bruce A Henderson"
 
+ModuleInfo "History: 1.01"
+ModuleInfo "History: Updated to ImHTML 0.4.0"
 ModuleInfo "History: 1.00 Initial Release"
 
 ModuleInfo "CPP_OPTS: -std=c++17"
