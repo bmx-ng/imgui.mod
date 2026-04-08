@@ -1,6 +1,6 @@
 '
 ' This file is generated. Do not modify it manually.
-' Generated from ImGui 1.92.6 header file.
+' Generated from ImGui 1.92.7 header file.
 '
 SuperStrict
 
@@ -3094,6 +3094,13 @@ Function ImGui_SetNextItemStorageID(storage_id:UInt)
 End Function
 
 Rem
+bbdoc:  retrieve tree node open/close state.
+End Rem
+Function ImGui_TreeNodeGetOpen:Int(storage_id:UInt)
+	Return _ImGui_TreeNodeGetOpen(storage_id)
+End Function
+
+Rem
 bbdoc:  Implied selected = false, flags = 0, size = ImVec2(0, 0)
 End Rem
 Function ImGui_Selectable:Int(label:String)
@@ -3874,7 +3881,7 @@ Function ImGui_SetNavCursorVisible(visible:Int)
 End Function
 
 Rem
-bbdoc:  allow next item to be overlapped by a subsequent item. Useful with invisible buttons, selectable, treenode covering an area where subsequent items may need to be added. Note that both Selectable() and TreeNode() have dedicated flags doing this.
+bbdoc:  allow next item to be overlapped by a subsequent item. Typically useful with InvisibleButton(), Selectable(), TreeNode() covering an area where subsequent items may need to be added. Note that both Selectable() and TreeNode() have dedicated flags doing this.
 End Rem
 Function ImGui_SetNextItemAllowOverlap()
 	_ImGui_SetNextItemAllowOverlap()
@@ -5536,6 +5543,10 @@ Function ImGuiViewport_GetWorkCenter:SImVec2(this:TImGuiViewport)
 	Return _ImGuiViewport_GetWorkCenter(this.handle)
 End Function
 
+Function ImGuiViewport_GetDebugName:String(this:TImGuiViewport)
+	Return _ImGuiViewport_GetDebugName(this.handle)
+End Function
+
 Rem
 bbdoc:  Clear all Platform_XXX fields. Typically called on Platform Backend shutdown.
 End Rem
@@ -5972,6 +5983,7 @@ Extern
 	Function _ImGui_CollapsingHeaderBoolPtr:Int(label:String, p_visible:Int Ptr, flags:EImGuiTreeNodeFlags) = "bmx_ImGui_CollapsingHeaderBoolPtr"
 	Function _ImGui_SetNextItemOpen(is_open:Int, cond:EImGuiCond) = "ImGui_SetNextItemOpen"
 	Function _ImGui_SetNextItemStorageID(storage_id:UInt) = "ImGui_SetNextItemStorageID"
+	Function _ImGui_TreeNodeGetOpen:Int(storage_id:UInt) = "ImGui_TreeNodeGetOpen"
 	Function _ImGui_Selectable:Int(label:String) = "bmx_ImGui_Selectable"
 	Function _ImGui_SelectableEx:Int(label:String, selected:Int, flags:EImGuiSelectableFlags, size:SImVec2) = "bmx_ImGui_SelectableEx"
 	Function _ImGui_SelectableBoolPtr:Int(label:String, p_selected:Int Ptr, flags:EImGuiSelectableFlags) = "bmx_ImGui_SelectableBoolPtr"
@@ -6400,6 +6412,7 @@ Extern
 	Function _ImFontBaked_IsGlyphLoaded:Int(this:Byte Ptr, c:Short) = "ImFontBaked_IsGlyphLoaded"
 	Function _ImGuiViewport_GetCenter:SImVec2(this:Byte Ptr) = "ImGuiViewport_GetCenter"
 	Function _ImGuiViewport_GetWorkCenter:SImVec2(this:Byte Ptr) = "ImGuiViewport_GetWorkCenter"
+	Function _ImGuiViewport_GetDebugName:String(this:Byte Ptr) = "bmx_ImGuiViewport_GetDebugName"
 	Function _ImGuiPlatformIO_ClearPlatformHandlers(this:Byte Ptr) = "ImGuiPlatformIO_ClearPlatformHandlers"
 	Function _ImGuiPlatformIO_ClearRendererHandlers(this:Byte Ptr) = "ImGuiPlatformIO_ClearRendererHandlers"
 End Extern
@@ -7014,11 +7027,12 @@ Enum EImGuiStyleVar
 	_TreeLinesRounding = 34
 	_ButtonTextAlign = 35
 	_SelectableTextAlign = 36
-	_SeparatorTextBorderSize = 37
-	_SeparatorTextAlign = 38
-	_SeparatorTextPadding = 39
-	_DockingSeparatorSize = 40
-	_COUNT = 41
+	_SeparatorSize = 37
+	_SeparatorTextBorderSize = 38
+	_SeparatorTextAlign = 39
+	_SeparatorTextPadding = 40
+	_DockingSeparatorSize = 41
+	_COUNT = 42
 End Enum
 
 Enum EImGuiButtonFlags Flags
@@ -7028,6 +7042,7 @@ Enum EImGuiButtonFlags Flags
 	_MouseButtonMiddle = 4
 	_MouseButtonMask_ = 7
 	_EnableNav = 8
+	_AllowOverlap = 4096
 End Enum
 
 Enum EImGuiColorEditFlags Flags
@@ -7221,10 +7236,13 @@ Enum EImGuiMultiSelectFlags Flags
 	_ClearOnClickVoid = 1024
 	_ScopeWindow = 2048
 	_ScopeRect = 4096
-	_SelectOnClick = 8192
-	_SelectOnClickRelease = 16384
+	_SelectOnAuto = 8192
+	_SelectOnClickAlways = 16384
+	_SelectOnClickRelease = 32768
 	_NavWrapX = 65536
 	_NoSelectOnRightClick = 131072
+	_SelectOnMask_ = 57344
+	_SelectOnClick = 8192
 End Enum
 
 Enum EImGuiSelectionRequestType

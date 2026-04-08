@@ -22,11 +22,13 @@ SuperStrict
 
 Module ImGui.ImGui
 
-ModuleInfo "Version: 1.02"
+ModuleInfo "Version: 1.03"
 ModuleInfo "License: MIT"
 ModuleInfo "Copyright: imgui - 2014-2026 Omar Cornut"
 ModuleInfo "Copyright: BlitzMax wrapper - 2025-2026 Bruce A Henderson"
 
+ModuleInfo "History: 1.03"
+ModuleInfo "History: Updated to ImGui 1.92.7"
 ModuleInfo "History: 1.02"
 ModuleInfo "History: Moved to docking branch"
 ModuleInfo "History: Improved integration"

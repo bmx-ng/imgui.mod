@@ -1,6 +1,6 @@
 //
 // This file is generated. Do not modify it manually.
-// Generated from ImGui 1.92.6 header file.
+// Generated from ImGui 1.92.7 header file.
 //
 
 #include "dcimgui.h"
@@ -2205,6 +2205,11 @@ ImFont* bmx_ImFontAtlas_AddFontFromMemoryCompressedBase85TTF(ImFontAtlas* this, 
 	const char * v1 = (const char *)bbStringToUTF8String(compressed_font_data_base85);
 	ImFont* result = ImFontAtlas_AddFontFromMemoryCompressedBase85TTF(this, v1, size_pixels, font_cfg, glyph_ranges);
 	bbMemFree(v1);
+	return result;
+}
+
+BBString * bmx_ImGuiViewport_GetDebugName(const ImGuiViewport* this) {
+	BBString * result = bbStringFromUTF8String((const unsigned char *)ImGuiViewport_GetDebugName(this));
 	return result;
 }
 
