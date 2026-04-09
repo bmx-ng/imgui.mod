@@ -464,6 +464,15 @@ ImFontAtlas * bmx_imgui_io_get_fonts(ImGuiIO * io) {
 
 ImFontConfig * bmx_imgui_font_config_new() {
 	ImFontConfig * config = (ImFontConfig *)malloc(sizeof(ImFontConfig));
+	memset(config, 0, sizeof(ImFontConfig));
+	config->FontDataOwnedByAtlas = true;
+    config->OversampleH = 0; // Auto == 1 or 2 depending on size
+    config->OversampleV = 0; // Auto == 1
+    config->ExtraSizeScale = 1.0f;
+    config->GlyphMaxAdvanceX = ((float)3.40282346638528860e+38); // FLT_MAX
+    config->RasterizerMultiply = 1.0f;
+    config->RasterizerDensity = 1.0f;
+    config->EllipsisChar = 0;
 	return config;
 }
 
