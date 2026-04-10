@@ -22,6 +22,10 @@ SOFTWARE.
 #include "imhtml.hpp"
 #include "brl.mod/blitz.mod/blitz.h"
 
+#if defined(_WIN32) || defined(_WIN64)
+#undef LoadImage
+#endif
+
 class MaxImHtmlFontFamily;
 class MaxImHtmlConfig;
 

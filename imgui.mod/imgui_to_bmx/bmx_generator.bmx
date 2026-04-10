@@ -1027,6 +1027,8 @@ Type TCodeGenerator
 			~tFunction bmx_imgui_font_config_new:Byte Ptr()
 			~tFunction bmx_imgui_font_config_free(handle:Byte Ptr)
 			~tFunction bmx_imgui_font_config_set_font_data(handle:Byte Ptr, data:Byte Ptr, size:Int, owned_by_atlas:Int)
+			~tFunction bmx_imgui_font_config_set_font_owned_by_atlas(handle:Byte Ptr, value:Int)
+			~tFunction bmx_imgui_font_config_get_font_owned_by_atlas:Int(handle:Byte Ptr)
 			~tFunction bmx_imgui_font_config_set_merge_mode(handle:Byte Ptr, value:Int)
 			~tFunction bmx_imgui_font_config_get_merge_mode:Int(handle:Byte Ptr)
 			~tFunction bmx_imgui_font_config_set_pixel_snap_h(handle:Byte Ptr, value:Int)
@@ -1825,6 +1827,14 @@ Type TCodeGenerator
 			config->FontData = data;
 			config->FontDataSize = size;
 			config->FontDataOwnedByAtlas = owned_by_atlas;
+		}
+
+		void bmx_imgui_font_config_set_font_owned_by_atlas(ImFontConfig * config, int owned_by_atlas) {
+			config->FontDataOwnedByAtlas = owned_by_atlas;
+		}
+
+		int bmx_imgui_font_config_get_font_owned_by_atlas(ImFontConfig * config) {
+			return config->FontDataOwnedByAtlas;
 		}
 
 		void bmx_imgui_font_config_set_merge_mode(ImFontConfig * config, int value) {
@@ -3113,6 +3123,20 @@ Type TCodeGenerator
 			End Method
 
 			Rem
+			bbdoc: Sets whether the font data is owned by the atlas.
+			End Rem
+			Method SetFontOwnedByAtlas(value:Int = True)
+				bmx_imgui_font_config_set_font_owned_by_atlas(handle, value)
+			End Method
+
+			Rem
+			bbdoc: Gets whether the font data is owned by the atlas.
+			End Rem
+			Method GetFontOwnedByAtlas:Int()
+				Return bmx_imgui_font_config_get_font_owned_by_atlas(handle)
+			End Method
+
+			Rem
 			bbdoc: Merge into previous ImFont, so you can combine multiple inputs font into one ImFont (e.g. ASCII font + icons + Japanese glyphs).
 			about: You may want to use GlyphOffset.y when merge font of different heights.
 			End Rem
@@ -3339,7 +3363,7 @@ Type TCodeGenerator
 		For Local func:TIGFunction = eachin model.functions
 			If Not FunctionRequired(func) Then Continue
 
-			If func.original_class = "ImFontAtlas" Then
+			If func.original_class = "ImFontAtlas" And func.name <> "ImFontAtlas_AddFontFromFileTTF" Then
 
 				Local bmxFunc:Int
 				Local returnType:String = GetBmxFunctionReturnType(func, bmxFunc)
@@ -3391,6 +3415,53 @@ Type TCodeGenerator
 				stream.WriteString("~tEnd Method~n~n")
 			End If
 		Next
+
+		' additional font loader implementation - path/stream
+		stream.WriteString("""
+			Rem
+			bbdoc: Adds a font from a TTF file with the given @filename.
+			End Rem
+			Method AddFontFromFileTTF:TImFont(filename:String, size_pixels:Float, font_cfg:TImFontConfig, glyph_ranges:Byte Ptr)
+				Return AddFontFromPathTTF(TPath.FromString(filename), size_pixels, font_cfg, glyph_ranges)
+			End Method
+
+			Rem
+			bbdoc: Adds a font from a TTF file using the given @stream.
+			about: The stream will not be closed by default. Set @closeStream to #True to have it closed after loading the font.
+			End Rem
+			Method AddFontFromStreamTTF:TImFont(stream:TStream, size_pixels:Float, font_cfg:TImFontConfig, glyph_ranges:Byte Ptr, closeStream:Int = False)
+				Local data:Byte[] = LoadByteArray(stream, closeStream)
+
+				If Not data Then
+					Return Null
+				End If
+
+				' copy, and give to ImGui to manage (will be freed by ImGui)
+				Local bytes:Byte Ptr = MemAlloc(Size_T(data.Length))
+				MemCopy(bytes, data, Size_T(data.Length))
+
+				If Not font_cfg Then
+					font_cfg = New TImFontConfig
+					font_cfg.SetFontData(bytes, data.Length, True)
+				Else
+					font_cfg.SetFontData(bytes, data.Length, True)
+				End If
+
+				If size_pixels > 0 Then
+					font_cfg.SetSizePixels(size_pixels)
+				End If
+
+				Return TImFont._Create(_ImFontAtlas_AddFont(handle, font_cfg.handle))
+			End Method
+
+			Rem
+			bbdoc: Adds a font from a TTF file with the given @path.
+			End Rem
+			Method AddFontFromPathTTF:TImFont(path:TPath, size_pixels:Float, font_cfg:TImFontConfig, glyph_ranges:Byte Ptr)
+				Return AddFontFromStreamTTF(path.Open(True, False), size_pixels, font_cfg, glyph_ranges, True)
+			End Method
+		""")
+		stream.WriteString("~n~n")
 
 		stream.WriteString("End Type~n")
 

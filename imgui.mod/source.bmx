@@ -21,6 +21,8 @@
 SuperStrict
 
 Import Pub.Freetype
+Import Brl.Stream
+Import Brl.Path
 
 Import "imgui/*.h"
 Import "db_generated/*.h"
