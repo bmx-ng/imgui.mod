@@ -155,6 +155,11 @@ extern "C" {
     void bmx_imgui_imcolortextedit_StripTrailingWhitespaces(MaxTextEditor * editor);
     void bmx_imgui_imcolortextedit_TabsToSpaces(MaxTextEditor * editor);
     void bmx_imgui_imcolortextedit_SpacesToTabs(MaxTextEditor * editor);
+
+    const TextEditor::Language* bmx_imgui_imcolortextedit_GetLanguage(int language);
+    const TextEditor::Language* bmx_imgui_imcolortextedit_language_blitzmax();
+
+    void bmx_imgui_imcolortextedit_setlanguage(MaxTextEditor * editor, const TextEditor::Language * language);
 }
 
 ///////////////////////////////////////////////////////////
@@ -662,6 +667,10 @@ public:
         editor.SpacesToTabs();
     }
 
+    void SetLanguage(const TextEditor::Language * language) {
+        editor.SetLanguage(language);
+    }
+
     TextEditor editor;
 };
 
@@ -1113,4 +1122,29 @@ void bmx_imgui_imcolortextedit_TabsToSpaces(MaxTextEditor * editor) {
 
 void bmx_imgui_imcolortextedit_SpacesToTabs(MaxTextEditor * editor) {
     editor->SpacesToTabs();
+}
+
+void bmx_imgui_imcolortextedit_setlanguage(MaxTextEditor * editor, const TextEditor::Language * language) {
+    editor->SetLanguage(language);
+}
+
+///////////////////////////////////////////////////////////
+
+const TextEditor::Language* bmx_imgui_imcolortextedit_GetLanguage(int language) {
+    switch(language) {
+        case 0: return nullptr;
+        case 1: return TextEditor::Language::C();
+        case 2: return TextEditor::Language::Cpp();
+        case 3: return TextEditor::Language::Cs();
+        case 4: return TextEditor::Language::AngelScript();
+        case 5: return TextEditor::Language::Lua();
+        case 6: return TextEditor::Language::Python();
+        case 7: return TextEditor::Language::Glsl();
+        case 8: return TextEditor::Language::Hlsl();
+        case 9: return TextEditor::Language::Json();
+        case 10: return TextEditor::Language::Markdown();
+        case 11: return TextEditor::Language::Sql();
+        case 12: return bmx_imgui_imcolortextedit_language_blitzmax();
+        default: return nullptr;
+    }
 }

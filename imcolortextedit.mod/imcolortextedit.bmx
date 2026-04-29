@@ -946,4 +946,28 @@ Type TImTextEditor
 		bmx_imgui_imcolortextedit_SpacesToTabs(editorPtr)
 	End Method
 
+	Method SetLanguage(language:EImTextEditLanguage)
+		Local lang:TImTextEditLanguage = TImTextEditLanguage.GetLanguage(language)
+		bmx_imgui_imcolortextedit_SetLanguage(editorPtr, lang.languagePtr)
+	End Method
+
 End Type
+
+Type TImTextEditLanguage
+
+	Field languagePtr:Byte Ptr
+
+	Function Create:TImTextEditLanguage(languagePtr:Byte Ptr)
+		If languagePtr Then
+			Local lang:TImTextEditLanguage = New TImTextEditLanguage
+			lang.languagePtr = languagePtr
+			Return lang
+		End If
+	End Function
+
+	Function GetLanguage:TImTextEditLanguage(language:EImTextEditLanguage)
+		Return TImTextEditLanguage.Create(bmx_imgui_imcolortextedit_GetLanguage(language))
+	End Function
+End Type
+
+

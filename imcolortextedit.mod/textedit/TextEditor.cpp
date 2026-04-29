@@ -706,6 +706,9 @@ void TextEditor::handleKeyboardInputs() {
 		if (isOptionalShift && ImGui::IsKeyPressed(ImGuiKey_UpArrow)) { moveUp(1, shift); }
 		else if (isOptionalShift && ImGui::IsKeyPressed(ImGuiKey_DownArrow)) { moveDown(1, shift); }
 
+		else if (isOptionalShiftShortcut && ImGui::IsKeyPressed(ImGuiKey_LeftArrow)) { moveToStartOfLine(shift); }
+		else if (isOptionalShiftShortcut && ImGui::IsKeyPressed(ImGuiKey_RightArrow)) { moveToEndOfLine(shift); }
+
 #if __APPLE__
 		else if (isCtrlShift && ImGui::IsKeyPressed(ImGuiKey_LeftArrow)) { shrinkSelectionsToCurlyBrackets(); }
 		else if (isCtrlShift && ImGui::IsKeyPressed(ImGuiKey_RightArrow)) { growSelectionsToCurlyBrackets(); }
@@ -1504,7 +1507,7 @@ void TextEditor::handleCharacter(ImWchar character) {
 	auto transaction = startTransaction(false);
 
 	auto opener = character;
-	auto isPaired = !overwrite && completePairedGlyphs && CodePoint::isPairOpener(opener);
+	auto isPaired = !overwrite && completePairedGlyphs && CodePoint::isPairOpener(opener, language ? language->hasSingleQuotedStrings : false);
 	auto closer = CodePoint::toPairCloser(opener);
 
 	// ignore input if it was the closing character for a pair that was automatically inserted
@@ -3694,9 +3697,11 @@ TextEditor::State TextEditor::Colorizer::update(Line& line, const Language* lang
 				glyph = line.end();
 
 			// are we starting a multiline comment
-			} else if (language->commentStart.size() && matches(glyph, line.end(), language->commentStart)) {
+			// } else if (language->commentStart.size() && matches(glyph, line.end(), language->commentStart, false)) {
+			} else if (language->commentStart.size() && (!language->commentStartAtLineStart || isAtLineStart(glyph, line.begin())) &&
+						matches(glyph, line.end(), language->commentStart, false) ) {
 				state = State::inComment;
-				auto size = language->commentEnd.size();
+				auto size = language->commentStart.size();
 				setColor(glyph, glyph + size, Color::comment);
 				glyph += size;
 
@@ -3799,8 +3804,9 @@ TextEditor::State TextEditor::Colorizer::update(Line& line, const Language* lang
 
 		} else if (state == State::inComment) {
 			// stay in comment state until we see the end sequence
-			if (matches(glyph, line.end(), language->commentEnd)) {
-				auto size = language->commentEnd.size();
+			bool altMatch = false;
+			if (matches(glyph, line.end(), language->commentEnd, false) || (language->commentEndAlt.size() && (altMatch = matches(glyph, line.end(), language->commentEndAlt, false)))) {
+				auto size = altMatch ? language->commentEndAlt.size() : language->commentEnd.size();
 				setColor(glyph, glyph + size, Color::comment);
 				glyph += size;
 				state = State::inText;
@@ -3824,9 +3830,8 @@ TextEditor::State TextEditor::Colorizer::update(Line& line, const Language* lang
 				setColor(glyph, glyph + size, Color::string);
 				glyph += size;
 				state = State::inText;
-
 			} else {
-				(glyph++)->color = Color::comment;
+				(glyph++)->color = Color::string;
 			}
 
 		} else if (state == State::inOtherStringAlt) {
@@ -3859,7 +3864,7 @@ TextEditor::State TextEditor::Colorizer::update(Line& line, const Language* lang
 					(glyph++)->color = Color::string;
 				}
 
-			} else if (glyph->codepoint == CodePoint::singleQuote) {
+			} else if (glyph->codepoint == CodePoint::singleQuote && language->hasSingleQuotedStrings) {
 				(glyph++)->color = Color::string;
 				state = State::inText;
 
@@ -3938,12 +3943,26 @@ void TextEditor::Colorizer::updateChangedLines(Document& document, const Languag
 	}
 }
 
+bool TextEditor::Colorizer::isAtLineStart(Line::iterator it, Line::iterator lineStart) {
+
+	while (it != lineStart) {
+		auto prev = it;
+		--prev;
+		ImWchar ch = prev->codepoint;
+		if (ch != ' ' && ch != '\t') {
+			return false;
+		}
+		it = prev;
+	}
+	return true;
+}
 
 //
 //	TextEditor::Colorizer::matches
 //
 
-bool TextEditor::Colorizer::matches(Line::iterator start, Line::iterator end, const std::string_view& text) {
+// text is already lowercase...
+bool TextEditor::Colorizer::matches(Line::iterator start, Line::iterator end, const std::string_view& text, bool caseSensitive) {
 	// see if text at iterators matches provided UTF-8 string
 	auto i = text.begin();
 
@@ -3955,7 +3974,13 @@ bool TextEditor::Colorizer::matches(Line::iterator start, Line::iterator end, co
 		ImWchar codepoint;
 		i = CodePoint::read(i, text.end(), &codepoint);
 
-		if ((start++)->codepoint != codepoint) {
+		ImWchar ch = (start++)->codepoint;
+
+		if (!caseSensitive) {
+			ch = CodePoint::toLower(ch);
+		}
+
+		if (ch != codepoint) {
 			return false;
 		}
 	}
