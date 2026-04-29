@@ -333,7 +333,94 @@ Type TCodeGenerator
 		Struct SImTextureRef
 			Field _TexData:Byte Ptr
 			Field _TexID:ULong
+
+			Method New(texID:ULong)
+				Self._TexID = texID
+			End Method
 		End Struct
+
+		Type TImGuiItemList
+			Field items:String[8]
+			Field itemCount:Int
+
+			Field itemArray:Byte Ptr
+			Field itemArrayCount:Int
+			Field needsUpdate:Int = True
+
+			Method New(initial:String[])
+				If initial Then
+					items = initial
+					itemCount = initial.Length
+				End If
+			End Method
+
+			Method ResizeIfNeeded(extra:Int = 0)
+				If itemCount + extra >= items.Length Then
+					items = items[..(itemCount + extra) * 3 / 2 + 1]
+				End If
+			End Method
+
+			Method Add(item:String)
+				ResizeIfNeeded()
+				items[itemCount] = item
+				itemCount :+ 1
+
+				needsUpdate = True
+			End Method
+
+			Method Set(items:String[])
+				Self.items = items
+				itemCount = items.Length
+				needsUpdate = True
+			End Method
+
+			Method AddAll(newItems:String[])
+				ResizeIfNeeded(newItems.Length)
+				For Local i:Int = 0 Until newItems.Length
+					Add(newItems[i])
+				Next
+			End Method
+
+			Method Clear()
+				itemCount = 0
+				needsUpdate = True
+			End Method
+
+			Method Insert(index:Int, item:String)
+				ResizeIfNeeded()
+				If index < itemCount Then
+					For Local i:Int = itemCount To index + 1 Step -1
+						items[i] = items[i - 1]
+					Next
+				End If
+				items[index] = item
+				itemCount :+ 1
+				needsUpdate = True
+			End Method
+
+			Method Free()
+				If itemArray Then
+					bmx_imgui_item_list_free_array(itemArray, itemArrayCount)
+					itemArray = Null
+					itemArrayCount = 0
+				End If
+			End Method
+
+			Method RefreshItems()
+				If needsUpdate Then
+					If itemArray Then
+						bmx_imgui_item_list_free_array(itemArray, itemArrayCount)
+					End If
+					itemArray = bmx_imgui_item_list_create_array(items, itemCount)
+					itemArrayCount = itemCount
+					needsUpdate = False
+				End If
+			End Method
+
+			Method Delete()
+				Free()
+			End Method
+		End Type
 		~n~n
 		""")
 
@@ -402,6 +489,48 @@ Type TCodeGenerator
 			End If
 		End Function
 
+		Rem
+		bbdoc: Renders a combo box with the given items.
+		returns: #True if the combo box value was changed, otherwise #False.
+		about: @current_item is updated to reflect the currently selected item index.
+		Implied popup_max_height_in_items = -1
+		End Rem
+		Function ImGui_ComboChar:Int(label:String, current_item:Int Ptr, items:TImGuiItemList)
+			items.RefreshItems()
+			If items.itemArrayCount = 0 Then
+				Return _ImGui_ComboChar(label, current_item, Null, 0)
+			Else
+				Return _ImGui_ComboChar(label, current_item, items.itemArray, items.itemArrayCount)
+			End If
+		End Function
+
+		Rem
+		bbdoc: Renders a combo box with the given items.
+		returns: #True if the combo box value was changed, otherwise #False.
+		about: @current_item is updated to reflect the currently selected item index.
+		End Rem
+		Function ImGui_ComboCharEx:Int(label:String, current_item:Int Ptr, items:TImGuiItemList, popup_max_height_in_items:Int)
+			items.RefreshItems()
+			If items.itemArrayCount = 0 Then
+				Return _ImGui_ComboCharEx(label, current_item, Null, 0, popup_max_height_in_items)
+			Else
+				Return _ImGui_ComboCharEx(label, current_item, items.itemArray, items.itemArrayCount, popup_max_height_in_items)
+			End If
+		End Function
+
+		Rem
+		bbdoc: Renders a list box with the given items.
+		returns: #True if the list box value was changed, otherwise #False.
+		about: @current_item is updated to reflect the currently selected item index.
+		End Rem
+		Function ImGui_ListBox:Int(label:String, current_item:Int Ptr, items:TImGuiItemList, height_in_items:Int)
+			items.RefreshItems()
+			If items.itemArrayCount = 0 Then
+				Return _ImGui_ListBox(label, current_item, Null, 0, height_in_items)
+			Else
+				Return _ImGui_ListBox(label, current_item, items.itemArray, items.itemArrayCount, height_in_items)
+			End If
+		End Function
 		""")
 
 		stream.WriteString("~n~n")
@@ -415,7 +544,8 @@ Type TCodeGenerator
 			' skip functions that we implement directly
 			Select func.name
 				Case "ImGui_CreateContext", "ImGui_DestroyContext", "ImGui_SetCurrentContext", "ImGui_StyleColorsDark", ..
-					"ImGui_StyleColorsLight", "ImGui_StyleColorsClassic", "ImGui_InputText", "ImGui_PushFontFloat"
+					"ImGui_StyleColorsLight", "ImGui_StyleColorsClassic", "ImGui_InputText", "ImGui_PushFontFloat", ..
+					"ImGui_ComboChar", "ImGui_ComboCharEx", "ImGui_ListBox"
 					Continue
 			End Select
 
@@ -487,6 +617,72 @@ Type TCodeGenerator
 				stream.WriteString("~n")
 			End If
 
+			stream.WriteString(indent)
+			stream.WriteString("End Rem~n")
+		End If
+	End Method
+
+	Method WriteEnumBbdocComments(stream:TStream, e:TIGEnum)
+		If e.comments Then
+			Local indent:String = ""
+
+			stream.WriteString(indent)
+			stream.WriteString("Rem~n")
+
+			stream.WriteString(indent)
+			stream.WriteString("bbdoc: ")
+				Local index:Int = 0
+			If e.comments.preceding Then
+				For Local commentLine:String = EachIn e.comments.preceding
+					stream.WriteString(indent)
+					If index = 1 Then
+						stream.WriteString("about: ")
+					End If
+					stream.WriteString(commentLine.Replace("//", ""))
+					stream.WriteString("~n")
+					index:+ 1
+				Next
+			Else
+				stream.WriteString("~n")
+			End If
+
+			If index = 1 Then
+				stream.WriteString(indent)
+				stream.WriteString("about: ~n")
+			End If
+
+			stream.WriteString("~n~n")
+
+			' table of enum values
+			stream.WriteString(indent)
+			stream.WriteString("| Value | Description |~n")
+			stream.WriteString(indent)
+			stream.WriteString("|-------|-------------|~n")
+
+			' values
+			For Local element:TIGEnumElement = eachin e.elements
+				If element.is_internal Then Continue
+
+				Local name:String = element.name.Replace(e.name, "_")
+				If name.StartsWith("__") Then
+					name = name[1..]
+				End If
+				If name.StartsWith("ImGuiMod_") Then
+					name = name.Replace("ImGuiMod_", "_Mod_")
+				End If
+
+				stream.WriteString(indent)
+				stream.WriteString("| " + name + " | ")
+
+				If element.comments And element.comments.attached Then
+					stream.WriteString(element.comments.attached.Replace("//", ""))
+				End If
+				
+				stream.WriteString(" |~n")
+			Next
+
+			stream.WriteString(indent)
+			stream.WriteString("|-------|-------------|~n")
 			stream.WriteString(indent)
 			stream.WriteString("End Rem~n")
 		End If
@@ -916,6 +1112,9 @@ Type TCodeGenerator
 		'
 		stream.WriteString("""
 			~tFunction _ImGui_InputText:Int(label:String, buf:String Var, buf_size:size_t, flags:EImGuiInputTextFlags) = "bmx_ImGui_InputText"
+			~tFunction _ImGui_ComboChar:Int(label:String, current_item:Int Ptr, item_array:Byte Ptr, item_count:Int) = "bmx_ImGui_ComboChar"
+			~tFunction _ImGui_ComboCharEx:Int(label:String, current_item:Int Ptr, item_array:Byte Ptr, items_count:Int, popup_max_height_in_items:Int) = "bmx_ImGui_ComboCharEx"
+			~tFunction _ImGui_ListBox:Int(label:String, current_item:Int Ptr, item_array:Byte Ptr, items_count:Int, height_in_items:Int) = "bmx_ImGui_ListBox"
 
 			~tFunction bmx_imgui_io_get_config_flags:EImGuiConfigFlags(handle:Byte Ptr)
 			~tFunction bmx_imgui_io_set_config_flags(handle:Byte Ptr, flags:EImGuiConfigFlags)
@@ -1054,6 +1253,9 @@ Type TCodeGenerator
 			~tFunction bmx_imgui_font_config_set_font_loader_flags(handle:Byte Ptr, value:UInt)
 			~tFunction bmx_imgui_font_config_get_font_loader_flags:UInt(handle:Byte Ptr)
 
+			~tFunction bmx_imgui_item_list_create_array:Byte Ptr(items:String[], items_count:Int)
+			~tFunction bmx_imgui_item_list_free_array(handle:Byte Ptr, items_count:Int)
+
 			""")
 		stream.WriteString("~n~n")
 
@@ -1063,6 +1265,13 @@ Type TCodeGenerator
 			If func.Name = "ImGui_InputText" Then
 				Continue
 			End If
+
+			' skip some functions that require special handling
+			Select func.name
+				Case "ImGui_ComboChar", "ImGui_ComboCharEx", "ImGui_ListBox"
+					Continue
+			End Select
+
 
 			' skip functions we aren't implementing yet
 			Select func.name
@@ -1305,6 +1514,9 @@ Type TCodeGenerator
 		For Local e:TIGEnum = eachin model.enums
 			If e.is_internal Then Continue
 
+			' comments
+			WriteEnumBbdocComments(stream, e)
+
 			stream.WriteString("Enum " + EnumNameToBmxName(e.name))
 			If e.is_flags_enum Then
 				stream.WriteString(" Flags")
@@ -1312,6 +1524,8 @@ Type TCodeGenerator
 			stream.WriteString("~n")
 
 			For Local element:TIGEnumElement = eachin e.elements
+				If element.is_internal Then Continue
+				
 				Local name:String = element.name.Replace(e.name, "_")
 				If name.StartsWith("__") Then
 					name = name[1..]
@@ -1933,6 +2147,21 @@ Type TCodeGenerator
 			return config->FontLoaderFlags;
 		}
 
+		char ** bmx_imgui_item_list_create_array(BBArray * items, int item_count) {
+			BBString ** s = (BBString**)BBARRAYDATA(items, items->dims);
+			char ** items_array = (char **)malloc(item_count * sizeof(char *));
+			for(int i = 0; i < item_count; i++) {
+				items_array[i] = (char *)bbStringToUTF8String(s[i]);
+			}
+			return items_array;
+		}
+
+		void bmx_imgui_item_list_free_array(char ** items_array, int item_count) {
+			for(int i = 0; i < item_count; i++) {
+				bbMemFree((void *)items_array[i]);
+			}
+			free(items_array);
+		}
 		""")
 
 		stream.WriteString("~n~n")
@@ -3092,6 +3321,20 @@ Type TCodeGenerator
 			End Rem
 			Method GetDpiScale:Float()
 				Return bmx_imgui_viewport_get_dpi_scale(handle)
+			End Method
+
+			Rem
+			bbdoc: Center of the viewport.
+			End Rem
+			Method GetCenter:SImVec2()
+				Return ImGuiViewport_GetCenter(Self)
+			End Method
+
+			Rem
+			bbdoc: Center of the work area.
+			End Rem
+			Method GetWorkCenter:SImVec2()
+				Return ImGuiViewport_GetWorkCenter(Self)
 			End Method
 
 		End Type
