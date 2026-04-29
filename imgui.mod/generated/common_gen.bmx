@@ -912,6 +912,20 @@ Type TImGuiViewport
 		Return bmx_imgui_viewport_get_dpi_scale(handle)
 	End Method
 
+	Rem
+	bbdoc: Center of the viewport.
+	End Rem
+	Method GetCenter:SImVec2()
+		Return ImGuiViewport_GetCenter(Self)
+	End Method
+
+	Rem
+	bbdoc: Center of the work area.
+	End Rem
+	Method GetWorkCenter:SImVec2()
+		Return ImGuiViewport_GetWorkCenter(Self)
+	End Method
+
 End Type
 
 Rem
@@ -1387,7 +1401,94 @@ End Struct
 Struct SImTextureRef
 	Field _TexData:Byte Ptr
 	Field _TexID:ULong
+
+	Method New(texID:ULong)
+		Self._TexID = texID
+	End Method
 End Struct
+
+Type TImGuiItemList
+	Field items:String[8]
+	Field itemCount:Int
+
+	Field itemArray:Byte Ptr
+	Field itemArrayCount:Int
+	Field needsUpdate:Int = True
+
+	Method New(initial:String[])
+		If initial Then
+			items = initial
+			itemCount = initial.Length
+		End If
+	End Method
+
+	Method ResizeIfNeeded(extra:Int = 0)
+		If itemCount + extra >= items.Length Then
+			items = items[..(itemCount + extra) * 3 / 2 + 1]
+		End If
+	End Method
+
+	Method Add(item:String)
+		ResizeIfNeeded()
+		items[itemCount] = item
+		itemCount :+ 1
+
+		needsUpdate = True
+	End Method
+
+	Method Set(items:String[])
+		Self.items = items
+		itemCount = items.Length
+		needsUpdate = True
+	End Method
+
+	Method AddAll(newItems:String[])
+		ResizeIfNeeded(newItems.Length)
+		For Local i:Int = 0 Until newItems.Length
+			Add(newItems[i])
+		Next
+	End Method
+
+	Method Clear()
+		itemCount = 0
+		needsUpdate = True
+	End Method
+
+	Method Insert(index:Int, item:String)
+		ResizeIfNeeded()
+		If index < itemCount Then
+			For Local i:Int = itemCount To index + 1 Step -1
+				items[i] = items[i - 1]
+			Next
+		End If
+		items[index] = item
+		itemCount :+ 1
+		needsUpdate = True
+	End Method
+
+	Method Free()
+		If itemArray Then
+			bmx_imgui_item_list_free_array(itemArray, itemArrayCount)
+			itemArray = Null
+			itemArrayCount = 0
+		End If
+	End Method
+
+	Method RefreshItems()
+		If needsUpdate Then
+			If itemArray Then
+				bmx_imgui_item_list_free_array(itemArray, itemArrayCount)
+			End If
+			itemArray = bmx_imgui_item_list_create_array(items, itemCount)
+			itemArrayCount = itemCount
+			needsUpdate = False
+		End If
+	End Method
+
+	Method Delete()
+		Free()
+	End Method
+End Type
 
 
 Function ImGui_CreateContext:TImGuiContext(atlas:TImFontAtlas = Null)
@@ -1453,6 +1554,48 @@ Function ImGui_PushFontFloat(font:TImFont, font_size_base_unscaled:Float)
 	End If
 End Function
 
+Rem
+bbdoc: Renders a combo box with the given items.
+returns: #True if the combo box value was changed, otherwise #False.
+about: @current_item is updated to reflect the currently selected item index.
+Implied popup_max_height_in_items = -1
+End Rem
+Function ImGui_ComboChar:Int(label:String, current_item:Int Ptr, items:TImGuiItemList)
+	items.RefreshItems()
+	If items.itemArrayCount = 0 Then
+		Return _ImGui_ComboChar(label, current_item, Null, 0)
+	Else
+		Return _ImGui_ComboChar(label, current_item, items.itemArray, items.itemArrayCount)
+	End If
+End Function
+
+Rem
+bbdoc: Renders a combo box with the given items.
+returns: #True if the combo box value was changed, otherwise #False.
+about: @current_item is updated to reflect the currently selected item index.
+End Rem
+Function ImGui_ComboCharEx:Int(label:String, current_item:Int Ptr, items:TImGuiItemList, popup_max_height_in_items:Int)
+	items.RefreshItems()
+	If items.itemArrayCount = 0 Then
+		Return _ImGui_ComboCharEx(label, current_item, Null, 0, popup_max_height_in_items)
+	Else
+		Return _ImGui_ComboCharEx(label, current_item, items.itemArray, items.itemArrayCount, popup_max_height_in_items)
+	End If
+End Function
+
+Rem
+bbdoc: Renders a list box with the given items.
+returns: #True if the list box value was changed, otherwise #False.
+about: @current_item is updated to reflect the currently selected item index.
+End Rem
+Function ImGui_ListBox:Int(label:String, current_item:Int Ptr, items:TImGuiItemList, height_in_items:Int)
+	items.RefreshItems()
+	If items.itemArrayCount = 0 Then
+		Return _ImGui_ListBox(label, current_item, Null, 0, height_in_items)
+	Else
+		Return _ImGui_ListBox(label, current_item, items.itemArray, items.itemArrayCount, height_in_items)
+	End If
+End Function
 
 Rem
 bbdoc:  == (_TexData ? _TexData->TexID : _TexID)  Implemented below in the file.
@@ -2542,17 +2685,6 @@ End Function
 Rem
 bbdoc:  Implied popup_max_height_in_items = -1
 End Rem
-Function ImGui_ComboChar:Int(label:String, current_item:Int Ptr, items:String[], items_count:Int)
-	Return _ImGui_ComboChar(label, current_item, items, items_count)
-End Function
-
-Function ImGui_ComboCharEx:Int(label:String, current_item:Int Ptr, items:String[], items_count:Int, popup_max_height_in_items:Int)
-	Return _ImGui_ComboCharEx(label, current_item, items, items_count, popup_max_height_in_items)
-End Function
-
-Rem
-bbdoc:  Implied popup_max_height_in_items = -1
-End Rem
 Function ImGui_Combo:Int(label:String, current_item:Int Ptr, items_separated_by_zeros:String)
 	Return _ImGui_Combo(label, current_item, items_separated_by_zeros)
 End Function
@@ -3214,10 +3346,6 @@ bbdoc:  only call EndListBox() if BeginListBox() returned true!
 End Rem
 Function ImGui_EndListBox()
 	_ImGui_EndListBox()
-End Function
-
-Function ImGui_ListBox:Int(label:String, current_item:Int Ptr, items:String[], items_count:Int, height_in_items:Int)
-	Return _ImGui_ListBox(label, current_item, items, items_count, height_in_items)
 End Function
 
 Rem
@@ -5613,6 +5741,9 @@ End Function
 Private
 Extern
 	Function _ImGui_InputText:Int(label:String, buf:String Var, buf_size:size_t, flags:EImGuiInputTextFlags) = "bmx_ImGui_InputText"
+	Function _ImGui_ComboChar:Int(label:String, current_item:Int Ptr, item_array:Byte Ptr, item_count:Int) = "bmx_ImGui_ComboChar"
+	Function _ImGui_ComboCharEx:Int(label:String, current_item:Int Ptr, item_array:Byte Ptr, items_count:Int, popup_max_height_in_items:Int) = "bmx_ImGui_ComboCharEx"
+	Function _ImGui_ListBox:Int(label:String, current_item:Int Ptr, item_array:Byte Ptr, items_count:Int, height_in_items:Int) = "bmx_ImGui_ListBox"
 
 	Function bmx_imgui_io_get_config_flags:EImGuiConfigFlags(handle:Byte Ptr)
 	Function bmx_imgui_io_set_config_flags(handle:Byte Ptr, flags:EImGuiConfigFlags)
@@ -5750,6 +5881,9 @@ Extern
 	Function bmx_imgui_font_config_get_font_no:Int(handle:Byte Ptr)
 	Function bmx_imgui_font_config_set_font_loader_flags(handle:Byte Ptr, value:UInt)
 	Function bmx_imgui_font_config_get_font_loader_flags:UInt(handle:Byte Ptr)
+
+	Function bmx_imgui_item_list_create_array:Byte Ptr(items:String[], items_count:Int)
+	Function bmx_imgui_item_list_free_array(handle:Byte Ptr, items_count:Int)
 
 
 	Function _ImTextureRef_GetTexID:ULong(this:Byte Ptr) = "ImTextureRef_GetTexID"
@@ -5926,8 +6060,6 @@ Extern
 	Function _ImGui_ImageButtonEx:Int(str_id:String, tex_ref:SImTextureRef, image_size:SImVec2, uv0:SImVec2, uv1:SImVec2, bg_col:SImVec4, tint_col:SImVec4) = "bmx_ImGui_ImageButtonEx"
 	Function _ImGui_BeginCombo:Int(label:String, preview_value:String, flags:EImGuiComboFlags) = "bmx_ImGui_BeginCombo"
 	Function _ImGui_EndCombo() = "ImGui_EndCombo"
-	Function _ImGui_ComboChar:Int(label:String, current_item:Int Ptr, items:String[], items_count:Int) = "bmx_ImGui_ComboChar"
-	Function _ImGui_ComboCharEx:Int(label:String, current_item:Int Ptr, items:String[], items_count:Int, popup_max_height_in_items:Int) = "bmx_ImGui_ComboCharEx"
 	Function _ImGui_Combo:Int(label:String, current_item:Int Ptr, items_separated_by_zeros:String) = "bmx_ImGui_Combo"
 	Function _ImGui_ComboEx:Int(label:String, current_item:Int Ptr, items_separated_by_zeros:String, popup_max_height_in_items:Int) = "bmx_ImGui_ComboEx"
 	Function _ImGui_ComboCallback:Int(label:String, current_item:Int Ptr, getter:Byte Ptr, user_data:Byte Ptr, items_count:Int) = "bmx_ImGui_ComboCallback"
@@ -6045,7 +6177,6 @@ Extern
 	Function _ImGui_IsItemToggledSelection:Int() = "ImGui_IsItemToggledSelection"
 	Function _ImGui_BeginListBox:Int(label:String, size:SImVec2) = "bmx_ImGui_BeginListBox"
 	Function _ImGui_EndListBox() = "ImGui_EndListBox"
-	Function _ImGui_ListBox:Int(label:String, current_item:Int Ptr, items:String[], items_count:Int, height_in_items:Int) = "bmx_ImGui_ListBox"
 	Function _ImGui_ListBoxCallback:Int(label:String, current_item:Int Ptr, getter:Byte Ptr, user_data:Byte Ptr, items_count:Int) = "bmx_ImGui_ListBoxCallback"
 	Function _ImGui_ListBoxCallbackEx:Int(label:String, current_item:Int Ptr, getter:Byte Ptr, user_data:Byte Ptr, items_count:Int, height_in_items:Int) = "bmx_ImGui_ListBoxCallbackEx"
 	Function _ImGui_PlotLines(label:String, values:Byte Ptr, values_count:Int) = "bmx_ImGui_PlotLines"
@@ -6468,6 +6599,39 @@ Extern
 End Extern
 
 Public
+Rem
+bbdoc:  Flags for ImGui::Begin()
+about:  (Those are per-window flags. There are shared flags in ImGuiIO: io.ConfigWindowsResizeFromEdges and io.ConfigWindowsMoveFromTitleBarOnly)
+
+
+| Value | Description |
+|-------|-------------|
+| _None |  |
+| _NoTitleBar |  Disable title-bar |
+| _NoResize |  Disable user resizing with the lower-right grip |
+| _NoMove |  Disable user moving the window |
+| _NoScrollbar |  Disable scrollbars (window can still scroll with mouse or programmatically) |
+| _NoScrollWithMouse |  Disable user vertically scrolling with mouse wheel. On child window, mouse wheel will be forwarded to the parent unless NoScrollbar is also set. |
+| _NoCollapse |  Disable user collapsing window by double-clicking on it. Also referred to as Window Menu Button (e.g. within a docking node). |
+| _AlwaysAutoResize |  Resize every window to its content every frame |
+| _NoBackground |  Disable drawing background color (WindowBg, etc.) and outside border. Similar as using SetNextWindowBgAlpha(0.0f). |
+| _NoSavedSettings |  Never load/save settings in .ini file |
+| _NoMouseInputs |  Disable catching mouse, hovering test with pass through. |
+| _MenuBar |  Has a menu-bar |
+| _HorizontalScrollbar |  Allow horizontal scrollbar to appear (off by default). You may use SetNextWindowContentSize(ImVec2(width,0.0f)); prior to calling Begin() to specify width. Read code in imgui_demo in the "Horizontal Scrolling" section. |
+| _NoFocusOnAppearing |  Disable taking focus when transitioning from hidden to visible state |
+| _NoBringToFrontOnFocus |  Disable bringing window to front when taking focus (e.g. clicking on it or programmatically giving it focus) |
+| _AlwaysVerticalScrollbar |  Always show vertical scrollbar (even if ContentSize.y < Size.y) |
+| _AlwaysHorizontalScrollbar |  Always show horizontal scrollbar (even if ContentSize.x < Size.x) |
+| _NoNavInputs |  No keyboard/gamepad navigation within the window |
+| _NoNavFocus |  No focusing toward this window with keyboard/gamepad navigation (e.g. skipped by Ctrl+Tab) |
+| _UnsavedDocument |  Display a dot next to the title. When used in a tab/docking context, tab is selected when clicking the X + closure is not assumed (will wait for user to stop submitting the tab). Otherwise closure is assumed when pressing the X, so if you keep submitting the tab may reappear at end of tab bar. |
+| _NoDocking |  Disable docking of this window |
+| _NoNav |  |
+| _NoDecoration |  |
+| _NoInputs |  |
+|-------|-------------|
+End Rem
 Enum EImGuiWindowFlags Flags
 	_None = 0
 	_NoTitleBar = 1
@@ -6493,14 +6657,34 @@ Enum EImGuiWindowFlags Flags
 	_NoNav = 196608
 	_NoDecoration = 43
 	_NoInputs = 197120
-	_DockNodeHost = 8388608
-	_ChildWindow = 16777216
-	_Tooltip = 33554432
-	_Popup = 67108864
-	_Modal = 134217728
-	_ChildMenu = 268435456
 End Enum
 
+Rem
+bbdoc:  Flags for ImGui::BeginChild()
+about:  (Legacy: bit 0 must always correspond to ImGuiChildFlags_Borders to be backward compatible with old API using 'bool border = false'.)
+ About using AutoResizeX/AutoResizeY flags:
+ - May be combined with SetNextWindowSizeConstraints() to set a min/max size for each axis (see "Demo->Child->Auto-resize with Constraints").
+ - Size measurement for a given axis is only performed when the child window is within visible boundaries, or is just appearing.
+   - This allows BeginChild() to return false when not within boundaries (e.g. when scrolling), which is more optimal. BUT it won't update its auto-size while clipped.
+     While not perfect, it is a better default behavior as the always-on performance gain is more valuable than the occasional "resizing after becoming visible again" glitch.
+   - You may also use ImGuiChildFlags_AlwaysAutoResize to force an update even when child window is not in view.
+     HOWEVER PLEASE UNDERSTAND THAT DOING SO WILL PREVENT BeginChild() FROM EVER RETURNING FALSE, disabling benefits of coarse clipping.
+
+
+| Value | Description |
+|-------|-------------|
+| _None |  |
+| _Borders |  Show an outer border and enable WindowPadding. (IMPORTANT: this is always == 1 == true for legacy reason) |
+| _AlwaysUseWindowPadding |  Pad with style.WindowPadding even if no border are drawn (no padding by default for non-bordered child windows because it makes more sense) |
+| _ResizeX |  Allow resize from right border (layout direction). Enable .ini saving (unless ImGuiWindowFlags_NoSavedSettings passed to window flags) |
+| _ResizeY |  Allow resize from bottom border (layout direction). " |
+| _AutoResizeX |  Enable auto-resizing width. Read "IMPORTANT: Size measurement" details above. |
+| _AutoResizeY |  Enable auto-resizing height. Read "IMPORTANT: Size measurement" details above. |
+| _AlwaysAutoResize |  Combined with AutoResizeX/AutoResizeY. Always measure size even when child is hidden, always return true, always disable clipping optimization! NOT RECOMMENDED. |
+| _FrameStyle |  Style the child window like a framed item: use FrameBg, FrameRounding, FrameBorderSize, FramePadding instead of ChildBg, ChildRounding, ChildBorderSize, WindowPadding. |
+| _NavFlattened |  [BETA] Share focus scope, allow keyboard/gamepad navigation to cross over parent border to this child or between sibling child windows. |
+|-------|-------------|
+End Rem
 Enum EImGuiChildFlags Flags
 	_None = 0
 	_Borders = 1
@@ -6514,6 +6698,23 @@ Enum EImGuiChildFlags Flags
 	_NavFlattened = 256
 End Enum
 
+Rem
+bbdoc:  Flags for ImGui::PushItemFlag()
+about:  (Those are shared by all submitted items)
+
+
+| Value | Description |
+|-------|-------------|
+| _None |  (Default) |
+| _NoTabStop |  false     Disable keyboard tabbing. This is a "lighter" version of ImGuiItemFlags_NoNav. |
+| _NoNav |  false     Disable any form of focusing (keyboard/gamepad directional navigation and SetKeyboardFocusHere() calls). |
+| _NoNavDefaultFocus |  false     Disable item being a candidate for default focus (e.g. used by title bar items). |
+| _ButtonRepeat |  false     Any button-like behavior will have repeat mode enabled (based on io.KeyRepeatDelay and io.KeyRepeatRate values). Note that you can also call IsItemActive() after any button to tell if it is being held. |
+| _AutoClosePopups |  true      MenuItem()/Selectable() automatically close their parent popup window. |
+| _AllowDuplicateId |  false     Allow submitting an item with the same identifier as an item already submitted this frame without triggering a warning tooltip if io.ConfigDebugHighlightIdConflicts is set. |
+| _Disabled |  false     [Internal] Disable interactions. DOES NOT affect visuals. This is used by BeginDisabled()/EndDisabled() and only provided here so you can read back via GetItemFlags(). |
+|-------|-------------|
+End Rem
 Enum EImGuiItemFlags Flags
 	_None = 0
 	_NoTabStop = 1
@@ -6525,6 +6726,41 @@ Enum EImGuiItemFlags Flags
 	_Disabled = 64
 End Enum
 
+Rem
+bbdoc:  Flags for ImGui::InputText()
+about:  (Those are per-item flags. There are shared flags in ImGuiIO: io.ConfigInputTextCursorBlink and io.ConfigInputTextEnterKeepActive)
+
+
+| Value | Description |
+|-------|-------------|
+| _None |  |
+| _CharsDecimal |  Allow 0123456789.+-*/ |
+| _CharsHexadecimal |  Allow 0123456789ABCDEFabcdef |
+| _CharsScientific |  Allow 0123456789.+-*/eE (Scientific notation input) |
+| _CharsUppercase |  Turn a..z into A..Z |
+| _CharsNoBlank |  Filter out spaces, tabs |
+| _AllowTabInput |  Pressing TAB input a '\t' character into the text field |
+| _EnterReturnsTrue |  Return 'true' when Enter is pressed (as opposed to every time the value was modified). Consider using IsItemDeactivatedAfterEdit() instead! |
+| _EscapeClearsAll |  Escape key clears content if not empty, and deactivate otherwise (contrast to default behavior of Escape to revert) |
+| _CtrlEnterForNewLine |  In multi-line mode: validate with Enter, add new line with Ctrl+Enter (default is opposite: validate with Ctrl+Enter, add line with Enter). Note that Shift+Enter always enter a new line either way. |
+| _ReadOnly |  Read-only mode |
+| _Password |  Password mode, display all characters as '*', disable copy |
+| _AlwaysOverwrite |  Overwrite mode |
+| _AutoSelectAll |  Select entire text when first taking mouse focus |
+| _ParseEmptyRefVal |  InputFloat(), InputInt(), InputScalar() etc. only: parse empty string as zero value. |
+| _DisplayEmptyRefVal |  InputFloat(), InputInt(), InputScalar() etc. only: when value is zero, do not display it. Generally used with ImGuiInputTextFlags_ParseEmptyRefVal. |
+| _NoHorizontalScroll |  Disable following the cursor horizontally |
+| _NoUndoRedo |  Disable undo/redo. Note that input text owns the text data while active, if you want to provide your own undo/redo stack you need e.g. to call ClearActiveID(). |
+| _ElideLeft |  When text doesn't fit, elide left side to ensure right side stays visible. Useful for path/filenames. Single-line only! |
+| _CallbackCompletion |  Callback on pressing TAB (for completion handling) |
+| _CallbackHistory |  Callback on pressing Up/Down arrows (for history handling) |
+| _CallbackAlways |  Callback on each iteration. User code may query cursor position, modify text buffer. |
+| _CallbackCharFilter |  Callback on character inputs to replace or discard them. Modify 'EventChar' to replace or discard, or return 1 in callback to discard. |
+| _CallbackResize |  Callback on buffer capacity changes request (beyond 'buf_size' parameter value), allowing the string to grow. Notify when the string wants to be resized (for string types which hold a cache of their Size). You will be provided a new BufSize in the callback and NEED to honor it. (see misc/cpp/imgui_stdlib.h for an example of using this) |
+| _CallbackEdit |  Callback on any edit. Note that InputText() already returns true on edit + you can always use IsItemEdited(). The callback is useful to manipulate the underlying buffer while focus is active. |
+| _WordWrap |  InputTextMultiline(): word-wrap lines that are too long. |
+|-------|-------------|
+End Rem
 Enum EImGuiInputTextFlags Flags
 	_None = 0
 	_CharsDecimal = 1
@@ -6554,6 +6790,39 @@ Enum EImGuiInputTextFlags Flags
 	_WordWrap = 16777216
 End Enum
 
+Rem
+bbdoc:  Flags for ImGui::TreeNodeEx(), ImGui::CollapsingHeader*()
+about: 
+
+
+| Value | Description |
+|-------|-------------|
+| _None |  |
+| _Selected |  Draw as selected |
+| _Framed |  Draw frame with background (e.g. for CollapsingHeader) |
+| _AllowOverlap |  Hit testing will allow subsequent widgets to overlap this one. Require previous frame HoveredId to match before being usable. Shortcut to calling SetNextItemAllowOverlap(). |
+| _NoTreePushOnOpen |  Don't do a TreePush() when open (e.g. for CollapsingHeader) = no extra indent nor pushing on ID stack |
+| _NoAutoOpenOnLog |  Don't automatically and temporarily open node when Logging is active (by default logging will automatically open tree nodes) |
+| _DefaultOpen |  Default node to be open |
+| _OpenOnDoubleClick |  Open on double-click instead of simple click (default for multi-select unless any _OpenOnXXX behavior is set explicitly). Both behaviors may be combined. |
+| _OpenOnArrow |  Open when clicking on the arrow part (default for multi-select unless any _OpenOnXXX behavior is set explicitly). Both behaviors may be combined. |
+| _Leaf |  No collapsing, no arrow (use as a convenience for leaf nodes). Note: will always open a tree/id scope and return true. If you never use that scope, add ImGuiTreeNodeFlags_NoTreePushOnOpen. |
+| _Bullet |  Display a bullet instead of arrow. IMPORTANT: node can still be marked open/close if you don't set the _Leaf flag! |
+| _FramePadding |  Use FramePadding (even for an unframed text node) to vertically align text baseline to regular widget height. Equivalent to calling AlignTextToFramePadding() before the node. |
+| _SpanAvailWidth |  Extend hit box to the right-most edge, even if not framed. This is not the default in order to allow adding other items on the same line without using AllowOverlap mode. |
+| _SpanFullWidth |  Extend hit box to the left-most and right-most edges (cover the indent area). |
+| _SpanLabelWidth |  Narrow hit box + narrow hovering highlight, will only cover the label text. |
+| _SpanAllColumns |  Frame will span all columns of its container table (label will still fit in current column) |
+| _LabelSpanAllColumns |  Label will span all columns of its container table |
+| _NavLeftJumpsToParent |  Nav: left arrow moves back to parent. This is processed in TreePop() when there's an unfulfilled Left nav request remaining. |
+| _CollapsingHeader |  |
+| _DrawLinesNone |  No lines drawn |
+| _DrawLinesFull |  Horizontal lines to child nodes. Vertical line drawn down to TreePop() position: cover full contents. Faster (for large trees). |
+| _DrawLinesToNodes |  Horizontal lines to child nodes. Vertical line drawn down to bottom-most child node. Slower (for large trees). |
+| _NavLeftJumpsBackHere |  Renamed in 1.92.0 |
+| _SpanTextWidth |  Renamed in 1.90.7 |
+|-------|-------------|
+End Rem
 Enum EImGuiTreeNodeFlags Flags
 	_None = 0
 	_Selected = 1
@@ -6581,6 +6850,26 @@ Enum EImGuiTreeNodeFlags Flags
 	_SpanTextWidth = 8192
 End Enum
 
+Rem
+bbdoc:  Flags for OpenPopup*(), BeginPopupContext*(), IsPopupOpen() functions.
+about:  - IMPORTANT: If you ever used the left mouse button with BeginPopupContextXXX() helpers before 1.92.6: Read "API BREAKING CHANGES" 2026/01/07 (1.92.6) entry in imgui.cpp or GitHub topic #9157.
+ - Multiple buttons currently cannot be combined/or-ed in those functions (we could allow it later).
+
+
+| Value | Description |
+|-------|-------------|
+| _None |  |
+| _MouseButtonLeft |  For BeginPopupContext*(): open on Left Mouse release. Only one button allowed! |
+| _MouseButtonRight |  For BeginPopupContext*(): open on Right Mouse release. Only one button allowed! (default) |
+| _MouseButtonMiddle |  For BeginPopupContext*(): open on Middle Mouse release. Only one button allowed! |
+| _NoReopen |  For OpenPopup*(), BeginPopupContext*(): don't reopen same popup if already open (won't reposition, won't reinitialize navigation) |
+| _NoOpenOverExistingPopup |  For OpenPopup*(), BeginPopupContext*(): don't open if there's already a popup at the same level of the popup stack |
+| _NoOpenOverItems |  For BeginPopupContextWindow(): don't return true when hovering items, only when hovering empty space |
+| _AnyPopupId |  For IsPopupOpen(): ignore the ImGuiID parameter and test for any popup. |
+| _AnyPopupLevel |  For IsPopupOpen(): search/test at any level of the popup stack (default test in the current level) |
+| _AnyPopup |  |
+|-------|-------------|
+End Rem
 Enum EImGuiPopupFlags Flags
 	_None = 0
 	_MouseButtonLeft = 4
@@ -6592,11 +6881,26 @@ Enum EImGuiPopupFlags Flags
 	_AnyPopupId = 1024
 	_AnyPopupLevel = 2048
 	_AnyPopup = 3072
-	_MouseButtonShift_ = 2
-	_MouseButtonMask_ = 12
-	_InvalidMask_ = 3
 End Enum
 
+Rem
+bbdoc:  Flags for ImGui::Selectable()
+about: 
+
+
+| Value | Description |
+|-------|-------------|
+| _None |  |
+| _NoAutoClosePopups |  Clicking this doesn't close parent popup window (overrides ImGuiItemFlags_AutoClosePopups) |
+| _SpanAllColumns |  Frame will span all columns of its container table (text will still fit in current column) |
+| _AllowDoubleClick |  Generate press events on double clicks too |
+| _Disabled |  Cannot be selected, display grayed out text |
+| _AllowOverlap |  Hit testing will allow subsequent widgets to overlap this one. Require previous frame HoveredId to match before being usable. Shortcut to calling SetNextItemAllowOverlap(). |
+| _Highlight |  Make the item be displayed as if it is hovered |
+| _SelectOnNav |  Auto-select when moved into, unless Ctrl is held. Automatic when in a BeginMultiSelect() block. |
+| _DontClosePopups |  Renamed in 1.91.0 |
+|-------|-------------|
+End Rem
 Enum EImGuiSelectableFlags Flags
 	_None = 0
 	_NoAutoClosePopups = 1
@@ -6609,6 +6913,24 @@ Enum EImGuiSelectableFlags Flags
 	_DontClosePopups = 1
 End Enum
 
+Rem
+bbdoc:  Flags for ImGui::BeginCombo()
+about: 
+
+
+| Value | Description |
+|-------|-------------|
+| _None |  |
+| _PopupAlignLeft |  Align the popup toward the left by default |
+| _HeightSmall |  Max ~4 items visible. Tip: If you want your combo popup to be a specific size you can use SetNextWindowSizeConstraints() prior to calling BeginCombo() |
+| _HeightRegular |  Max ~8 items visible (default) |
+| _HeightLarge |  Max ~20 items visible |
+| _HeightLargest |  As many fitting items as possible |
+| _NoArrowButton |  Display on the preview box without the square arrow button |
+| _NoPreview |  Display only a square arrow button |
+| _WidthFitPreview |  Width dynamically calculated from preview contents |
+|-------|-------------|
+End Rem
 Enum EImGuiComboFlags Flags
 	_None = 0
 	_PopupAlignLeft = 1
@@ -6619,9 +6941,29 @@ Enum EImGuiComboFlags Flags
 	_NoArrowButton = 32
 	_NoPreview = 64
 	_WidthFitPreview = 128
-	_HeightMask_ = 30
 End Enum
 
+Rem
+bbdoc:  Flags for ImGui::BeginTabBar()
+about: 
+
+
+| Value | Description |
+|-------|-------------|
+| _None |  |
+| _Reorderable |  Allow manually dragging tabs to re-order them + New tabs are appended at the end of list |
+| _AutoSelectNewTabs |  Automatically select new tabs when they appear |
+| _TabListPopupButton |  Disable buttons to open the tab list popup |
+| _NoCloseWithMiddleMouseButton |  Disable behavior of closing tabs (that are submitted with p_open != NULL) with middle mouse button. You may handle this behavior manually on user's side with if (IsItemHovered() && IsMouseClicked(2)) *p_open = false. |
+| _NoTabListScrollingButtons |  Disable scrolling buttons (apply when fitting policy is ImGuiTabBarFlags_FittingPolicyScroll) |
+| _NoTooltip |  Disable tooltips when hovering a tab |
+| _DrawSelectedOverline |  Draw selected overline markers over selected tab |
+| _FittingPolicyMixed |  Shrink down tabs when they don't fit, until width is style.TabMinWidthShrink, then enable scrolling buttons. |
+| _FittingPolicyShrink |  Shrink down tabs when they don't fit |
+| _FittingPolicyScroll |  Enable scrolling buttons when tabs don't fit |
+| _FittingPolicyResizeDown |  Renamed in 1.92.2 |
+|-------|-------------|
+End Rem
 Enum EImGuiTabBarFlags Flags
 	_None = 0
 	_Reorderable = 1
@@ -6634,11 +6976,28 @@ Enum EImGuiTabBarFlags Flags
 	_FittingPolicyMixed = 128
 	_FittingPolicyShrink = 256
 	_FittingPolicyScroll = 512
-	_FittingPolicyMask_ = 896
-	_FittingPolicyDefault_ = 128
 	_FittingPolicyResizeDown = 256
 End Enum
 
+Rem
+bbdoc:  Flags for ImGui::BeginTabItem()
+about: 
+
+
+| Value | Description |
+|-------|-------------|
+| _None |  |
+| _UnsavedDocument |  Display a dot next to the title + set ImGuiTabItemFlags_NoAssumedClosure. |
+| _SetSelected |  Trigger flag to programmatically make the tab selected when calling BeginTabItem() |
+| _NoCloseWithMiddleMouseButton |  Disable behavior of closing tabs (that are submitted with p_open != NULL) with middle mouse button. You may handle this behavior manually on user's side with if (IsItemHovered() && IsMouseClicked(2)) *p_open = false. |
+| _NoPushId |  Don't call PushID()/PopID() on BeginTabItem()/EndTabItem() |
+| _NoTooltip |  Disable tooltip for the given tab |
+| _NoReorder |  Disable reordering this tab or having another tab cross over this tab |
+| _Leading |  Enforce the tab position to the left of the tab bar (after the tab list popup button) |
+| _Trailing |  Enforce the tab position to the right of the tab bar (before the scrolling buttons) |
+| _NoAssumedClosure |  Tab is selected when trying to close + closure is not immediately assumed (will wait for user to stop submitting the tab). Otherwise closure is assumed when pressing the X, so if you keep submitting the tab may reappear at end of tab bar. |
+|-------|-------------|
+End Rem
 Enum EImGuiTabItemFlags Flags
 	_None = 0
 	_UnsavedDocument = 1
@@ -6652,6 +7011,22 @@ Enum EImGuiTabItemFlags Flags
 	_NoAssumedClosure = 256
 End Enum
 
+Rem
+bbdoc:  Flags for ImGui::IsWindowFocused()
+about: 
+
+
+| Value | Description |
+|-------|-------------|
+| _None |  |
+| _ChildWindows |  Return true if any children of the window is focused |
+| _RootWindow |  Test from root window (top most parent of the current hierarchy) |
+| _AnyWindow |  Return true if any window is focused. Important: If you are trying to tell how to dispatch your low-level inputs, do NOT use this. Use 'io.WantCaptureMouse' instead! Please read the FAQ! |
+| _NoPopupHierarchy |  Do not consider popup hierarchy (do not treat popup emitter as parent of popup) (when used with _ChildWindows or _RootWindow) |
+| _DockHierarchy |  Consider docking hierarchy (treat dockspace host as parent of docked window) (when used with _ChildWindows or _RootWindow) |
+| _RootAndChildWindows |  |
+|-------|-------------|
+End Rem
 Enum EImGuiFocusedFlags Flags
 	_None = 0
 	_ChildWindows = 1
@@ -6662,6 +7037,37 @@ Enum EImGuiFocusedFlags Flags
 	_RootAndChildWindows = 3
 End Enum
 
+Rem
+bbdoc:  Flags for ImGui::IsItemHovered(), ImGui::IsWindowHovered()
+about:  Note: if you are trying to check whether your mouse should be dispatched to Dear ImGui or to your app, you should use 'io.WantCaptureMouse' instead! Please read the FAQ!
+ Note: windows with the ImGuiWindowFlags_NoInputs flag are ignored by IsWindowHovered() calls.
+
+
+| Value | Description |
+|-------|-------------|
+| _None |  Return true if directly over the item/window, not obstructed by another window, not obstructed by an active popup or modal blocking inputs under them. |
+| _ChildWindows |  IsWindowHovered() only: Return true if any children of the window is hovered |
+| _RootWindow |  IsWindowHovered() only: Test from root window (top most parent of the current hierarchy) |
+| _AnyWindow |  IsWindowHovered() only: Return true if any window is hovered |
+| _NoPopupHierarchy |  IsWindowHovered() only: Do not consider popup hierarchy (do not treat popup emitter as parent of popup) (when used with _ChildWindows or _RootWindow) |
+| _DockHierarchy |  IsWindowHovered() only: Consider docking hierarchy (treat dockspace host as parent of docked window) (when used with _ChildWindows or _RootWindow) |
+| _AllowWhenBlockedByPopup |  Return true even if a popup window is normally blocking access to this item/window |
+| _AllowWhenBlockedByActiveItem |  Return true even if an active item is blocking access to this item/window. Useful for Drag and Drop patterns. |
+| _AllowWhenOverlappedByItem |  IsItemHovered() only: Return true even if the item uses AllowOverlap mode and is overlapped by another hoverable item. |
+| _AllowWhenOverlappedByWindow |  IsItemHovered() only: Return true even if the position is obstructed or overlapped by another window. |
+| _AllowWhenDisabled |  IsItemHovered() only: Return true even if the item is disabled |
+| _NoNavOverride |  IsItemHovered() only: Disable using keyboard/gamepad navigation state when active, always query mouse |
+| _AllowWhenOverlapped |  |
+| _RectOnly |  |
+| _RootAndChildWindows |  |
+| _ForTooltip |  Shortcut for standard flags when using IsItemHovered() + SetTooltip() sequence. |
+| _Stationary |  Require mouse to be stationary for style.HoverStationaryDelay (~0.15 sec) _at least one time_. After this, can move on same item/window. Using the stationary test tends to reduces the need for a long delay. |
+| _DelayNone |  IsItemHovered() only: Return true immediately (default). As this is the default you generally ignore this. |
+| _DelayShort |  IsItemHovered() only: Return true after style.HoverDelayShort elapsed (~0.15 sec) (shared between items) + requires mouse to be stationary for style.HoverStationaryDelay (once per item). |
+| _DelayNormal |  IsItemHovered() only: Return true after style.HoverDelayNormal elapsed (~0.40 sec) (shared between items) + requires mouse to be stationary for style.HoverStationaryDelay (once per item). |
+| _NoSharedDelay |  IsItemHovered() only: Disable shared delay system where moving from one item to the next keeps the previous timer for a short time (standard for tooltips with long delays) |
+|-------|-------------|
+End Rem
 Enum EImGuiHoveredFlags Flags
 	_None = 0
 	_ChildWindows = 1
@@ -6686,6 +7092,26 @@ Enum EImGuiHoveredFlags Flags
 	_NoSharedDelay = 131072
 End Enum
 
+Rem
+bbdoc:  Flags for ImGui::DockSpace(), shared/inherited by child nodes.
+about:  (Some flags can be applied to individual nodes directly)
+ FIXME-DOCK: Also see ImGuiDockNodeFlagsPrivate_ which may involve using the WIP and internal DockBuilder api.
+
+
+| Value | Description |
+|-------|-------------|
+| _None |  |
+| _KeepAliveOnly |         Don't display the dockspace node but keep it alive. Windows docked into this dockspace node won't be undocked. |
+| _NoDockingOverCentralNode |         Disable docking over the Central Node, which will be always kept empty. |
+| _PassthruCentralNode |         Enable passthru dockspace: 1) DockSpace() will render a ImGuiCol_WindowBg background covering everything excepted the Central Node when empty. Meaning the host window should probably use SetNextWindowBgAlpha(0.0f) prior to Begin() when using this. 2) When Central Node is empty: let inputs pass-through + won't display a DockingEmptyBg background. See demo for details. |
+| _NoDockingSplit |         Disable other windows/nodes from splitting this node. |
+| _NoResize |  Saved  Disable resizing node using the splitter/separators. Useful with programmatically setup dockspaces. |
+| _AutoHideTabBar |         Tab bar will automatically hide when there is a single window in the dock node. |
+| _NoUndocking |         Disable undocking this node. |
+| _NoSplit |  Renamed in 1.90 |
+| _NoDockingInCentralNode |  Renamed in 1.90 |
+|-------|-------------|
+End Rem
 Enum EImGuiDockNodeFlags Flags
 	_None = 0
 	_KeepAliveOnly = 1
@@ -6706,6 +7132,30 @@ Enum EImGuiDockNodeFlags Flags
 	_NoCloseButton = 1 Shl 15
 End Enum
 
+Rem
+bbdoc:  Flags for ImGui::BeginDragDropSource(), ImGui::AcceptDragDropPayload()
+about: 
+
+
+| Value | Description |
+|-------|-------------|
+| _None |  |
+| _SourceNoPreviewTooltip |  Disable preview tooltip. By default, a successful call to BeginDragDropSource opens a tooltip so you can display a preview or description of the source contents. This flag disables this behavior. |
+| _SourceNoDisableHover |  By default, when dragging we clear data so that IsItemHovered() will return false, to avoid subsequent user code submitting tooltips. This flag disables this behavior so you can still call IsItemHovered() on the source item. |
+| _SourceNoHoldToOpenOthers |  Disable the behavior that allows to open tree nodes and collapsing header by holding over them while dragging a source item. |
+| _SourceAllowNullID |  Allow items such as Text(), Image() that have no unique identifier to be used as drag source, by manufacturing a temporary identifier based on their window-relative position. This is extremely unusual within the dear imgui ecosystem and so we made it explicit. |
+| _SourceExtern |  External source (from outside of dear imgui), won't attempt to read current item/window info. Will always return true. Only one Extern source can be active simultaneously. |
+| _PayloadAutoExpire |  Automatically expire the payload if the source cease to be submitted (otherwise payloads are persisting while being dragged) |
+| _PayloadNoCrossContext |  Hint to specify that the payload may not be copied outside current dear imgui context. |
+| _PayloadNoCrossProcess |  Hint to specify that the payload may not be copied outside current process. |
+| _AcceptBeforeDelivery |  AcceptDragDropPayload() will returns true even before the mouse button is released. You can then call IsDelivery() to test if the payload needs to be delivered. |
+| _AcceptNoDrawDefaultRect |  Do not draw the default highlight rectangle when hovering over target. |
+| _AcceptNoPreviewTooltip |  Request hiding the BeginDragDropSource tooltip from the BeginDragDropTarget site. |
+| _AcceptDrawAsHovered |  Accepting item will render as if hovered. Useful for e.g. a Button() used as a drop target. |
+| _AcceptPeekOnly |  For peeking ahead and inspecting the payload before delivery. |
+| _SourceAutoExpirePayload |  Renamed in 1.90.9 |
+|-------|-------------|
+End Rem
 Enum EImGuiDragDropFlags Flags
 	_None = 0
 	_SourceNoPreviewTooltip = 1
@@ -6724,6 +7174,28 @@ Enum EImGuiDragDropFlags Flags
 	_SourceAutoExpirePayload = 32
 End Enum
 
+Rem
+bbdoc:  A primary data type
+about: 
+
+
+| Value | Description |
+|-------|-------------|
+| _S8 |  signed char / char (with sensible compilers) |
+| _U8 |  unsigned char |
+| _S16 |  short |
+| _U16 |  unsigned short |
+| _S32 |  int |
+| _U32 |  unsigned int |
+| _S64 |  long long / __int64 |
+| _U64 |  unsigned long long / unsigned __int64 |
+| _Float |  float |
+| _Double |  double |
+| _Bool |  bool (provided for user convenience, not supported by scalar widgets) |
+| _String |  char* (provided for user convenience, not supported by scalar widgets) |
+| _COUNT |  |
+|-------|-------------|
+End Rem
 Enum EImGuiDataType
 	_S8 = 0
 	_U8 = 1
@@ -6740,6 +7212,21 @@ Enum EImGuiDataType
 	_COUNT = 12
 End Enum
 
+Rem
+bbdoc:  A cardinal direction
+about: 
+
+
+| Value | Description |
+|-------|-------------|
+| _None |  |
+| _Left |  |
+| _Right |  |
+| _Up |  |
+| _Down |  |
+| _COUNT |  |
+|-------|-------------|
+End Rem
 Enum EImGuiDir
 	_None = -1
 	_Left = 0
@@ -6749,12 +7236,197 @@ Enum EImGuiDir
 	_COUNT = 4
 End Enum
 
+Rem
+bbdoc:  A sorting direction
+about: 
+
+
+| Value | Description |
+|-------|-------------|
+| _None |  |
+| _Ascending |  Ascending = 0->9, A->Z etc. |
+| _Descending |  Descending = 9->0, Z->A etc. |
+|-------|-------------|
+End Rem
 Enum EImGuiSortDirection
 	_None = 0
 	_Ascending = 1
 	_Descending = 2
 End Enum
 
+Rem
+bbdoc:  A key identifier (ImGuiKey_XXX or ImGuiMod_XXX value): can represent Keyboard, Mouse and Gamepad values.
+about:  All our named keys are >= 512. Keys value 0 to 511 are left unused and were legacy native/opaque key values (< 1.87).
+ Support for legacy keys was completely removed in 1.91.5.
+ Read details about the 1.87+ transition : https:github.com/ocornut/imgui/issues/4921
+ Note that "Keys" related to physical keys and are not the same concept as input "Characters", the latter are submitted via io.AddInputCharacter().
+ The keyboard key enum values are named after the keys on a standard US keyboard, and on other keyboard types the keys reported may not match the keycaps.
+
+
+| Value | Description |
+|-------|-------------|
+| _None |  |
+| _NamedKey_BEGIN |  First valid key value (other than 0) |
+| _Tab |  == ImGuiKey_NamedKey_BEGIN |
+| _LeftArrow |  |
+| _RightArrow |  |
+| _UpArrow |  |
+| _DownArrow |  |
+| _PageUp |  |
+| _PageDown |  |
+| _Home |  |
+| _End |  |
+| _Insert |  |
+| _Delete |  |
+| _Backspace |  |
+| _Space |  |
+| _Enter |  |
+| _Escape |  |
+| _LeftCtrl |  |
+| _LeftShift |  |
+| _LeftAlt |  |
+| _LeftSuper |  Also see ImGuiMod_Ctrl, ImGuiMod_Shift, ImGuiMod_Alt, ImGuiMod_Super below! |
+| _RightCtrl |  |
+| _RightShift |  |
+| _RightAlt |  |
+| _RightSuper |  |
+| _Menu |  |
+| _0 |  |
+| _1 |  |
+| _2 |  |
+| _3 |  |
+| _4 |  |
+| _5 |  |
+| _6 |  |
+| _7 |  |
+| _8 |  |
+| _9 |  |
+| _A |  |
+| _B |  |
+| _C |  |
+| _D |  |
+| _E |  |
+| _F |  |
+| _G |  |
+| _H |  |
+| _I |  |
+| _J |  |
+| _K |  |
+| _L |  |
+| _M |  |
+| _N |  |
+| _O |  |
+| _P |  |
+| _Q |  |
+| _R |  |
+| _S |  |
+| _T |  |
+| _U |  |
+| _V |  |
+| _W |  |
+| _X |  |
+| _Y |  |
+| _Z |  |
+| _F1 |  |
+| _F2 |  |
+| _F3 |  |
+| _F4 |  |
+| _F5 |  |
+| _F6 |  |
+| _F7 |  |
+| _F8 |  |
+| _F9 |  |
+| _F10 |  |
+| _F11 |  |
+| _F12 |  |
+| _F13 |  |
+| _F14 |  |
+| _F15 |  |
+| _F16 |  |
+| _F17 |  |
+| _F18 |  |
+| _F19 |  |
+| _F20 |  |
+| _F21 |  |
+| _F22 |  |
+| _F23 |  |
+| _F24 |  |
+| _Apostrophe |  ' |
+| _Comma |  , |
+| _Minus |  - |
+| _Period |  . |
+| _Slash |  / |
+| _Semicolon |  ; |
+| _Equal |  = |
+| _LeftBracket |  [ |
+| _Backslash |  \ (this text inhibit multiline comment caused by backslash) |
+| _RightBracket |  ] |
+| _GraveAccent |  ` |
+| _CapsLock |  |
+| _ScrollLock |  |
+| _NumLock |  |
+| _PrintScreen |  |
+| _Pause |  |
+| _Keypad0 |  |
+| _Keypad1 |  |
+| _Keypad2 |  |
+| _Keypad3 |  |
+| _Keypad4 |  |
+| _Keypad5 |  |
+| _Keypad6 |  |
+| _Keypad7 |  |
+| _Keypad8 |  |
+| _Keypad9 |  |
+| _KeypadDecimal |  |
+| _KeypadDivide |  |
+| _KeypadMultiply |  |
+| _KeypadSubtract |  |
+| _KeypadAdd |  |
+| _KeypadEnter |  |
+| _KeypadEqual |  |
+| _AppBack |  Available on some keyboard/mouses. Often referred as "Browser Back" |
+| _AppForward |  |
+| _Oem102 |  Non-US backslash. |
+| _GamepadStart |  Menu        | +       | Options  | |
+| _GamepadBack |  View        | -       | Share    | |
+| _GamepadFaceLeft |  X           | Y       | Square   | Toggle Menu. Hold for Windowing mode (Focus/Move/Resize windows) |
+| _GamepadFaceRight |  B           | A       | Circle   | Cancel / Close / Exit |
+| _GamepadFaceUp |  Y           | X       | Triangle | Open Context Menu |
+| _GamepadFaceDown |  A           | B       | Cross    | Activate / Open / Toggle. Hold for 0.60f to Activate in Text Input mode (e.g. wired to an on-screen keyboard). |
+| _GamepadDpadLeft |  D-pad Left  | "       | "        | Move / Tweak / Resize Window (in Windowing mode) |
+| _GamepadDpadRight |  D-pad Right | "       | "        | Move / Tweak / Resize Window (in Windowing mode) |
+| _GamepadDpadUp |  D-pad Up    | "       | "        | Move / Tweak / Resize Window (in Windowing mode) |
+| _GamepadDpadDown |  D-pad Down  | "       | "        | Move / Tweak / Resize Window (in Windowing mode) |
+| _GamepadL1 |  L Bumper    | L       | L1       | Tweak Slower / Focus Previous (in Windowing mode) |
+| _GamepadR1 |  R Bumper    | R       | R1       | Tweak Faster / Focus Next (in Windowing mode) |
+| _GamepadL2 |  L Trigger   | ZL      | L2       | [Analog] |
+| _GamepadR2 |  R Trigger   | ZR      | R2       | [Analog] |
+| _GamepadL3 |  L Stick     | L3      | L3       | |
+| _GamepadR3 |  R Stick     | R3      | R3       | |
+| _GamepadLStickLeft |              |         |          | [Analog] Move Window (in Windowing mode) |
+| _GamepadLStickRight |              |         |          | [Analog] Move Window (in Windowing mode) |
+| _GamepadLStickUp |              |         |          | [Analog] Move Window (in Windowing mode) |
+| _GamepadLStickDown |              |         |          | [Analog] Move Window (in Windowing mode) |
+| _GamepadRStickLeft |              |         |          | [Analog] |
+| _GamepadRStickRight |              |         |          | [Analog] |
+| _GamepadRStickUp |              |         |          | [Analog] |
+| _GamepadRStickDown |              |         |          | [Analog] |
+| _MouseLeft |  |
+| _MouseRight |  |
+| _MouseMiddle |  |
+| _MouseX1 |  |
+| _MouseX2 |  |
+| _MouseWheelX |  |
+| _MouseWheelY |  |
+| _Mod_None |  |
+| _Mod_Ctrl |  Ctrl (non-macOS), Cmd (macOS) |
+| _Mod_Shift |  Shift |
+| _Mod_Alt |  Option/Menu |
+| _Mod_Super |  Windows/Super (non-macOS), Ctrl (macOS) |
+| _COUNT |  Obsoleted in 1.91.5 because it was misleading (since named keys don't start at 0 anymore) |
+| _Mod_Shortcut |  Removed in 1.90.7, you can now simply use ImGuiMod_Ctrl |
+|-------|-------------|
+End Rem
 Enum EImGuiKey
 	_None = 0
 	_NamedKey_BEGIN = 512
@@ -6909,22 +7581,36 @@ Enum EImGuiKey
 	_MouseX2 = 660
 	_MouseWheelX = 661
 	_MouseWheelY = 662
-	_ReservedForModCtrl = 663
-	_ReservedForModShift = 664
-	_ReservedForModAlt = 665
-	_ReservedForModSuper = 666
-	_NamedKey_END = 667
-	_NamedKey_COUNT = 155
 	_Mod_None = 0
 	_Mod_Ctrl = 4096
 	_Mod_Shift = 8192
 	_Mod_Alt = 16384
 	_Mod_Super = 32768
-	_Mod_Mask_ = 61440
 	_COUNT = 667
 	_Mod_Shortcut = 4096
 End Enum
 
+Rem
+bbdoc:  Flags for Shortcut(), SetNextItemShortcut(),
+about:  (and for upcoming extended versions of IsKeyPressed(), IsMouseClicked(), Shortcut(), SetKeyOwner(), SetItemKeyOwner() that are still in imgui_internal.h)
+ Don't mistake with ImGuiInputTextFlags! (which is for ImGui::InputText() function)
+
+
+| Value | Description |
+|-------|-------------|
+| _None |  |
+| _Repeat |  Enable repeat. Return true on successive repeats. Default for legacy IsKeyPressed(). NOT Default for legacy IsMouseClicked(). MUST BE == 1. |
+| _RouteActive |  Route to active item only. |
+| _RouteFocused |  Route to windows in the focus stack (DEFAULT). Deep-most focused window takes inputs. Active item takes inputs over deep-most focused window. |
+| _RouteGlobal |  Global route (unless a focused window or active item registered the route). |
+| _RouteAlways |  Do not register route, poll keys directly. |
+| _RouteOverFocused |  Option: global route: higher priority than focused route (unless active item in focused route). |
+| _RouteOverActive |  Option: global route: higher priority than active item. Unlikely you need to use that: will interfere with every active items, e.g. Ctrl+A registered by InputText will be overridden by this. May not be fully honored as user/internal code is likely to always assume they can access keys when active. |
+| _RouteUnlessBgFocused |  Option: global route: will not be applied if underlying background/void is focused (== no Dear ImGui windows are focused). Useful for overlay applications. |
+| _RouteFromRootWindow |  Option: route evaluated from the point of view of root window rather than current window. |
+| _Tooltip |  Automatically display a tooltip when hovering item [BETA] Unsure of right api (opt-in/opt-out) |
+|-------|-------------|
+End Rem
 Enum EImGuiInputFlags Flags
 	_None = 0
 	_Repeat = 1
@@ -6939,6 +7625,29 @@ Enum EImGuiInputFlags Flags
 	_Tooltip = 262144
 End Enum
 
+Rem
+bbdoc:  Configuration flags stored in io.ConfigFlags. Set by user/application.
+about:  Note that nowadays most of our configuration options are in other ImGuiIO fields, e.g. io.ConfigWindowsMoveFromTitleBarOnly.
+
+
+| Value | Description |
+|-------|-------------|
+| _None |  |
+| _NavEnableKeyboard |  Master keyboard navigation enable flag. Enable full Tabbing + directional arrows + Space/Enter to activate. Note: some features such as basic Tabbing and CtrL+Tab are enabled by regardless of this flag (and may be disabled via other means, see #4828, #9218). |
+| _NavEnableGamepad |  Master gamepad navigation enable flag. Backend also needs to set ImGuiBackendFlags_HasGamepad. |
+| _NoMouse |  Instruct dear imgui to disable mouse inputs and interactions. |
+| _NoMouseCursorChange |  Instruct backend to not alter mouse cursor shape and visibility. Use if the backend cursor changes are interfering with yours and you don't want to use SetMouseCursor() to change mouse cursor. You may want to honor requests from imgui by reading GetMouseCursor() yourself instead. |
+| _NoKeyboard |  Instruct dear imgui to disable keyboard inputs and interactions. This is done by ignoring keyboard events and clearing existing states. |
+| _DockingEnable |  Docking enable flags. |
+| _ViewportsEnable |  Viewport enable flags (require both ImGuiBackendFlags_PlatformHasViewports + ImGuiBackendFlags_RendererHasViewports set by the respective backends) |
+| _IsSRGB |  Application is SRGB-aware. |
+| _IsTouchScreen |  Application is using a touch screen instead of a mouse. |
+| _NavEnableSetMousePos |  [moved/renamed in 1.91.4] -> use bool io.ConfigNavMoveSetMousePos |
+| _NavNoCaptureKeyboard |  [moved/renamed in 1.91.4] -> use bool io.ConfigNavCaptureKeyboard |
+| _DpiEnableScaleFonts |  [moved/renamed in 1.92.0] -> use bool io.ConfigDpiScaleFonts |
+| _DpiEnableScaleViewports |  [moved/renamed in 1.92.0] -> use bool io.ConfigDpiScaleViewports |
+|-------|-------------|
+End Rem
 Enum EImGuiConfigFlags Flags
 	_None = 0
 	_NavEnableKeyboard = 1
@@ -6956,6 +7665,25 @@ Enum EImGuiConfigFlags Flags
 	_DpiEnableScaleViewports = 32768
 End Enum
 
+Rem
+bbdoc:  Backend capabilities flags stored in io.BackendFlags. Set by imgui_impl_xxx or custom backend.
+about: 
+
+
+| Value | Description |
+|-------|-------------|
+| _None |  |
+| _HasGamepad |  Backend Platform supports gamepad and currently has one connected. |
+| _HasMouseCursors |  Backend Platform supports honoring GetMouseCursor() value to change the OS cursor shape. |
+| _HasSetMousePos |  Backend Platform supports io.WantSetMousePos requests to reposition the OS mouse position (only used if io.ConfigNavMoveSetMousePos is set). |
+| _RendererHasVtxOffset |  Backend Renderer supports ImDrawCmd::VtxOffset. This enables output of large meshes (64K+ vertices) while still using 16-bit indices. |
+| _RendererHasTextures |  Backend Renderer supports ImTextureData requests to create/update/destroy textures. This enables incremental texture updates and texture reloads. See https:github.com/ocornut/imgui/blob/master/docs/BACKENDS.md for instructions on how to upgrade your custom backend. |
+| _RendererHasViewports |  Backend Renderer supports multiple viewports. |
+| _PlatformHasViewports |  Backend Platform supports multiple viewports. |
+| _HasMouseHoveredViewport |  Backend Platform supports calling io.AddMouseViewportEvent() with the viewport under the mouse. IF POSSIBLE, ignore viewports with the ImGuiViewportFlags_NoInputs flag (Win32 backend, GLFW 3.30+ backend can do this, SDL backend cannot). If this cannot be done, Dear ImGui needs to use a flawed heuristic to find the viewport under. |
+| _HasParentViewport |  Backend Platform supports honoring viewport->ParentViewport/ParentViewportId value, by applying the corresponding parent/child relation at the Platform level. |
+|-------|-------------|
+End Rem
 Enum EImGuiBackendFlags Flags
 	_None = 0
 	_HasGamepad = 1
@@ -6969,6 +7697,82 @@ Enum EImGuiBackendFlags Flags
 	_HasParentViewport = 8192
 End Enum
 
+Rem
+bbdoc:  Enumeration for PushStyleColor() / PopStyleColor()
+about: 
+
+
+| Value | Description |
+|-------|-------------|
+| _Text |  |
+| _TextDisabled |  |
+| _WindowBg |  Background of normal windows |
+| _ChildBg |  Background of child windows |
+| _PopupBg |  Background of popups, menus, tooltips windows |
+| _Border |  |
+| _BorderShadow |  |
+| _FrameBg |  Background of checkbox, radio button, plot, slider, text input |
+| _FrameBgHovered |  |
+| _FrameBgActive |  |
+| _TitleBg |  Title bar |
+| _TitleBgActive |  Title bar when focused |
+| _TitleBgCollapsed |  Title bar when collapsed |
+| _MenuBarBg |  |
+| _ScrollbarBg |  |
+| _ScrollbarGrab |  |
+| _ScrollbarGrabHovered |  |
+| _ScrollbarGrabActive |  |
+| _CheckMark |  Checkbox tick and RadioButton circle |
+| _SliderGrab |  |
+| _SliderGrabActive |  |
+| _Button |  |
+| _ButtonHovered |  |
+| _ButtonActive |  |
+| _Header |  Header* colors are used for CollapsingHeader, TreeNode, Selectable, MenuItem |
+| _HeaderHovered |  |
+| _HeaderActive |  |
+| _Separator |  |
+| _SeparatorHovered |  |
+| _SeparatorActive |  |
+| _ResizeGrip |  Resize grip in lower-right and lower-left corners of windows. |
+| _ResizeGripHovered |  |
+| _ResizeGripActive |  |
+| _InputTextCursor |  InputText cursor/caret |
+| _TabHovered |  Tab background, when hovered |
+| _Tab |  Tab background, when tab-bar is focused & tab is unselected |
+| _TabSelected |  Tab background, when tab-bar is focused & tab is selected |
+| _TabSelectedOverline |  Tab horizontal overline, when tab-bar is focused & tab is selected |
+| _TabDimmed |  Tab background, when tab-bar is unfocused & tab is unselected |
+| _TabDimmedSelected |  Tab background, when tab-bar is unfocused & tab is selected |
+| _TabDimmedSelectedOverline | ..horizontal overline, when tab-bar is unfocused & tab is selected |
+| _DockingPreview |  Preview overlay color when about to docking something |
+| _DockingEmptyBg |  Background color for empty node (e.g. CentralNode with no window docked into it) |
+| _PlotLines |  |
+| _PlotLinesHovered |  |
+| _PlotHistogram |  |
+| _PlotHistogramHovered |  |
+| _TableHeaderBg |  Table header background |
+| _TableBorderStrong |  Table outer and header borders (prefer using Alpha=1.0 here) |
+| _TableBorderLight |  Table inner borders (prefer using Alpha=1.0 here) |
+| _TableRowBg |  Table row background (even rows) |
+| _TableRowBgAlt |  Table row background (odd rows) |
+| _TextLink |  Hyperlink color |
+| _TextSelectedBg |  Selected text inside an InputText |
+| _TreeLines |  Tree node hierarchy outlines when using ImGuiTreeNodeFlags_DrawLines |
+| _DragDropTarget |  Rectangle border highlighting a drop target |
+| _DragDropTargetBg |  Rectangle background highlighting a drop target |
+| _UnsavedMarker |  Unsaved Document marker (in window title and tabs) |
+| _NavCursor |  Color of keyboard/gamepad navigation cursor/rectangle, when visible |
+| _NavWindowingHighlight |  Highlight window when using Ctrl+Tab |
+| _NavWindowingDimBg |  Darken/colorize entire screen behind the Ctrl+Tab window list, when active |
+| _ModalWindowDimBg |  Darken/colorize entire screen behind a modal window, when one is active |
+| _COUNT |  |
+| _TabActive |  [renamed in 1.90.9] |
+| _TabUnfocused |  [renamed in 1.90.9] |
+| _TabUnfocusedActive |  [renamed in 1.90.9] |
+| _NavHighlight |  [renamed in 1.91.4] |
+|-------|-------------|
+End Rem
 Enum EImGuiCol
 	_Text = 0
 	_TextDisabled = 1
@@ -7039,6 +7843,64 @@ Enum EImGuiCol
 	_NavHighlight = 58
 End Enum
 
+Rem
+bbdoc:  Enumeration for PushStyleVar() / PopStyleVar() to temporarily modify the ImGuiStyle structure.
+about:  - The enum only refers to fields of ImGuiStyle which makes sense to be pushed/popped inside UI code.
+   During initialization or between frames, feel free to just poke into ImGuiStyle directly.
+ - Tip: Use your programming IDE navigation facilities on the names in the _second column_ below to find the actual members and their description.
+   - In Visual Studio: Ctrl+Comma ("Edit.GoToAll") can follow symbols inside comments, whereas Ctrl+F12 ("Edit.GoToImplementation") cannot.
+   - In Visual Studio w/ Visual Assist installed: Alt+G ("VAssistX.GoToImplementation") can also follow symbols inside comments.
+   - In VS Code, CLion, etc.: Ctrl+Click can follow symbols inside comments.
+ - When changing this enum, you need to update the associated internal table GStyleVarInfo[] accordingly. This is where we link enum values to members offset/type.
+
+
+| Value | Description |
+|-------|-------------|
+| _Alpha |  float     Alpha |
+| _DisabledAlpha |  float     DisabledAlpha |
+| _WindowPadding |  ImVec2    WindowPadding |
+| _WindowRounding |  float     WindowRounding |
+| _WindowBorderSize |  float     WindowBorderSize |
+| _WindowMinSize |  ImVec2    WindowMinSize |
+| _WindowTitleAlign |  ImVec2    WindowTitleAlign |
+| _ChildRounding |  float     ChildRounding |
+| _ChildBorderSize |  float     ChildBorderSize |
+| _PopupRounding |  float     PopupRounding |
+| _PopupBorderSize |  float     PopupBorderSize |
+| _FramePadding |  ImVec2    FramePadding |
+| _FrameRounding |  float     FrameRounding |
+| _FrameBorderSize |  float     FrameBorderSize |
+| _ItemSpacing |  ImVec2    ItemSpacing |
+| _ItemInnerSpacing |  ImVec2    ItemInnerSpacing |
+| _IndentSpacing |  float     IndentSpacing |
+| _CellPadding |  ImVec2    CellPadding |
+| _ScrollbarSize |  float     ScrollbarSize |
+| _ScrollbarRounding |  float     ScrollbarRounding |
+| _ScrollbarPadding |  float     ScrollbarPadding |
+| _GrabMinSize |  float     GrabMinSize |
+| _GrabRounding |  float     GrabRounding |
+| _ImageRounding |  float     ImageRounding |
+| _ImageBorderSize |  float     ImageBorderSize |
+| _TabRounding |  float     TabRounding |
+| _TabBorderSize |  float     TabBorderSize |
+| _TabMinWidthBase |  float     TabMinWidthBase |
+| _TabMinWidthShrink |  float     TabMinWidthShrink |
+| _TabBarBorderSize |  float     TabBarBorderSize |
+| _TabBarOverlineSize |  float     TabBarOverlineSize |
+| _TableAngledHeadersAngle |  float     TableAngledHeadersAngle |
+| _TableAngledHeadersTextAlign |  ImVec2  TableAngledHeadersTextAlign |
+| _TreeLinesSize |  float     TreeLinesSize |
+| _TreeLinesRounding |  float     TreeLinesRounding |
+| _ButtonTextAlign |  ImVec2    ButtonTextAlign |
+| _SelectableTextAlign |  ImVec2    SelectableTextAlign |
+| _SeparatorSize |  float     SeparatorSize |
+| _SeparatorTextBorderSize |  float     SeparatorTextBorderSize |
+| _SeparatorTextAlign |  ImVec2    SeparatorTextAlign |
+| _SeparatorTextPadding |  ImVec2    SeparatorTextPadding |
+| _DockingSeparatorSize |  float     DockingSeparatorSize |
+| _COUNT |  |
+|-------|-------------|
+End Rem
 Enum EImGuiStyleVar
 	_Alpha = 0
 	_DisabledAlpha = 1
@@ -7085,16 +7947,66 @@ Enum EImGuiStyleVar
 	_COUNT = 42
 End Enum
 
+Rem
+bbdoc:  Flags for InvisibleButton() [extended in imgui_internal.h]
+about: 
+
+
+| Value | Description |
+|-------|-------------|
+| _None |  |
+| _MouseButtonLeft |  React on left mouse button (default) |
+| _MouseButtonRight |  React on right mouse button |
+| _MouseButtonMiddle |  React on center mouse button |
+| _EnableNav |  InvisibleButton(): do not disable navigation/tabbing. Otherwise disabled by default. |
+| _AllowOverlap |  Hit testing will allow subsequent widgets to overlap this one. Require previous frame HoveredId to match before being usable. Shortcut to calling SetNextItemAllowOverlap(). |
+|-------|-------------|
+End Rem
 Enum EImGuiButtonFlags Flags
 	_None = 0
 	_MouseButtonLeft = 1
 	_MouseButtonRight = 2
 	_MouseButtonMiddle = 4
-	_MouseButtonMask_ = 7
 	_EnableNav = 8
 	_AllowOverlap = 4096
 End Enum
 
+Rem
+bbdoc:  Flags for ColorEdit3() / ColorEdit4() / ColorPicker3() / ColorPicker4() / ColorButton()
+about: 
+
+
+| Value | Description |
+|-------|-------------|
+| _None |  |
+| _NoAlpha |                ColorEdit, ColorPicker, ColorButton: ignore Alpha component (will only read 3 components from the input pointer). |
+| _NoPicker |                ColorEdit: disable picker when clicking on color square. |
+| _NoOptions |                ColorEdit: disable toggling options menu when right-clicking on inputs/small preview. |
+| _NoSmallPreview |                ColorEdit, ColorPicker: disable color square preview next to the inputs. (e.g. to show only the inputs) |
+| _NoInputs |                ColorEdit, ColorPicker: disable inputs sliders/text widgets (e.g. to show only the small preview color square). |
+| _NoTooltip |                ColorEdit, ColorPicker, ColorButton: disable tooltip when hovering the preview. |
+| _NoLabel |                ColorEdit, ColorPicker: disable display of inline text label (the label is still forwarded to the tooltip and picker). |
+| _NoSidePreview |                ColorPicker: disable bigger color preview on right side of the picker, use small color square preview instead. |
+| _NoDragDrop |                ColorEdit: disable drag and drop target/source. ColorButton: disable drag and drop source. |
+| _NoBorder |                ColorButton: disable border (which is enforced by default) |
+| _NoColorMarkers |                ColorEdit: disable rendering R/G/B/A color marker. May also be disabled globally by setting style.ColorMarkerSize = 0. |
+| _AlphaOpaque |                ColorEdit, ColorPicker, ColorButton: disable alpha in the preview,. Contrary to _NoAlpha it may still be edited when calling ColorEdit4()/ColorPicker4(). For ColorButton() this does the same as _NoAlpha. |
+| _AlphaNoBg |                ColorEdit, ColorPicker, ColorButton: disable rendering a checkerboard background behind transparent color. |
+| _AlphaPreviewHalf |                ColorEdit, ColorPicker, ColorButton: display half opaque / half transparent preview. |
+| _AlphaBar |                ColorEdit, ColorPicker: show vertical alpha bar/gradient in picker. |
+| _HDR |                (WIP) ColorEdit: Currently only disable 0.0f..1.0f limits in RGBA edition (note: you probably want to use ImGuiColorEditFlags_Float flag as well). |
+| _DisplayRGB |  [Display]     ColorEdit: override _display_ type among RGB/HSV/Hex. ColorPicker: select any combination using one or more of RGB/HSV/Hex. |
+| _DisplayHSV |  [Display]     " |
+| _DisplayHex |  [Display]     " |
+| _Uint8 |  [DataType]    ColorEdit, ColorPicker, ColorButton: _display_ values formatted as 0..255. |
+| _Float |  [DataType]    ColorEdit, ColorPicker, ColorButton: _display_ values formatted as 0.0f..1.0f floats instead of 0..255 integers. No round-trip of value via integers. |
+| _PickerHueBar |  [Picker]      ColorPicker: bar for Hue, rectangle for Sat/Value. |
+| _PickerHueWheel |  [Picker]      ColorPicker: wheel for Hue, triangle for Sat/Value. |
+| _InputRGB |  [Input]       ColorEdit, ColorPicker: input and output data in RGB format. |
+| _InputHSV |  [Input]       ColorEdit, ColorPicker: input and output data in HSV format. |
+| _AlphaPreview |  Removed in 1.91.8. This is the default now. Will display a checkerboard unless ImGuiColorEditFlags_AlphaNoBg is set. |
+|-------|-------------|
+End Rem
 Enum EImGuiColorEditFlags Flags
 	_None = 0
 	_NoAlpha = 2
@@ -7122,15 +8034,29 @@ Enum EImGuiColorEditFlags Flags
 	_PickerHueWheel = 67108864
 	_InputRGB = 134217728
 	_InputHSV = 268435456
-	_DefaultOptions_ = 177209344
-	_AlphaMask_ = 28674
-	_DisplayMask_ = 7340032
-	_DataTypeMask_ = 25165824
-	_PickerMask_ = 100663296
-	_InputMask_ = 402653184
 	_AlphaPreview = 0
 End Enum
 
+Rem
+bbdoc:  Flags for DragFloat(), DragInt(), SliderFloat(), SliderInt() etc.
+about:  We use the same sets of flags for DragXXX() and SliderXXX() functions as the features are the same and it makes it easier to swap them.
+ (Those are per-item flags. There is shared behavior flag too: ImGuiIO: io.ConfigDragClickToInputText)
+
+
+| Value | Description |
+|-------|-------------|
+| _None |  |
+| _Logarithmic |  Make the widget logarithmic (linear otherwise). Consider using ImGuiSliderFlags_NoRoundToFormat with this if using a format-string with small amount of digits. |
+| _NoRoundToFormat |  Disable rounding underlying value to match precision of the display format string (e.g. %.3f values are rounded to those 3 digits). |
+| _NoInput |  Disable Ctrl+Click or Enter key allowing to input text directly into the widget. |
+| _WrapAround |  Enable wrapping around from max to min and from min to max. Only supported by DragXXX() functions for now. |
+| _ClampOnInput |  Clamp value to min/max bounds when input manually with Ctrl+Click. By default Ctrl+Click allows going out of bounds. |
+| _ClampZeroRange |  Clamp even if min==max==0.0f. Otherwise due to legacy reason DragXXX functions don't clamp with those values. When your clamping limits are dynamic you almost always want to use it. |
+| _NoSpeedTweaks |  Disable keyboard modifiers altering tweak speed. Useful if you want to alter tweak speed yourself based on your own logic. |
+| _ColorMarkers |  DragScalarN(), SliderScalarN(): Draw R/G/B/A color markers on each component. |
+| _AlwaysClamp |  |
+|-------|-------------|
+End Rem
 Enum EImGuiSliderFlags Flags
 	_None = 0
 	_Logarithmic = 32
@@ -7142,9 +8068,21 @@ Enum EImGuiSliderFlags Flags
 	_NoSpeedTweaks = 2048
 	_ColorMarkers = 4096
 	_AlwaysClamp = 1536
-	_InvalidMask_ = 1879048207
 End Enum
 
+Rem
+bbdoc:  Identify a mouse button.
+about:  Those values are guaranteed to be stable and we frequently use 0/1 directly. Named enums provided for convenience.
+
+
+| Value | Description |
+|-------|-------------|
+| _Left |  |
+| _Right |  |
+| _Middle |  |
+| _COUNT |  |
+|-------|-------------|
+End Rem
 Enum EImGuiMouseButton
 	_Left = 0
 	_Right = 1
@@ -7152,6 +8090,28 @@ Enum EImGuiMouseButton
 	_COUNT = 5
 End Enum
 
+Rem
+bbdoc:  Enumeration for GetMouseCursor()
+about:  User code may request backend to display given cursor by calling SetMouseCursor(), which is why we have some cursors that are marked unused here
+
+
+| Value | Description |
+|-------|-------------|
+| _None |  |
+| _Arrow |  |
+| _TextInput |  When hovering over InputText, etc. |
+| _ResizeAll |  (Unused by Dear ImGui functions) |
+| _ResizeNS |  When hovering over a horizontal border |
+| _ResizeEW |  When hovering over a vertical border or a column |
+| _ResizeNESW |  When hovering over the bottom-left corner of a window |
+| _ResizeNWSE |  When hovering over the bottom-right corner of a window |
+| _Hand |  (Unused by Dear ImGui functions. Use for e.g. hyperlinks) |
+| _Wait |  When waiting for something to process/load. |
+| _Progress |  When waiting for something to process/load, but application is still interactive. |
+| _NotAllowed |  When hovering something with disallowed interaction. Usually a crossed circle. |
+| _COUNT |  |
+|-------|-------------|
+End Rem
 Enum EImGuiMouseCursor
 	_None = -1
 	_Arrow = 0
@@ -7168,6 +8128,21 @@ Enum EImGuiMouseCursor
 	_COUNT = 11
 End Enum
 
+Rem
+bbdoc:  Enumeration for AddMouseSourceEvent() actual source of Mouse Input data.
+about:  Historically we use "Mouse" terminology everywhere to indicate pointer data, e.g. MousePos, IsMousePressed(), io.AddMousePosEvent()
+ But that "Mouse" data can come from different source which occasionally may be useful for application to know about.
+ You can submit a change of pointer type using io.AddMouseSourceEvent().
+
+
+| Value | Description |
+|-------|-------------|
+| _Mouse |  Input is coming from an actual mouse. |
+| _TouchScreen |  Input is coming from a touch screen (no hovering prior to initial press, less precise initial press aiming, dual-axis wheeling possible). |
+| _Pen |  Input is coming from a pressure/magnetic pen (often used in conjunction with high-sampling rates). |
+| _COUNT |  |
+|-------|-------------|
+End Rem
 Enum EImGuiMouseSource
 	_Mouse = 0
 	_TouchScreen = 1
@@ -7175,6 +8150,21 @@ Enum EImGuiMouseSource
 	_COUNT = 3
 End Enum
 
+Rem
+bbdoc:  Enumeration for ImGui::SetNextWindow***(), SetWindow***(), SetNextItem***() functions
+about:  Represent a condition.
+ Important: Treat as a regular enum! Do NOT combine multiple values using binary operators! All the functions above treat 0 as a shortcut to ImGuiCond_Always.
+
+
+| Value | Description |
+|-------|-------------|
+| _None |  No condition (always set the variable), same as _Always |
+| _Always |  No condition (always set the variable), same as _None |
+| _Once |  Set the variable once per runtime session (only the first call will succeed) |
+| _FirstUseEver |  Set the variable if the object/window has no persistently saved data (no entry in .ini file) |
+| _Appearing |  Set the variable if the object/window is appearing after being hidden/inactive (or the first time) |
+|-------|-------------|
+End Rem
 Enum EImGuiCond
 	_None = 0
 	_Always = 1
@@ -7183,6 +8173,71 @@ Enum EImGuiCond
 	_Appearing = 8
 End Enum
 
+Rem
+bbdoc:  Flags for ImGui::BeginTable()
+about:  - Important! Sizing policies have complex and subtle side effects, much more so than you would expect.
+   Read comments/demos carefully + experiment with live demos to get acquainted with them.
+ - The DEFAULT sizing policies are:
+    - Default to ImGuiTableFlags_SizingFixedFit    if ScrollX is on, or if host window has ImGuiWindowFlags_AlwaysAutoResize.
+    - Default to ImGuiTableFlags_SizingStretchSame if ScrollX is off.
+ - When ScrollX is off:
+    - Table defaults to ImGuiTableFlags_SizingStretchSame -> all Columns defaults to ImGuiTableColumnFlags_WidthStretch with same weight.
+    - Columns sizing policy allowed: Stretch (default), Fixed/Auto.
+    - Fixed Columns (if any) will generally obtain their requested width (unless the table cannot fit them all).
+    - Stretch Columns will share the remaining width according to their respective weight.
+    - Mixed Fixed/Stretch columns is possible but has various side-effects on resizing behaviors.
+      The typical use of mixing sizing policies is: any number of LEADING Fixed columns, followed by one or two TRAILING Stretch columns.
+      (this is because the visible order of columns have subtle but necessary effects on how they react to manual resizing).
+ - When ScrollX is on:
+    - Table defaults to ImGuiTableFlags_SizingFixedFit -> all Columns defaults to ImGuiTableColumnFlags_WidthFixed
+    - Columns sizing policy allowed: Fixed/Auto mostly.
+    - Fixed Columns can be enlarged as needed. Table will show a horizontal scrollbar if needed.
+    - When using auto-resizing (non-resizable) fixed columns, querying the content width to use item right-alignment e.g. SetNextItemWidth(-FLT_MIN) doesn't make sense, would create a feedback loop.
+    - Using Stretch columns OFTEN DOES NOT MAKE SENSE if ScrollX is on, UNLESS you have specified a value for 'inner_width' in BeginTable().
+      If you specify a value for 'inner_width' then effectively the scrolling space is known and Stretch or mixed Fixed/Stretch columns become meaningful again.
+ - Read on documentation at the top of imgui_tables.cpp for details.
+
+
+| Value | Description |
+|-------|-------------|
+| _None |  |
+| _Resizable |  Enable resizing columns. |
+| _Reorderable |  Enable reordering columns in header row. (Need calling TableSetupColumn() + TableHeadersRow() to display headers, or using ImGuiTableFlags_ContextMenuInBody to access context-menu without headers). |
+| _Hideable |  Enable hiding/disabling columns in context menu. |
+| _Sortable |  Enable sorting. Call TableGetSortSpecs() to obtain sort specs. Also see ImGuiTableFlags_SortMulti and ImGuiTableFlags_SortTristate. |
+| _NoSavedSettings |  Disable persisting columns order, width, visibility and sort settings in the .ini file. |
+| _ContextMenuInBody |  Right-click on columns body/contents will also display table context menu. By default it is available in TableHeadersRow(). |
+| _RowBg |  Set each RowBg color with ImGuiCol_TableRowBg or ImGuiCol_TableRowBgAlt (equivalent of calling TableSetBgColor with ImGuiTableBgFlags_RowBg0 on each row manually) |
+| _BordersInnerH |  Draw horizontal borders between rows. |
+| _BordersOuterH |  Draw horizontal borders at the top and bottom. |
+| _BordersInnerV |  Draw vertical borders between columns. |
+| _BordersOuterV |  Draw vertical borders on the left and right sides. |
+| _BordersH |  Draw horizontal borders. |
+| _BordersV |  Draw vertical borders. |
+| _BordersInner |  Draw inner borders. |
+| _BordersOuter |  Draw outer borders. |
+| _Borders |  Draw all borders. |
+| _NoBordersInBody |  [ALPHA] Disable vertical borders in columns Body (borders will always appear in Headers). -> May move to style |
+| _NoBordersInBodyUntilResize |  [ALPHA] Disable vertical borders in columns Body until hovered for resize (borders will always appear in Headers). -> May move to style |
+| _SizingFixedFit |  Columns default to _WidthFixed or _WidthAuto (if resizable or not resizable), matching contents width. |
+| _SizingFixedSame |  Columns default to _WidthFixed or _WidthAuto (if resizable or not resizable), matching the maximum contents width of all columns. Implicitly enable ImGuiTableFlags_NoKeepColumnsVisible. |
+| _SizingStretchProp |  Columns default to _WidthStretch with default weights proportional to each columns contents widths. |
+| _SizingStretchSame |  Columns default to _WidthStretch with default weights all equal, unless overridden by TableSetupColumn(). |
+| _NoHostExtendX |  Make outer width auto-fit to columns, overriding outer_size.x value. Only available when ScrollX/ScrollY are disabled and Stretch columns are not used. |
+| _NoHostExtendY |  Make outer height stop exactly at outer_size.y (prevent auto-extending table past the limit). Only available when ScrollX/ScrollY are disabled. Data below the limit will be clipped and not visible. |
+| _NoKeepColumnsVisible |  Disable keeping column always minimally visible when ScrollX is off and table gets too small. Not recommended if columns are resizable. |
+| _PreciseWidths |  Disable distributing remainder width to stretched columns (width allocation on a 100-wide table with 3 columns: Without this flag: 33,33,34. With this flag: 33,33,33). With larger number of columns, resizing will appear to be less smooth. |
+| _NoClip |  Disable clipping rectangle for every individual columns (reduce draw command count, items will be able to overflow into other columns). Generally incompatible with TableSetupScrollFreeze(). |
+| _PadOuterX |  Default if BordersOuterV is on. Enable outermost padding. Generally desirable if you have headers. |
+| _NoPadOuterX |  Default if BordersOuterV is off. Disable outermost padding. |
+| _NoPadInnerX |  Disable inner padding between columns (double inner padding if BordersOuterV is on, single inner padding if BordersOuterV is off). |
+| _ScrollX |  Enable horizontal scrolling. Require 'outer_size' parameter of BeginTable() to specify the container size. Changes default sizing policy. Because this creates a child window, ScrollY is currently generally recommended when using ScrollX. |
+| _ScrollY |  Enable vertical scrolling. Require 'outer_size' parameter of BeginTable() to specify the container size. |
+| _SortMulti |  Hold shift when clicking headers to sort on multiple column. TableGetSortSpecs() may return specs where (SpecsCount > 1). |
+| _SortTristate |  Allow no sorting, disable default sorting. TableGetSortSpecs() may return specs where (SpecsCount == 0). |
+| _HighlightHoveredColumn |  Highlight column headers when hovered (may evolve into a fuller highlight) |
+|-------|-------------|
+End Rem
 Enum EImGuiTableFlags Flags
 	_None = 0
 	_Resizable = 1
@@ -7220,9 +8275,41 @@ Enum EImGuiTableFlags Flags
 	_SortMulti = 67108864
 	_SortTristate = 134217728
 	_HighlightHoveredColumn = 268435456
-	_SizingMask_ = 57344
 End Enum
 
+Rem
+bbdoc:  Flags for ImGui::TableSetupColumn()
+about: 
+
+
+| Value | Description |
+|-------|-------------|
+| _None |  |
+| _Disabled |  Overriding/master disable flag: hide column, won't show in context menu (unlike calling TableSetColumnEnabled() which manipulates the user accessible state) |
+| _DefaultHide |  Default as a hidden/disabled column. |
+| _DefaultSort |  Default as a sorting column. |
+| _WidthStretch |  Column will stretch. Preferable with horizontal scrolling disabled (default if table sizing policy is _SizingStretchSame or _SizingStretchProp). |
+| _WidthFixed |  Column will not stretch. Preferable with horizontal scrolling enabled (default if table sizing policy is _SizingFixedFit and table is resizable). |
+| _NoResize |  Disable manual resizing. |
+| _NoReorder |  Disable manual reordering this column, this will also prevent other columns from crossing over this column. |
+| _NoHide |  Disable ability to hide/disable this column. |
+| _NoClip |  Disable clipping for this column (all NoClip columns will render in a same draw command). |
+| _NoSort |  Disable ability to sort on this field (even if ImGuiTableFlags_Sortable is set on the table). |
+| _NoSortAscending |  Disable ability to sort in the ascending direction. |
+| _NoSortDescending |  Disable ability to sort in the descending direction. |
+| _NoHeaderLabel |  TableHeadersRow() will submit an empty label for this column. Convenient for some small columns. Name will still appear in context menu or in angled headers. You may append into this cell by calling TableSetColumnIndex() right after the TableHeadersRow() call. |
+| _NoHeaderWidth |  Disable header text width contribution to automatic column width. |
+| _PreferSortAscending |  Make the initial sort direction Ascending when first sorting on this column (default). |
+| _PreferSortDescending |  Make the initial sort direction Descending when first sorting on this column. |
+| _IndentEnable |  Use current Indent value when entering cell (default for column 0). |
+| _IndentDisable |  Ignore current Indent value when entering cell (default for columns > 0). Indentation changes _within_ the cell will still be honored. |
+| _AngledHeader |  TableHeadersRow() will submit an angled header row for this column. Note this will add an extra row. |
+| _IsEnabled |  Status: is enabled == not hidden by user/api (referred to as "Hide" in _DefaultHide and _NoHide) flags. |
+| _IsVisible |  Status: is visible == is enabled AND not clipped by scrolling. |
+| _IsSorted |  Status: is currently part of the sort specs |
+| _IsHovered |  Status: is hovered by mouse |
+|-------|-------------|
+End Rem
 Enum EImGuiTableColumnFlags Flags
 	_None = 0
 	_Disabled = 1
@@ -7248,17 +8335,44 @@ Enum EImGuiTableColumnFlags Flags
 	_IsVisible = 33554432
 	_IsSorted = 67108864
 	_IsHovered = 134217728
-	_WidthMask_ = 24
-	_IndentMask_ = 196608
-	_StatusMask_ = 251658240
-	_NoDirectResize_ = 1073741824
 End Enum
 
+Rem
+bbdoc:  Flags for ImGui::TableNextRow()
+about: 
+
+
+| Value | Description |
+|-------|-------------|
+| _None |  |
+| _Headers |  Identify header row (set default background color + width of its contents accounted differently for auto column width) |
+|-------|-------------|
+End Rem
 Enum EImGuiTableRowFlags Flags
 	_None = 0
 	_Headers = 1
 End Enum
 
+Rem
+bbdoc:  Enum for ImGui::TableSetBgColor()
+about:  Background colors are rendering in 3 layers:
+  - Layer 0: draw with RowBg0 color if set, otherwise draw with ColumnBg0 if set.
+  - Layer 1: draw with RowBg1 color if set, otherwise draw with ColumnBg1 if set.
+  - Layer 2: draw with CellBg color if set.
+ The purpose of the two row/columns layers is to let you decide if a background color change should override or blend with the existing color.
+ When using ImGuiTableFlags_RowBg on the table, each row has the RowBg0 color automatically set for odd/even rows.
+ If you set the color of RowBg0 target, your color will override the existing RowBg0 color.
+ If you set the color of RowBg1 or ColumnBg1 target, your color will blend over the RowBg0 color.
+
+
+| Value | Description |
+|-------|-------------|
+| _None |  |
+| _RowBg0 |  Set row background color 0 (generally used for background, automatically set when ImGuiTableFlags_RowBg is used) |
+| _RowBg1 |  Set row background color 1 (generally used for selection marking) |
+| _CellBg |  Set cell background color (top-most color) |
+|-------|-------------|
+End Rem
 Enum EImGuiTableBgTarget
 	_None = 0
 	_RowBg0 = 1
@@ -7266,11 +8380,51 @@ Enum EImGuiTableBgTarget
 	_CellBg = 3
 End Enum
 
+Rem
+bbdoc:  Flags for ImGuiListClipper (currently not fully exposed in function calls: a future refactor will likely add this to ImGuiListClipper::Begin function equivalent)
+about: 
+
+
+| Value | Description |
+|-------|-------------|
+| _None |  |
+| _NoSetTableRowCounters |  [Internal] Disabled modifying table row counters. Avoid assumption that 1 clipper item == 1 table row. |
+|-------|-------------|
+End Rem
 Enum EImGuiListClipperFlags Flags
 	_None = 0
 	_NoSetTableRowCounters = 1
 End Enum
 
+Rem
+bbdoc:  Flags for BeginMultiSelect()
+about: 
+
+
+| Value | Description |
+|-------|-------------|
+| _None |  |
+| _SingleSelect |  Disable selecting more than one item. This is available to allow single-selection code to share same code/logic if desired. It essentially disables the main purpose of BeginMultiSelect() tho! |
+| _NoSelectAll |  Disable Ctrl+A shortcut to select all. |
+| _NoRangeSelect |  Disable Shift+selection mouse/keyboard support (useful for unordered 2D selection). With BoxSelect is also ensure contiguous SetRange requests are not combined into one. This allows not handling interpolation in SetRange requests. |
+| _NoAutoSelect |  Disable selecting items when navigating (useful for e.g. supporting range-select in a list of checkboxes). |
+| _NoAutoClear |  Disable clearing selection when navigating or selecting another one (generally used with ImGuiMultiSelectFlags_NoAutoSelect. useful for e.g. supporting range-select in a list of checkboxes). |
+| _NoAutoClearOnReselect |  Disable clearing selection when clicking/selecting an already selected item. |
+| _BoxSelect1d |  Enable box-selection with same width and same x pos items (e.g. full row Selectable()). Box-selection works better with little bit of spacing between items hit-box in order to be able to aim at empty space. |
+| _BoxSelect2d |  Enable box-selection with varying width or varying x pos items support (e.g. different width labels, or 2D layout/grid). This is slower: alters clipping logic so that e.g. horizontal movements will update selection of normally clipped items. |
+| _BoxSelectNoScroll |  Disable scrolling when box-selecting and moving mouse near edges of scope. |
+| _ClearOnEscape |  Clear selection when pressing Escape while scope is focused. |
+| _ClearOnClickVoid |  Clear selection when clicking on empty location within scope. |
+| _ScopeWindow |  Scope for _BoxSelect and _ClearOnClickVoid is whole window (Default). Use if BeginMultiSelect() covers a whole window or used a single time in same window. |
+| _ScopeRect |  Scope for _BoxSelect and _ClearOnClickVoid is rectangle encompassing BeginMultiSelect()/EndMultiSelect(). Use if BeginMultiSelect() is called multiple times in same window. |
+| _SelectOnAuto |  Apply selection on mouse down when clicking on unselected item, on mouse up when clicking on selected item. (Default) |
+| _SelectOnClickAlways |  Apply selection on mouse down when clicking on any items. Prevents Drag and Drop from being used on multiple-selection, but allows e.g. BoxSelect to always reselect even when clicking inside an existing selection. (Excel style behavior) |
+| _SelectOnClickRelease |  Apply selection on mouse release when clicking an unselected item. Allow dragging an unselected item without altering selection. |
+| _NavWrapX |  [Temporary] Enable navigation wrapping on X axis. Provided as a convenience because we don't have a design for the general Nav API for this yet. When the more general feature be public we may obsolete this flag in favor of new one. |
+| _NoSelectOnRightClick |  Disable default right-click processing, which selects item on mouse down, and is designed for context-menus. |
+| _SelectOnClick |  RENAMED in 1.92.6 |
+|-------|-------------|
+End Rem
 Enum EImGuiMultiSelectFlags Flags
 	_None = 0
 	_SingleSelect = 1
@@ -7291,16 +8445,48 @@ Enum EImGuiMultiSelectFlags Flags
 	_SelectOnClickRelease = 32768
 	_NavWrapX = 65536
 	_NoSelectOnRightClick = 131072
-	_SelectOnMask_ = 57344
 	_SelectOnClick = 8192
 End Enum
 
+Rem
+bbdoc:  Selection request type
+about: 
+
+
+| Value | Description |
+|-------|-------------|
+| _None |  |
+| _SetAll |  Request app to clear selection (if Selected==false) or select all items (if Selected==true). We cannot set RangeFirstItem/RangeLastItem as its contents is entirely up to user (not necessarily an index) |
+| _SetRange |  Request app to select/unselect [RangeFirstItem..RangeLastItem] items (inclusive) based on value of Selected. Only EndMultiSelect() request this, app code can read after BeginMultiSelect() and it will always be false. |
+|-------|-------------|
+End Rem
 Enum EImGuiSelectionRequestType
 	_None = 0
 	_SetAll = 1
 	_SetRange = 2
 End Enum
 
+Rem
+bbdoc:  Flags for ImDrawList functions
+about:  (Legacy: bit 0 must always correspond to ImDrawFlags_Closed to be backward compatible with old API using a bool. Bits 1..3 must be unused)
+
+
+| Value | Description |
+|-------|-------------|
+| _None |  |
+| _Closed |  PathStroke(), AddPolyline(): specify that shape should be closed (Important: this is always == 1 for legacy reason) |
+| _RoundCornersTopLeft |  AddRect(), AddRectFilled(), PathRect(): enable rounding top-left corner only (when rounding > 0.0f, we default to all corners). Was 0x01. |
+| _RoundCornersTopRight |  AddRect(), AddRectFilled(), PathRect(): enable rounding top-right corner only (when rounding > 0.0f, we default to all corners). Was 0x02. |
+| _RoundCornersBottomLeft |  AddRect(), AddRectFilled(), PathRect(): enable rounding bottom-left corner only (when rounding > 0.0f, we default to all corners). Was 0x04. |
+| _RoundCornersBottomRight |  AddRect(), AddRectFilled(), PathRect(): enable rounding bottom-right corner only (when rounding > 0.0f, we default to all corners). Wax 0x08. |
+| _RoundCornersNone |  AddRect(), AddRectFilled(), PathRect(): disable rounding on all corners (when rounding > 0.0f). This is NOT zero, NOT an implicit flag! |
+| _RoundCornersTop |  |
+| _RoundCornersBottom |  |
+| _RoundCornersLeft |  |
+| _RoundCornersRight |  |
+| _RoundCornersAll |  |
+|-------|-------------|
+End Rem
 Enum EImDrawFlags Flags
 	_None = 0
 	_Closed = 1
@@ -7314,10 +8500,22 @@ Enum EImDrawFlags Flags
 	_RoundCornersLeft = 80
 	_RoundCornersRight = 160
 	_RoundCornersAll = 240
-	_RoundCornersDefault_ = 240
-	_RoundCornersMask_ = 496
 End Enum
 
+Rem
+bbdoc:  Flags for ImDrawList instance. Those are set automatically by ImGui:: functions from ImGuiIO settings, and generally not manipulated directly.
+about:  It is however possible to temporarily alter flags between calls to ImDrawList:: functions.
+
+
+| Value | Description |
+|-------|-------------|
+| _None |  |
+| _AntiAliasedLines |  Enable anti-aliased lines/borders (*2 the number of triangles for 1.0f wide line or lines thin enough to be drawn using textures, otherwise *3 the number of triangles) |
+| _AntiAliasedLinesUseTex |  Enable anti-aliased lines/borders using textures when possible. Require backend to render with bilinear filtering (NOT point/nearest filtering). |
+| _AntiAliasedFill |  Enable anti-aliased edge around filled shapes (rounded rectangles, circles). |
+| _AllowVtxOffset |  Can emit 'VtxOffset > 0' to allow large meshes. Set when 'ImGuiBackendFlags_RendererHasVtxOffset' is enabled. |
+|-------|-------------|
+End Rem
 Enum EImDrawListFlags Flags
 	_None = 0
 	_AntiAliasedLines = 1
@@ -7326,11 +8524,36 @@ Enum EImDrawListFlags Flags
 	_AllowVtxOffset = 8
 End Enum
 
+Rem
+bbdoc:  Most standard backends only support RGBA32 but we provide a single channel option for low-resource/embedded systems.
+about: 
+
+
+| Value | Description |
+|-------|-------------|
+| _RGBA32 |  4 components per pixel, each is unsigned 8-bit. Total size = TexWidth * TexHeight * 4 |
+| _Alpha8 |  1 component per pixel, each is unsigned 8-bit. Total size = TexWidth * TexHeight |
+|-------|-------------|
+End Rem
 Enum EImTextureFormat
 	_RGBA32 = 0
 	_Alpha8 = 1
 End Enum
 
+Rem
+bbdoc:  Status of a texture to communicate with Renderer Backend.
+about: 
+
+
+| Value | Description |
+|-------|-------------|
+| _OK |  |
+| _Destroyed |  Backend destroyed the texture. |
+| _WantCreate |  Requesting backend to create the texture. Set status OK when done. |
+| _WantUpdates |  Requesting backend to update specific blocks of pixels (write to texture portions which have never been used before). Set status OK when done. |
+| _WantDestroy |  Requesting backend to destroy the texture. Set status to Destroyed when done. |
+|-------|-------------|
+End Rem
 Enum EImTextureStatus
 	_OK = 0
 	_Destroyed = 1
@@ -7339,6 +8562,19 @@ Enum EImTextureStatus
 	_WantDestroy = 4
 End Enum
 
+Rem
+bbdoc:  Flags for ImFontAtlas build
+about: 
+
+
+| Value | Description |
+|-------|-------------|
+| _None |  |
+| _NoPowerOfTwoHeight |  Don't round the height to next power of two |
+| _NoMouseCursors |  Don't build software mouse cursors into the atlas (save a little texture memory) |
+| _NoBakedLines |  Don't build thick line textures into the atlas (save a little texture memory, allow support for point/nearest filtering). The AntiAliasedLinesUseTex features uses them, otherwise they will be rendered using polygons (more expensive for CPU/GPU). |
+|-------|-------------|
+End Rem
 Enum EImFontAtlasFlags Flags
 	_None = 0
 	_NoPowerOfTwoHeight = 1
@@ -7346,6 +8582,19 @@ Enum EImFontAtlasFlags Flags
 	_NoBakedLines = 4
 End Enum
 
+Rem
+bbdoc:  Font flags
+about:  (in future versions as we redesign font loading API, this will become more important and better documented. for now please consider this as internal/advanced use)
+
+
+| Value | Description |
+|-------|-------------|
+| _None |  |
+| _NoLoadError |  Disable throwing an error/assert when calling AddFontXXX() with missing file/data. Calling code is expected to check AddFontXXX() return value. |
+| _NoLoadGlyphs |  [Internal] Disable loading new glyphs. |
+| _LockBakedSizes |  [Internal] Disable loading new baked sizes, disable garbage collecting current ones. e.g. if you want to lock a font to a single size. Important: if you use this to preload given sizes, consider the possibility of multiple font density used on Retina display. |
+|-------|-------------|
+End Rem
 Enum EImFontFlags Flags
 	_None = 0
 	_NoLoadError = 2
@@ -7353,6 +8602,30 @@ Enum EImFontFlags Flags
 	_LockBakedSizes = 8
 End Enum
 
+Rem
+bbdoc:  Flags stored in ImGuiViewport::Flags, giving indications to the platform backends.
+about: 
+
+
+| Value | Description |
+|-------|-------------|
+| _None |  |
+| _IsPlatformWindow |  Represent a Platform Window |
+| _IsPlatformMonitor |  Represent a Platform Monitor (unused yet) |
+| _OwnedByApp |  Platform Window: Is created/managed by the user application? (rather than our backend) |
+| _NoDecoration |  Platform Window: Disable platform decorations: title bar, borders, etc. (generally set all windows, but if ImGuiConfigFlags_ViewportsDecoration is set we only set this on popups/tooltips) |
+| _NoTaskBarIcon |  Platform Window: Disable platform task bar icon (generally set on popups/tooltips, or all windows if ImGuiConfigFlags_ViewportsNoTaskBarIcon is set) |
+| _NoFocusOnAppearing |  Platform Window: Don't take focus when created. |
+| _NoFocusOnClick |  Platform Window: Don't take focus when clicked on. |
+| _NoInputs |  Platform Window: Make mouse pass through so we can drag this window while peaking behind it. |
+| _NoRendererClear |  Platform Window: Renderer doesn't need to clear the framebuffer ahead (because we will fill it entirely). |
+| _NoAutoMerge |  Platform Window: Avoid merging this window into another host window. This can only be set via ImGuiWindowClass viewport flags override (because we need to now ahead if we are going to create a viewport in the first place!). |
+| _TopMost |  Platform Window: Display on top (for tooltips only). |
+| _CanHostOtherWindows |  Viewport can host multiple imgui windows (secondary viewports are associated to a single window).  FIXME: In practice there's still probably code making the assumption that this is always and only on the MainViewport. Will fix once we add support for "no main viewport". |
+| _IsMinimized |  Platform Window: Window is minimized, can skip render. When minimized we tend to avoid using the viewport pos/size for clipping window or testing if they are contained in the viewport. |
+| _IsFocused |  Platform Window: Window is focused (last call to Platform_GetWindowFocus() returned true) |
+|-------|-------------|
+End Rem
 Enum EImGuiViewportFlags Flags
 	_None = 0
 	_IsPlatformWindow = 1

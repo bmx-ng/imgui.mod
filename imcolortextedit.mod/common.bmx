@@ -28,6 +28,7 @@ Import "textedit/*.h"
 Import "textedit/TextEditor.cpp"
 
 Import "glue.cpp"
+Import "bmax_language.cpp"
 
 Extern
 
@@ -152,6 +153,9 @@ Extern
 	Function bmx_imgui_imcolortextedit_TabsToSpaces(editor:Byte Ptr)
 	Function bmx_imgui_imcolortextedit_SpacesToTabs(editor:Byte Ptr)
 
+	Function bmx_imgui_imcolortextedit_GetLanguage:Byte Ptr(lang:EImTextEditLanguage)
+	Function bmx_imgui_imcolortextedit_language_blitzmax:Byte Ptr()
+	Function bmx_imgui_imcolortextedit_setlanguage(editor:Byte Ptr, language:Byte Ptr)
 End Extern
 
 Struct SCursorPosition
@@ -165,7 +169,23 @@ Struct SCursorSelection
 End Struct
 
 Enum EScroll
-	AlignTop
-	AlignMiddle
-	AlignBottom
+	_AlignTop
+	_AlignMiddle
+	_AlignBottom
+End Enum
+
+Enum EImTextEditLanguage
+	_None = 0
+	_C
+	_Cpp
+	_Cs
+	_AngelScript
+	_Lua
+	_Python
+	_Glsl
+	_Hlsl
+	_Json
+	_Markdown
+	_Sql
+	_BlitzMax
 End Enum

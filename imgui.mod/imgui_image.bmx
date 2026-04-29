@@ -41,6 +41,12 @@ Type TImGuiImageEntry
 		Return resource <> Null
 	End Method
 
+	Method GetTextureRef:SImTextureRef()
+		If resource Then
+			Return New SImTextureRef(resource.GetImTextureID())
+		End If
+	End Method
+
 	Method GetTextureID:ULong()
 		If resource Then
 			Return resource.GetImTextureID()

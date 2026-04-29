@@ -590,6 +590,21 @@ unsigned int bmx_imgui_font_config_get_font_loader_flags(ImFontConfig * config) 
 	return config->FontLoaderFlags;
 }
 
+char ** bmx_imgui_item_list_create_array(BBArray * items, int item_count) {
+	BBString ** s = (BBString**)BBARRAYDATA(items, items->dims);
+	char ** items_array = (char **)malloc(item_count * sizeof(char *));
+	for(int i = 0; i < item_count; i++) {
+		items_array[i] = (char *)bbStringToUTF8String(s[i]);
+	}
+	return items_array;
+}
+
+void bmx_imgui_item_list_free_array(char ** items_array, int item_count) {
+	for(int i = 0; i < item_count; i++) {
+		bbMemFree((void *)items_array[i]);
+	}
+	free(items_array);
+}
 
 int bmx_ImGui_ShowStyleSelector(BBString * label) {
 	const char * v0 = (const char *)bbStringToUTF8String(label);

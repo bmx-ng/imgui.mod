@@ -416,6 +416,11 @@ public:
 		// the start and end character sequence for multiline comments (can be blank language doesn't have this feature)
 		std::string commentStart;
 		std::string commentEnd;
+		std::string commentEndAlt; // handle cases where multiline comments can be ended with different character sequences
+
+		// flags specifying whether comment start and end character sequences must be at the start of a line (ignoring whitespace)
+		bool commentStartAtLineStart = false;
+		bool commentEndAtLineStart = false;
 
 		// flags specifying whether language supports single quoted ['] and/or double quoted [""] strings
 		bool hasSingleQuotedStrings = false;
@@ -638,21 +643,21 @@ public:
 		static constexpr ImWchar openParenthesis = '(';
 		static constexpr ImWchar closeParenthesis = ')';
 
-		static inline bool isPairOpener(ImWchar ch) {
+		static inline bool isPairOpener(ImWchar ch, bool includeSingleQuotes = true) {
 			return
 				ch == openCurlyBracket ||
 				ch == openSquareBracket ||
 				ch == openParenthesis ||
-				ch == singleQuote ||
+				(includeSingleQuotes && ch == singleQuote) ||
 				ch == doubleQuote;
 		}
 
-		static inline bool isPairCloser(ImWchar ch) {
+		static inline bool isPairCloser(ImWchar ch, bool includeSingleQuotes = true) {
 			return
 				ch == closeCurlyBracket ||
 				ch == closeSquareBracket ||
 				ch == closeParenthesis ||
-				ch == singleQuote ||
+				(includeSingleQuotes && ch == singleQuote) ||
 				ch == doubleQuote;
 		}
 
@@ -1072,7 +1077,9 @@ protected:
 		State update(Line& line, const Language* language);
 
 		// see if string matches part of line
-		bool matches(Line::iterator start, Line::iterator end, const std::string_view& text);
+		bool matches(Line::iterator start, Line::iterator end, const std::string_view& text, bool caseSensitive = true);
+		// see if string matches part of line, ignoring whitespace and comments (if specified in language definition)
+		bool isAtLineStart(Line::iterator it, Line::iterator lineStart);
 
 		// set color for specified range of glyphs
 		inline void setColor(Line::iterator start, Line::iterator end, Color color) { while (start < end) (start++)->color = color; }
