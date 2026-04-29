@@ -34,6 +34,7 @@ extern "C" {
     void imgui_imhtml_TImHTMLConfig__LoadImage(BBString * src, BBString * baseUrl);
     ImHTML::ImageMeta imgui_imhtml_TImHTMLConfig__GetImageMeta(BBString * src, BBString * baseUrl);
     ImTextureID imgui_imhtml_TImHTMLConfig__GetImageTexture(BBString * src, BBString * baseUrl);
+    BBString * imgui_imhtml_TImHTMLConfig__LoadCSS(BBString * url, BBString * baseUrl);
 
     int bmx_ImHTML_Canvas(BBString * id, BBString *html, float width);
     int bmx_ImHTML_CanvasEx(BBString * id, BBString *html, float width, BBString **clickedURL);
@@ -196,6 +197,18 @@ public:
             BBString * bSrc = src ? bbStringFromUTF8String((unsigned char *)src) : &bbEmptyString;
             BBString * bBaseUrl = baseurl ? bbStringFromUTF8String((unsigned char *)baseurl) : &bbEmptyString;
             return imgui_imhtml_TImHTMLConfig__GetImageTexture(bSrc, bBaseUrl);
+        };
+        target_->LoadCSS = [](const char *url, const char *baseurl) {
+            BBString * bUrl = url ? bbStringFromUTF8String((unsigned char *)url) : &bbEmptyString;
+            BBString * bBaseUrl = baseurl ? bbStringFromUTF8String((unsigned char *)baseurl) : &bbEmptyString;
+            BBString * res = imgui_imhtml_TImHTMLConfig__LoadCSS(bUrl, bBaseUrl);
+            if (res == &bbEmptyString) {
+                return std::string();
+            }
+            char * css =(char*)bbStringToUTF8String(res);
+            std::string cssStr(css);
+            bbMemFree(css);
+            return cssStr;
         };
     }
 

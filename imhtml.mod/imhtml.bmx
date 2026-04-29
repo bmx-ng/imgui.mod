@@ -108,6 +108,12 @@ Type TImHTMLConfig
     Field configPtr:Byte Ptr
     Global imageCache:TImGuiImageCache
 
+    Global loadCSSCallback:String(src:String, baseUrl:String, user:Object)
+    Global loadCSSUser:Object
+
+    Global baseUrlCallback:String(url:String, user:Object)
+    Global baseUrlUser:Object
+
 Private
     Method New(configPtr:Byte Ptr)
         Self.configPtr = configPtr
@@ -136,6 +142,21 @@ Public
     End Rem
     Function SetImageCache(cache:TImGuiImageCache)
         imageCache = cache
+    End Function
+
+    Rem
+    bbdoc: Sets the callback function to be used for loading CSS content in HTML.
+    about: The callback function should take a URL and a base URL as parameters, and return the CSS content as a string. This allows you to implement custom logic for loading CSS, such as fetching it from a file, a network resource, or generating it dynamically.
+    The callback is global, so it will be used for all HTML rendering that relies on the CSS loading callback, regardless of which config is active.
+    End Rem
+    Function SetLoadCSSCallback(func:String(src:String, baseUrl:String, user:Object), user:Object = Null)
+        loadCSSCallback = func
+        loadCSSUser = user
+    End Function
+
+    Function SetBaseUrlCallback(func:String(url:String, user:Object), user:Object = Null)
+        baseUrlCallback = func
+        baseUrlUser = user
     End Function
 
     Rem
@@ -205,6 +226,14 @@ Public
             Return
         End If
 
+        If baseUrlCallback Then
+            baseUrl = baseUrlCallback(baseUrl, baseUrlUser)
+        End If
+
+        If baseUrl Then
+            src = TPath.FromString(baseUrl).Join(src).ToString()
+        End If
+
         ' already loaded?
         If imageCache.Contains(src) Then
             Return
@@ -218,6 +247,14 @@ Public
 
         If Not imageCache Then
             Return meta
+        End If
+
+        If baseUrlCallback Then
+            baseUrl = baseUrlCallback(baseUrl, baseUrlUser)
+        End If
+
+        If baseUrl Then
+            src = TPath.FromString(baseUrl).Join(src).ToString()
         End If
 
         Local entry:TImGuiImageEntry
@@ -236,7 +273,22 @@ Public
             Return 0
         End If
 
+        If baseUrlCallback Then
+            baseUrl = baseUrlCallback(baseUrl, baseUrlUser)
+        End If
+
+        If baseUrl Then
+            src = TPath.FromString(baseUrl).Join(src).ToString()
+        End If
+
         Return imageCache.GetTextureID(src)
+     End Function
+
+     Function _LoadCSS:String(src:String, baseUrl:String) { nomangle }
+        If loadCSSCallback Then
+            Return loadCSSCallback(src, baseUrl, loadCSSUser)
+        End If
+        Return ""
      End Function
 
 End Type
