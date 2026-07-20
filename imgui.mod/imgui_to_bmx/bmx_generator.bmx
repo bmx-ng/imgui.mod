@@ -2475,7 +2475,7 @@ Type TCodeGenerator
 		bbdoc: Main configuration and I/O between your application and ImGui
 		End Rem
 		Type TImGuiIO
-			Private
+			Internal
 			Field handle:Byte Ptr
 			Function _Create:TImGuiIO(handle:Byte Ptr)
 				Local this:TImGuiIO = New TImGuiIO

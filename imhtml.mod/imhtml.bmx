@@ -114,7 +114,7 @@ Type TImHTMLConfig
     Global baseUrlCallback:String(url:String, user:Object)
     Global baseUrlUser:Object
 
-Private
+Internal
     Method New(configPtr:Byte Ptr)
         Self.configPtr = configPtr
     End Method
@@ -305,7 +305,7 @@ End Rem
 Type TImHTMLFontFamily
 
     Field familyPtr:Byte Ptr
-Private
+Internal
     Method New(familyPtr:Byte Ptr)
         Self.familyPtr = familyPtr
     End Method
