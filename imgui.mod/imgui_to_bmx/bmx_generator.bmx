@@ -1573,7 +1573,7 @@ Type TCodeGenerator
 
 			int result = ImGui_InputText(v0, bufPtr, size < length ? length : size, flags);
 
-			bbMemFree(v0);
+			bbMemFree((void *)v0);
 
 			*buf = bbStringFromUTF8String(bufPtr);
 			free(bufPtr);
@@ -1615,7 +1615,7 @@ Type TCodeGenerator
 				v0 = (const char *)bbStringToUTF8String(filename);
 			}
 			io->IniFilename = v0;
-			bbMemFree(v0);
+			bbMemFree((void *)v0);
 		}
 
 		BBString * bmx_imgui_io_get_log_filename(ImGuiIO * io) {
@@ -1628,7 +1628,7 @@ Type TCodeGenerator
 				v0 = (const char *)bbStringToUTF8String(filename);
 			}
 			io->LogFilename = v0;
-			bbMemFree(v0);
+			bbMemFree((void *)v0);
 		}
 
 		int bmx_imgui_io_get_want_capture_mouse(ImGuiIO * io) {
@@ -2400,7 +2400,7 @@ Type TCodeGenerator
 
 				If conv Then
 					Local variable:String = "v" + index
-					stream.WriteString("~tbbMemFree(" + variable + ");~n")
+					stream.WriteString("~tbbMemFree((void *)" + variable + ");~n")
 				End If
 
 				index :+ 1
