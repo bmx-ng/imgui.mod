@@ -406,7 +406,12 @@ void ImGuiToggleRenderer::UpdateStateConfig()
 
     _state.FrameBorderThickness = ImLerp(_config.Off.FrameBorderThickness, _config.On.FrameBorderThickness, _animationPercent);
     _state.KnobBorderThickness = ImLerp(_config.Off.KnobBorderThickness, _config.On.KnobBorderThickness, _animationPercent);
-    _state.KnobInset = ImLerp(_config.Off.KnobInset, _config.On.KnobInset, _animationPercent);
+    // ImGui's scalar ImLerp no longer accepts composite types.
+    _state.KnobInset = ImOffsetRect(
+        ImLerp(_config.Off.KnobInset.Top, _config.On.KnobInset.Top, _animationPercent),
+        ImLerp(_config.Off.KnobInset.Left, _config.On.KnobInset.Left, _animationPercent),
+        ImLerp(_config.Off.KnobInset.Bottom, _config.On.KnobInset.Bottom, _animationPercent),
+        ImLerp(_config.Off.KnobInset.Right, _config.On.KnobInset.Right, _animationPercent));
     _state.KnobOffset = ImLerp(_config.Off.KnobOffset, _config.On.KnobOffset, _animationPercent);
 }
 

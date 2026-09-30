@@ -1,6 +1,6 @@
 //
 // This file is generated. Do not modify it manually.
-// Generated from ImGui 1.92.7 header file.
+// Generated from ImGui 1.92.9b header file.
 //
 
 #include "dcimgui.h"
@@ -942,16 +942,16 @@ int bmx_ImGui_ComboEx(BBString * label, int* current_item, BBString * items_sepa
 	return result;
 }
 
-int bmx_ImGui_ComboCallback(BBString * label, int* current_item, const char* (*getter)(void* user_data, int idx) , void* user_data, int items_count) {
+int bmx_ImGui_ComboObsolete(BBString * label, int* current_item, const char* (*getter)(void* user_data, int idx) , void* user_data, int items_count) {
 	const char * v0 = (const char *)bbStringToUTF8String(label);
-	int result = ImGui_ComboCallback(v0, current_item, getter, user_data, items_count);
+	int result = ImGui_ComboObsolete(v0, current_item, getter, user_data, items_count);
 	bbMemFree(v0);
 	return result;
 }
 
-int bmx_ImGui_ComboCallbackEx(BBString * label, int* current_item, const char* (*getter)(void* user_data, int idx) , void* user_data, int items_count, int popup_max_height_in_items) {
+int bmx_ImGui_ComboObsoleteEx(BBString * label, int* current_item, const char* (*getter)(void* user_data, int idx) , void* user_data, int items_count, int popup_max_height_in_items) {
 	const char * v0 = (const char *)bbStringToUTF8String(label);
-	int result = ImGui_ComboCallbackEx(v0, current_item, getter, user_data, items_count, popup_max_height_in_items);
+	int result = ImGui_ComboObsoleteEx(v0, current_item, getter, user_data, items_count, popup_max_height_in_items);
 	bbMemFree(v0);
 	return result;
 }
@@ -1744,16 +1744,16 @@ int bmx_ImGui_ListBox(BBString * label, int* current_item, const char*const item
 	return result;
 }
 
-int bmx_ImGui_ListBoxCallback(BBString * label, int* current_item, const char* (*getter)(void* user_data, int idx) , void* user_data, int items_count) {
+int bmx_ImGui_ListBoxObsolete(BBString * label, int* current_item, const char* (*getter)(void* user_data, int idx) , void* user_data, int items_count) {
 	const char * v0 = (const char *)bbStringToUTF8String(label);
-	int result = ImGui_ListBoxCallback(v0, current_item, getter, user_data, items_count);
+	int result = ImGui_ListBoxObsolete(v0, current_item, getter, user_data, items_count);
 	bbMemFree(v0);
 	return result;
 }
 
-int bmx_ImGui_ListBoxCallbackEx(BBString * label, int* current_item, const char* (*getter)(void* user_data, int idx) , void* user_data, int items_count, int height_in_items) {
+int bmx_ImGui_ListBoxObsoleteEx(BBString * label, int* current_item, const char* (*getter)(void* user_data, int idx) , void* user_data, int items_count, int height_in_items) {
 	const char * v0 = (const char *)bbStringToUTF8String(label);
-	int result = ImGui_ListBoxCallbackEx(v0, current_item, getter, user_data, items_count, height_in_items);
+	int result = ImGui_ListBoxObsoleteEx(v0, current_item, getter, user_data, items_count, height_in_items);
 	bbMemFree(v0);
 	return result;
 }
@@ -1891,16 +1891,18 @@ int bmx_ImGui_BeginPopupModal(BBString * name, bool* p_open, ImGuiWindowFlags fl
 	return result;
 }
 
-void bmx_ImGui_OpenPopup(BBString * str_id, ImGuiPopupFlags popup_flags) {
+int bmx_ImGui_OpenPopup(BBString * str_id, ImGuiPopupFlags popup_flags) {
 	const char * v0 = (const char *)bbStringToUTF8String(str_id);
-	ImGui_OpenPopup(v0, popup_flags);
+	int result = ImGui_OpenPopup(v0, popup_flags);
 	bbMemFree(v0);
+	return result;
 }
 
-void bmx_ImGui_OpenPopupOnItemClick(BBString * str_id, ImGuiPopupFlags popup_flags) {
+int bmx_ImGui_OpenPopupOnItemClick(BBString * str_id, ImGuiPopupFlags popup_flags) {
 	const char * v0 = (const char *)bbStringToUTF8String(str_id);
-	ImGui_OpenPopupOnItemClick(v0, popup_flags);
+	int result = ImGui_OpenPopupOnItemClick(v0, popup_flags);
 	bbMemFree(v0);
+	return result;
 }
 
 int bmx_ImGui_BeginPopupContextItemEx(BBString * str_id, ImGuiPopupFlags popup_flags) {
@@ -1951,9 +1953,9 @@ void bmx_ImGui_TableSetupColumn(BBString * label, ImGuiTableColumnFlags flags) {
 	bbMemFree(v0);
 }
 
-void bmx_ImGui_TableSetupColumnEx(BBString * label, ImGuiTableColumnFlags flags, float init_width_or_weight, ImGuiID user_id) {
+void bmx_ImGui_TableSetupColumnEx(BBString * label, ImGuiTableColumnFlags flags, float init_width_or_weight, ImGuiID user_data) {
 	const char * v0 = (const char *)bbStringToUTF8String(label);
-	ImGui_TableSetupColumnEx(v0, flags, init_width_or_weight, user_id);
+	ImGui_TableSetupColumnEx(v0, flags, init_width_or_weight, user_data);
 	bbMemFree(v0);
 }
 
@@ -2116,6 +2118,11 @@ void bmx_ImGui_DebugLogV(BBString * fmt) {
 	const char * v0 = (const char *)bbStringToUTF8String(fmt);
 	ImGui_DebugLogV(v0, NULL);
 	bbMemFree(v0);
+}
+
+BBString * bmx_DearBindings_GetVersion() {
+	BBString * result = bbStringFromUTF8String((const unsigned char *)DearBindings_GetVersion());
+	return result;
 }
 
 void bmx_ImGuiIO_AddInputCharactersUTF8(ImGuiIO* this, BBString * str) {

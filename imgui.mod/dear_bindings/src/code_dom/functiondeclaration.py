@@ -10,6 +10,7 @@ class DOMFunctionDeclaration(code_dom.element.DOMElement):
         self.return_type = None
         self.arguments = []
         self.initialiser_list_tokens = None  # List of tokens making up the initialiser list if one exists
+        self.assignment_tokens = None  # List of tokens making up the assignment (e.g. "=delete") if one exists
         self.body = None
         self.is_const = False
         self.is_constexpr = False
@@ -38,6 +39,7 @@ class DOMFunctionDeclaration(code_dom.element.DOMElement):
         self.is_unformatted_helper = False  # Set if this is a variant of a function accepting a format string with
         #                                  format string forced to '%s' and a single string argument
         self.is_loose_function_body = False  # Set if this is a "loose" inline function body in the header file
+        self.is_deleted = False  # Set if this function has been explicitly deleted (with "=delete")
 
     # Parse tokens from the token stream given
     @staticmethod
@@ -54,6 +56,9 @@ class DOMFunctionDeclaration(code_dom.element.DOMElement):
             if (prefix_token.value == 'IMGUI_API') or (prefix_token.value == 'IMGUI_IMPL_API'):
                 stream.get_token()  # Eat token
                 dom_element.is_imgui_api = True
+            elif prefix_token.value == 'IM_NODEBUGSTEP':
+                stream.get_token()  # Eat token
+                dom_element.is_no_debug_step = True
             elif prefix_token.value == 'inline':
                 stream.get_token()  # Eat token
                 dom_element.is_inline = True
@@ -67,6 +72,24 @@ class DOMFunctionDeclaration(code_dom.element.DOMElement):
                 # Copy constructors can look like this "operator ImVec4() const;" and thus have "operator" as a prefix
                 stream.get_token()  # Eat token
                 dom_element.is_operator = True
+            elif prefix_token.value == 'IM_FMTARGS':
+                stream.get_token()  # Eat token
+                if stream.get_token_of_type(['LPAREN']) is None:
+                    stream.rewind(checkpoint)
+                    return None
+                dom_element.im_fmtargs = stream.get_token().value
+                if stream.get_token_of_type(['RPAREN']) is None:
+                    stream.rewind(checkpoint)
+                    return None
+            elif prefix_token.value == 'IM_FMTLIST':
+                stream.get_token()  # Eat token
+                if stream.get_token_of_type(['LPAREN']) is None:
+                    stream.rewind(checkpoint)
+                    return None
+                dom_element.im_fmtlist = stream.get_token().value
+                if stream.get_token_of_type(['RPAREN']) is None:
+                    stream.rewind(checkpoint)
+                    return None
             else:
                 break
 
@@ -182,6 +205,28 @@ class DOMFunctionDeclaration(code_dom.element.DOMElement):
 
         if stream.get_token_of_type(['CONST']) is not None:
             dom_element.is_const = True
+
+        # Possible assignment (eg "=delete")
+
+        assignment_opener = stream.get_token_of_type(["EQUAL"])
+        if assignment_opener is not None:
+            dom_element.assignment_tokens = []
+            dom_element.assignment_tokens.append(assignment_opener)
+            while True:
+                tok = stream.get_token()
+
+                if tok.type == 'LBRACE':
+                    # Start of code block
+                    stream.rewind_one_token()
+                    break
+                elif tok.type == 'SEMICOLON':
+                    # End of declaration
+                    stream.rewind_one_token()
+                    break
+                else:
+                    dom_element.assignment_tokens.append(tok)
+                    if tok.value == "delete":
+                        dom_element.is_deleted = True
 
         # Check for IM_FMTARGS()
 

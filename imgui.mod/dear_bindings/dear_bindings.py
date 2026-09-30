@@ -1,4 +1,8 @@
-# Dear Bindings Version v0.19
+# Dear Bindings
+# Version:
+version = "0.24"
+version_number = 24
+
 # Generates C-language headers for Dear ImGui
 # Developed by Ben Carter (e-mail: ben AT shironekolabs.com, github: @ShironekoBen)
 
@@ -14,6 +18,8 @@
 #   dcimgui.cpp  : a CPP implementation file which can to be linked into a C program.
 #   dcimgui.json : full metadata to reconstruct bindings for other programming languages, including full comments.
 
+# See docs/Readme.md for more examples and details
+
 import os
 from pathlib import Path
 from src import code_dom
@@ -22,6 +28,7 @@ from src import utils
 import argparse
 import sys
 import traceback
+import json
 from src.modifiers import *
 from src.generators import *
 from src.type_comprehension import *
@@ -94,7 +101,9 @@ def convert_header(
         imgui_include_dir,
         backend_include_dir,
         emit_combined_json_metadata,
-        prefix_replacements
+        prefix_replacements,
+        remap_list,
+        remap_list_verbose
 ):
     # Set up context and DOM root
     context = code_dom.ParseContext()
@@ -155,6 +164,7 @@ def convert_header(
                                                               True)
 
     mod_attach_preceding_comments.apply(dom_root)
+    mod_remove_deleted_functions.apply(dom_root)
     mod_remove_function_bodies.apply(dom_root)
     mod_assign_anonymous_type_names.apply(dom_root)
     # Remove ImGuiOnceUponAFrame for now as it needs custom fiddling to make it usable from C
@@ -228,17 +238,26 @@ def convert_header(
                                                   "memory but does not call destructors on contained objects "
                                                   "(if they have them)",
                                               ])
-        # ImStr conversion helper, only enabled if IMGUI_HAS_IMSTR is on
+        # ImStrv conversion helper, only enabled if IMGUI_HAS_IMSTR is on
         mod_add_manual_helper_functions.apply(dom_root,
                                               [
-                                                  "ImStr ImStr_FromCharStr(const char* b); // Build an ImStr "
+                                                  "ImStrv ImStrv_FromCharStr(const char* b); // Build an ImStrv "
                                                   "from a regular const char* (no data is copied, so you need to make "
                                                   "sure the original char* isn't altered as long as you are using the "
-                                                  "ImStr)."
+                                                  "ImStrv)."
                                               ],
-                                              # This weirdness is because we want this to compile cleanly even if
-                                              # IMGUI_HAS_IMSTR wasn't defined
-                                              ["defined(IMGUI_HAS_IMSTR)", "IMGUI_HAS_IMSTR"])
+                                              ["defined(IMGUI_HAS_IMSTR)"])
+
+    if not is_backend and not is_imgui_internal:
+        # Add Dear Bindings version functions
+        # Implementation code for these can be found in templates/imgui-header.cpp
+        mod_add_manual_helper_functions.apply(dom_root,
+                                              [
+                                                  "const char* DearBindings_GetVersion(); // Get the Dear Bindings "
+                                                  "version which generated these bindings as a string.",
+                                                  "int DearBindings_GetVersionNumber(); // Get the Dear Bindings "
+                                                  "version which generated these bindings as an integer.",
+                                              ])
 
     # Add a note to ImFontGlyphRangesBuilder_BuildRanges() pointing people at the helpers
     mod_add_function_comment.apply(dom_root,
@@ -333,7 +352,7 @@ def convert_header(
         'ImVec2ih',
         'ImVec4',
         'ImColor',
-        'ImStr',
+        'ImStrv',
         'ImRect',
         'ImGuiListClipperRange',
         'ImTextureRef'
@@ -345,13 +364,29 @@ def convert_header(
     mod_remove_static_fields.apply(dom_root)
     mod_remove_extern_fields.apply(dom_root)
     mod_remove_constexpr.apply(dom_root)
-    mod_generate_imstr_helpers.apply(dom_root)
+    # Generate helpers for ImStrv functions that accept char* instead
+    mod_generate_imstr_helpers.apply(dom_root, functions_to_ignore=[
+        # TreeNode already has helpers defined in the original header, so don't try to generate more
+        "ImGui_TreeNode",
+        "ImGui_TreeNodeEx",
+        # As do quite a few functions in imgui_internal.h
+        "cImStrcmp",
+        "cImStrncmp",
+        "cImStrncpy",
+        "cImStrdup",
+        "cImStrdupcpy",
+        "cImFileOpen",
+    ])
     mod_remove_enum_forward_declarations.apply(dom_root)
     mod_calculate_enum_values.apply(dom_root)
     # Treat enum values ending with _ as internal, and _COUNT as being count values
     mod_mark_special_enum_values.apply(dom_root, internal_suffixes=["_"], count_suffixes=["_COUNT"])
     # Mark enums that end with Flags (or Flags_ for the internal ones) as being flag enums
     mod_mark_flags_enums.apply(dom_root, ["Flags", "Flags_"])
+
+    # Some functions have arguments with explicit struct/class prefixes on them, which can cause compile errors in C,
+    # so remove them (we should have everything forward-declared now anyway)
+    mod_remove_argument_struct_prefixes.apply(dom_root)
 
     # These two are special cases because there are now (deprecated) overloads that differ from the main functions
     # only in the type of the callback function. The normal disambiguation system can't handle that, so instead we
@@ -365,6 +400,30 @@ def convert_header(
                                            'ImGui_ListBox',  # Function name
                                            'old_callback',  # Argument to look for to identify this function
                                            'ImGui_ListBoxObsolete'  # New name
+                                           )
+    # And two sub-cases of the above - in the string_view branch, the signatures are virtually identical
+    # between the obsolete versions and the real ones. We rely on the fact that the obsolete one comes first in the file
+    # to identify it.
+    mod_rename_function_by_signature.apply(dom_root,
+                                           'ImGui_Combo',  # Function name
+                                           'getter',  # Argument to look for to identify this function
+                                           'ImGui_ComboObsolete'  # New name
+                                           )
+    mod_rename_function_by_signature.apply(dom_root,
+                                           'ImGui_ListBox',  # Function name
+                                           'getter',  # Argument to look for to identify this function
+                                           'ImGui_ListBoxObsolete'  # New name
+                                           )
+    # ...and the same thing happens with combo boxes/list boxes, but only in the ImStr helpers
+    mod_rename_function_by_signature.apply(dom_root,
+                                           'ImGui_ComboImStrv',  # Function name
+                                           'getter',  # Argument to look for to identify this function
+                                           'ImGui_ComboImStrObsolete'  # New name
+                                           )
+    mod_rename_function_by_signature.apply(dom_root,
+                                           'ImGui_ListBoxImStrv',  # Function name
+                                           'getter',  # Argument to look for to identify this function
+                                           'ImGui_ListBoxImStrObsolete'  # New name
                                            )
 
     # The DirectX backends declare some DirectX types that need to not have _t appended to their typedef names
@@ -662,7 +721,10 @@ def convert_header(
         "IMGUI_VERSION"
     ], "DEAR_BINDINGS_INTERNAL_GLUE_CODE")
 
-    mod_forward_declare_structs.apply(dom_root)
+    # The forward declaration for ImGuiTextFilterItem appears after it is used in an ImVector<>, so we need to shuffle
+    # it up even though it itself is not a full declaration (and thus normally skipped)
+    mod_forward_declare_structs.apply(dom_root, force_forward_declaration_names=[ "ImGuiTextFilterItem" ])
+
     mod_wrap_with_extern_c.apply(main_src_root)  # main_src_root here to avoid wrapping the config headers
     # For now we leave #pragma once intact on the assumption that modern compilers all support it, but if necessary
     # it can be replaced with a traditional #include guard by uncommenting the line below. If you find yourself needing
@@ -701,6 +763,11 @@ def convert_header(
     if len(prefix_replacements) > 0:
         mod_rename_prefix.apply(dom_root, prefix_replacements)
 
+    # If the user requested custom remapping, do that here too
+
+    if remap_list is not None:
+        mod_rename_regexp.apply(dom_root, remap_list, remap_list_verbose)
+
     dom_root.validate_hierarchy()
 
     # Test code
@@ -723,7 +790,9 @@ def convert_header(
         dest_file_name_only_no_internal = dest_file_name_only
 
     # Expansions to be used when processing templates, to insert variables as required
-    expansions = {"%IMGUI_INCLUDE_DIR%": imgui_include_dir,
+    expansions = {"%DEAR_BINDINGS_VERSION%": f'\"{version}\"',
+                  "%DEAR_BINDINGS_VERSION_NUMBER%": str(version_number),
+                  "%IMGUI_INCLUDE_DIR%": imgui_include_dir,
                   "%BACKEND_INCLUDE_DIR%": backend_include_dir,
                   "%OUTPUT_HEADER_NAME%": dest_file_name_only + ".h",
                   "%OUTPUT_HEADER_NAME_NO_INTERNAL%": dest_file_name_only_no_internal + ".h"}
@@ -775,7 +844,7 @@ if __name__ == '__main__':
     # dest_file_no_ext.cpp. Metadata will be written to dest_file_no_ext.json. implementation_header should point to a
     # file containing the initial header block for the implementation (provided in the templates/ directory).
 
-    print("Dear Bindings: parse Dear ImGui headers, convert to C and output metadata.")
+    print(f"Dear Bindings v{version}: parse Dear ImGui headers, convert to C and output metadata.")
 
     # Debug code
     # type_comprehender.get_type_description("void (*ImDrawCallback)(const ImDrawList* parent_list, const ImDrawCmd* cmd)").dump(0)
@@ -839,6 +908,17 @@ if __name__ == '__main__':
                              "following suit)",
                         default=[],
                         action='append')
+    parser.add_argument('--remap-list',
+                        help="Specify a JSON file containing remapping name regular expressions to be used."
+                             "The JSON file should contain a single map with search terms as the keys and replacments"
+                             "as the values. Python re.sub() is used for evaluation and replacement - see Python "
+                             "documentation for the full specification. Use --remap-list-verbose to help with debugging"
+                             "lists for this feature.",
+                        default=None)
+    parser.add_argument('--remap-list-verbose',
+                        action='store_true',
+                        help="Print verbose output for --remap-list remapping (for debugging purposes)",
+                        default=False)
 
     if len(sys.argv) == 1:
         parser.print_help(sys.stderr)
@@ -872,6 +952,26 @@ if __name__ == '__main__':
         new_prefix = replacement_str[(index + 1):]
         prefix_replacements[old_prefix] = new_prefix
 
+    # Read any custom remap_list file provided
+    remap_list = None
+    if args.remap_list is not None:
+        with open(args.remap_list, "rt") as remap_file:
+            try:
+                remap_list = json.loads(remap_file.read())
+            except Exception as e:
+                print(f"JSON file passed to --remap-list could not be parsed due to {e}")
+                sys.exit(1)
+            if not isinstance(remap_list, dict):
+                print(f"JSON file passed to --remap-list does not contain a JSON map")
+                sys.exit(1)
+            for key, value in remap_list.items():
+                if not isinstance(key, str):
+                    print(f"JSON file passed to --remap-list search term {key} is not a string")
+                    sys.exit(1)
+                if not isinstance(value, str):
+                    print(f"JSON file passed to --remap-list replace term {value} is not a string")
+                    sys.exit(1)
+
     # --custom-namespace-prefix is just handled as a handy short form for --replace-prefix ImGui_=<something>
     if args.custom_namespace_prefix is not None:
         prefix_replacements["ImGui_"] = args.custom_namespace_prefix
@@ -894,7 +994,9 @@ if __name__ == '__main__':
             args.imgui_include_dir,
             args.backend_include_dir if args.backend_include_dir is not None else args.imgui_include_dir,
             args.emit_combined_json_metadata,
-            prefix_replacements
+            prefix_replacements,
+            remap_list,
+            args.remap_list_verbose
         )
     except:  # noqa - suppress warning about broad exception clause as it's intentionally broad
         print("Exception during conversion:")

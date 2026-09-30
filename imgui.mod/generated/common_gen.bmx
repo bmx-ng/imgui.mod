@@ -1,6 +1,6 @@
 '
 ' This file is generated. Do not modify it manually.
-' Generated from ImGui 1.92.7 header file.
+' Generated from ImGui 1.92.9b header file.
 '
 SuperStrict
 
@@ -933,7 +933,7 @@ bbdoc: A font input/source.
 End Rem
 Type TImFontConfig
 	Field handle:Byte Ptr
-	
+
 	Method New()
 		handle = bmx_imgui_font_config_new()
 	End Method
@@ -1254,15 +1254,11 @@ Type TImFontAtlas
 
 	End Method
 
+	Rem
+	bbdoc:  Remove a font
+	End Rem
 	Method RemoveFont(font:TImFont)
 		_ImFontAtlas_RemoveFont(handle, font.handle)
-	End Method
-
-	Rem
-	bbdoc:  Clear everything (input fonts, output glyphs/textures).
-	End Rem
-	Method Clear()
-		_ImFontAtlas_Clear(handle)
 	End Method
 
 	Rem
@@ -1280,17 +1276,24 @@ Type TImFontAtlas
 	End Method
 
 	Rem
+	bbdoc:  Clear everything (fonts + textures). Don't call mid-frame!
+	End Rem
+	Method Clear()
+		_ImFontAtlas_Clear(handle)
+	End Method
+
+	Rem
+	bbdoc:  Clear input+output font data/glyphs. New fonts and textures will be recreated afterwards.
+	End Rem
+	Method ClearFonts()
+		_ImFontAtlas_ClearFonts(handle)
+	End Method
+
+	Rem
 	bbdoc:  [OBSOLETE] Clear input data (all ImFontConfig structures including sizes, TTF data, glyph ranges, etc.) = all the data used to build the texture and fonts.
 	End Rem
 	Method ClearInputData()
 		_ImFontAtlas_ClearInputData(handle)
-	End Method
-
-	Rem
-	bbdoc:  [OBSOLETE] Clear input+output font data (same as ClearInputData() + glyphs storage, UV coordinates).
-	End Rem
-	Method ClearFonts()
-		_ImFontAtlas_ClearFonts(handle)
 	End Method
 
 	Rem
@@ -2463,7 +2466,7 @@ Function ImGui_TextUnformatted(text:String)
 End Function
 
 Rem
-bbdoc:  raw text without formatting. Roughly equivalent to Text("%s", text) but: A) doesn't require null terminated string if 'text_end' is specified, B) it's faster, no memory copy is done, no buffer size limits, recommended for long chunks of text.
+bbdoc:  raw text without formatting. Practically equivalent to 'Text("%s", text)' but doesn't require null terminated string if 'text_end' is specified.
 End Rem
 Function ImGui_TextUnformattedEx(text:String, text_end:String)
 	_ImGui_TextUnformattedEx(text, text_end)
@@ -2699,12 +2702,12 @@ End Function
 Rem
 bbdoc:  Implied popup_max_height_in_items = -1
 End Rem
-Function ImGui_ComboCallback:Int(label:String, current_item:Int Ptr, getter:Byte Ptr, user_data:Byte Ptr, items_count:Int)
-	Return _ImGui_ComboCallback(label, current_item, getter, user_data, items_count)
+Function ImGui_ComboObsolete:Int(label:String, current_item:Int Ptr, getter:Byte Ptr, user_data:Byte Ptr, items_count:Int)
+	Return _ImGui_ComboObsolete(label, current_item, getter, user_data, items_count)
 End Function
 
-Function ImGui_ComboCallbackEx:Int(label:String, current_item:Int Ptr, getter:Byte Ptr, user_data:Byte Ptr, items_count:Int, popup_max_height_in_items:Int)
-	Return _ImGui_ComboCallbackEx(label, current_item, getter, user_data, items_count, popup_max_height_in_items)
+Function ImGui_ComboObsoleteEx:Int(label:String, current_item:Int Ptr, getter:Byte Ptr, user_data:Byte Ptr, items_count:Int, popup_max_height_in_items:Int)
+	Return _ImGui_ComboObsoleteEx(label, current_item, getter, user_data, items_count, popup_max_height_in_items)
 End Function
 
 Rem
@@ -3162,13 +3165,6 @@ Function ImGui_ColorButtonEx:Int(desc_id:String, col:SImVec4, flags:EImGuiColorE
 End Function
 
 Rem
-bbdoc:  initialize current options (generally on application startup) if you want to select a default format, picker type, etc. User will be able to change many settings, unless you pass the _NoOptions flag to your calls.
-End Rem
-Function ImGui_SetColorEditOptions(flags:EImGuiColorEditFlags)
-	_ImGui_SetColorEditOptions(flags)
-End Function
-
-Rem
 bbdoc: 
 End Rem
 Function ImGui_TreeNode:Int(label:String)
@@ -3351,12 +3347,12 @@ End Function
 Rem
 bbdoc:  Implied height_in_items = -1
 End Rem
-Function ImGui_ListBoxCallback:Int(label:String, current_item:Int Ptr, getter:Byte Ptr, user_data:Byte Ptr, items_count:Int)
-	Return _ImGui_ListBoxCallback(label, current_item, getter, user_data, items_count)
+Function ImGui_ListBoxObsolete:Int(label:String, current_item:Int Ptr, getter:Byte Ptr, user_data:Byte Ptr, items_count:Int)
+	Return _ImGui_ListBoxObsolete(label, current_item, getter, user_data, items_count)
 End Function
 
-Function ImGui_ListBoxCallbackEx:Int(label:String, current_item:Int Ptr, getter:Byte Ptr, user_data:Byte Ptr, items_count:Int, height_in_items:Int)
-	Return _ImGui_ListBoxCallbackEx(label, current_item, getter, user_data, items_count, height_in_items)
+Function ImGui_ListBoxObsoleteEx:Int(label:String, current_item:Int Ptr, getter:Byte Ptr, user_data:Byte Ptr, items_count:Int, height_in_items:Int)
+	Return _ImGui_ListBoxObsoleteEx(label, current_item, getter, user_data, items_count, height_in_items)
 End Function
 
 Rem
@@ -3540,22 +3536,22 @@ End Function
 Rem
 bbdoc:  call to mark popup as open (don't call every frame!).
 End Rem
-Function ImGui_OpenPopup(str_id:String, popup_flags:EImGuiPopupFlags)
-	_ImGui_OpenPopup(str_id, popup_flags)
+Function ImGui_OpenPopup:Int(str_id:String, popup_flags:EImGuiPopupFlags)
+	Return _ImGui_OpenPopup(str_id, popup_flags)
 End Function
 
 Rem
 bbdoc:  id overload to facilitate calling from nested stacks
 End Rem
-Function ImGui_OpenPopupID(id:UInt, popup_flags:EImGuiPopupFlags)
-	_ImGui_OpenPopupID(id, popup_flags)
+Function ImGui_OpenPopupID:Int(id:UInt, popup_flags:EImGuiPopupFlags)
+	Return _ImGui_OpenPopupID(id, popup_flags)
 End Function
 
 Rem
 bbdoc:  helper to open popup when clicked on last item. Default to ImGuiPopupFlags_MouseButtonRight == 1. (note: actually triggers on the mouse _released_ event to be consistent with popup behaviors)
 End Rem
-Function ImGui_OpenPopupOnItemClick(str_id:String, popup_flags:EImGuiPopupFlags)
-	_ImGui_OpenPopupOnItemClick(str_id, popup_flags)
+Function ImGui_OpenPopupOnItemClick:Int(str_id:String, popup_flags:EImGuiPopupFlags)
+	Return _ImGui_OpenPopupOnItemClick(str_id, popup_flags)
 End Function
 
 Rem
@@ -3661,14 +3657,14 @@ Function ImGui_TableSetColumnIndex:Int(column_n:Int)
 End Function
 
 Rem
-bbdoc:  Implied init_width_or_weight = 0.0f, user_id = 0
+bbdoc:  Implied init_width_or_weight = 0.0f, user_data = 0
 End Rem
 Function ImGui_TableSetupColumn(label:String, flags:EImGuiTableColumnFlags)
 	_ImGui_TableSetupColumn(label, flags)
 End Function
 
-Function ImGui_TableSetupColumnEx(label:String, flags:EImGuiTableColumnFlags, init_width_or_weight:Float, user_id:UInt)
-	_ImGui_TableSetupColumnEx(label, flags, init_width_or_weight, user_id)
+Function ImGui_TableSetupColumnEx(label:String, flags:EImGuiTableColumnFlags, init_width_or_weight:Float, user_data:UInt)
+	_ImGui_TableSetupColumnEx(label, flags, init_width_or_weight, user_data)
 End Function
 
 Rem
@@ -4197,6 +4193,20 @@ Function ImGui_GetItemFlags:EImGuiItemFlags()
 End Function
 
 Rem
+bbdoc:  Implied mouse_button = 0, delay = -1.0f
+End Rem
+Function ImGui_GetItemClickedCountWithSingleClickDelay:Int()
+	Return _ImGui_GetItemClickedCountWithSingleClickDelay()
+End Function
+
+Rem
+bbdoc:  [BETA] building block for disambiguation between single-click and double-click. Returns 1 on single-click but delayed by io.MouseSingleClickDelay after mouse release. Returns 2+ on double-click or repeated clicks.
+End Rem
+Function ImGui_GetItemClickedCountWithSingleClickDelayEx:Int(mouse_button:EImGuiMouseButton, delay:Float)
+	Return _ImGui_GetItemClickedCountWithSingleClickDelayEx(mouse_button, delay)
+End Function
+
+Rem
 bbdoc:  return primary/default viewport. This can never be NULL.
 End Rem
 Function ImGui_GetMainViewport:TImGuiViewport()
@@ -4382,10 +4392,10 @@ Function ImGui_SetNextItemShortcut(key_chord:Int, flags:EImGuiInputFlags)
 End Function
 
 Rem
-bbdoc:  Set key owner to last item ID if it is hovered or active. Equivalent to 'if (IsItemHovered() || IsItemActive()) { SetKeyOwner(key, GetItemID());'.
+bbdoc:  Set key owner to last item ID if it is hovered or active. Return true when ownership has been set. Roughly equivalent to 'if (TestKeyOwner(key, GetItemID()) && (IsItemHovered() || IsItemActive())) { SetKeyOwner(key, GetItemID());'. 
 End Rem
-Function ImGui_SetItemKeyOwner(key:EImGuiKey)
-	_ImGui_SetItemKeyOwner(key)
+Function ImGui_SetItemKeyOwner:Int(key:EImGuiKey)
+	Return _ImGui_SetItemKeyOwner(key)
 End Function
 
 Rem
@@ -4424,10 +4434,17 @@ Function ImGui_IsMouseDoubleClicked:Int(button:EImGuiMouseButton)
 End Function
 
 Rem
-bbdoc:  delayed mouse release (use very sparingly!). Generally used with 'delay >= io.MouseDoubleClickTime' + combined with a 'io.MouseClickedLastCount==1' test. This is a very rarely used UI idiom, but some apps use this: e.g. MS Explorer single click on an icon to rename.
+bbdoc:  Implied delay = -1.f
 End Rem
-Function ImGui_IsMouseReleasedWithDelay:Int(button:EImGuiMouseButton, delay:Float)
-	Return _ImGui_IsMouseReleasedWithDelay(button, delay)
+Function ImGui_IsMouseReleasedWithDelay:Int(button:EImGuiMouseButton)
+	Return _ImGui_IsMouseReleasedWithDelay(button)
+End Function
+
+Rem
+bbdoc:  delayed mouse release. Use sparingly. Prefer higher-level helper GetItemClickedCountWithSingleClickDelay(). Generally used with 'delay >= io.MouseDoubleClickTime' + combined with a 'io.MouseClickedLastCount==1' test.
+End Rem
+Function ImGui_IsMouseReleasedWithDelayEx:Int(button:EImGuiMouseButton, delay:Float)
+	Return _ImGui_IsMouseReleasedWithDelayEx(button, delay)
 End Function
 
 Rem
@@ -4676,7 +4693,21 @@ Function ImVector_Destruct(vector:Byte Ptr)
 End Function
 
 Rem
-bbdoc:  Scale all spacing/padding/thickness values. Do not scale fonts.
+bbdoc:  Get the Dear Bindings version which generated these bindings as a string.
+End Rem
+Function DearBindings_GetVersion:String()
+	Return _DearBindings_GetVersion()
+End Function
+
+Rem
+bbdoc:  Get the Dear Bindings version which generated these bindings as an integer.
+End Rem
+Function DearBindings_GetVersionNumber:Int()
+	Return _DearBindings_GetVersionNumber()
+End Function
+
+Rem
+bbdoc:  Scale all spacing/padding/thickness values. Do not scale fonts. See comments in definition. Consider not calling this if your initial scale factor if <1.0.
 End Rem
 Function ImGuiStyle_ScaleAllSizes(this:TImGuiStyle, scale_factor:Float)
 	_ImGuiStyle_ScaleAllSizes(this.handle, scale_factor)
@@ -5176,7 +5207,29 @@ Function ImDrawList_AddLineEx(this:TImDrawList, p1:SImVec2, p2:SImVec2, col:UInt
 End Function
 
 Rem
-bbdoc:  Implied rounding = 0.0f, flags = 0, thickness = 1.0f
+bbdoc:  Implied thickness = 1.0f
+End Rem
+Function ImDrawList_AddLineH(this:TImDrawList, min_x:Float, max_x:Float, y:Float, col:UInt)
+	_ImDrawList_AddLineH(this.handle, min_x, max_x, y, col)
+End Function
+
+Function ImDrawList_AddLineHEx(this:TImDrawList, min_x:Float, max_x:Float, y:Float, col:UInt, thickness:Float)
+	_ImDrawList_AddLineHEx(this.handle, min_x, max_x, y, col, thickness)
+End Function
+
+Rem
+bbdoc:  Implied thickness = 1.0f
+End Rem
+Function ImDrawList_AddLineV(this:TImDrawList, x:Float, min_y:Float, max_y:Float, col:UInt)
+	_ImDrawList_AddLineV(this.handle, x, min_y, max_y, col)
+End Function
+
+Function ImDrawList_AddLineVEx(this:TImDrawList, x:Float, min_y:Float, max_y:Float, col:UInt, thickness:Float)
+	_ImDrawList_AddLineVEx(this.handle, x, min_y, max_y, col, thickness)
+End Function
+
+Rem
+bbdoc:  Implied rounding = 0.0f, thickness = 1.0f, flags = 0
 End Rem
 Function ImDrawList_AddRect(this:TImDrawList, p_min:SImVec2, p_max:SImVec2, col:UInt)
 	_ImDrawList_AddRect(this.handle, p_min, p_max, col)
@@ -5185,8 +5238,8 @@ End Function
 Rem
 bbdoc:  a: upper-left, b: lower-right (== upper-left + size)
 End Rem
-Function ImDrawList_AddRectEx(this:TImDrawList, p_min:SImVec2, p_max:SImVec2, col:UInt, rounding:Float, flags:EImDrawFlags, thickness:Float)
-	_ImDrawList_AddRectEx(this.handle, p_min, p_max, col, rounding, flags, thickness)
+Function ImDrawList_AddRectEx(this:TImDrawList, p_min:SImVec2, p_max:SImVec2, col:UInt, rounding:Float, thickness:Float, flags:EImDrawFlags)
+	_ImDrawList_AddRectEx(this.handle, p_min, p_max, col, rounding, thickness, flags)
 End Function
 
 Rem
@@ -5328,8 +5381,8 @@ End Function
 Rem
 bbdoc: 
 End Rem
-Function ImDrawList_AddPolyline(this:TImDrawList, points:Byte Ptr, num_points:Int, col:UInt, flags:EImDrawFlags, thickness:Float)
-	_ImDrawList_AddPolyline(this.handle, points, num_points, col, flags, thickness)
+Function ImDrawList_AddPolyline(this:TImDrawList, points:Byte Ptr, num_points:Int, col:UInt, thickness:Float, flags:EImDrawFlags)
+	_ImDrawList_AddPolyline(this.handle, points, num_points, col, thickness, flags)
 End Function
 
 Function ImDrawList_AddConvexPolyFilled(this:TImDrawList, points:Byte Ptr, num_points:Int, col:UInt)
@@ -5389,8 +5442,8 @@ Function ImDrawList_PathFillConcave(this:TImDrawList, col:UInt)
 	_ImDrawList_PathFillConcave(this.handle, col)
 End Function
 
-Function ImDrawList_PathStroke(this:TImDrawList, col:UInt, flags:EImDrawFlags, thickness:Float)
-	_ImDrawList_PathStroke(this.handle, col, flags, thickness)
+Function ImDrawList_PathStroke(this:TImDrawList, col:UInt, thickness:Float, flags:EImDrawFlags)
+	_ImDrawList_PathStroke(this.handle, col, thickness, flags)
 End Function
 
 Function ImDrawList_PathArcTo(this:TImDrawList, center:SImVec2, radius:Float, a_min:Float, a_max:Float, num_segments:Int)
@@ -5437,10 +5490,10 @@ Function ImDrawList_PathRect(this:TImDrawList, rect_min:SImVec2, rect_max:SImVec
 End Function
 
 Rem
-bbdoc:  Implied userdata_size = 0
+bbdoc:  Implied userdata = NULL, userdata_size = 0
 End Rem
-Function ImDrawList_AddCallback(this:TImDrawList, callback:Byte Ptr, userdata:Byte Ptr)
-	_ImDrawList_AddCallback(this.handle, callback, userdata)
+Function ImDrawList_AddCallback(this:TImDrawList, callback:Byte Ptr)
+	_ImDrawList_AddCallback(this.handle, callback)
 End Function
 
 Function ImDrawList_AddCallbackEx(this:TImDrawList, callback:Byte Ptr, userdata:Byte Ptr, userdata_size:size_t)
@@ -6062,8 +6115,8 @@ Extern
 	Function _ImGui_EndCombo() = "ImGui_EndCombo"
 	Function _ImGui_Combo:Int(label:String, current_item:Int Ptr, items_separated_by_zeros:String) = "bmx_ImGui_Combo"
 	Function _ImGui_ComboEx:Int(label:String, current_item:Int Ptr, items_separated_by_zeros:String, popup_max_height_in_items:Int) = "bmx_ImGui_ComboEx"
-	Function _ImGui_ComboCallback:Int(label:String, current_item:Int Ptr, getter:Byte Ptr, user_data:Byte Ptr, items_count:Int) = "bmx_ImGui_ComboCallback"
-	Function _ImGui_ComboCallbackEx:Int(label:String, current_item:Int Ptr, getter:Byte Ptr, user_data:Byte Ptr, items_count:Int, popup_max_height_in_items:Int) = "bmx_ImGui_ComboCallbackEx"
+	Function _ImGui_ComboObsolete:Int(label:String, current_item:Int Ptr, getter:Byte Ptr, user_data:Byte Ptr, items_count:Int) = "bmx_ImGui_ComboObsolete"
+	Function _ImGui_ComboObsoleteEx:Int(label:String, current_item:Int Ptr, getter:Byte Ptr, user_data:Byte Ptr, items_count:Int, popup_max_height_in_items:Int) = "bmx_ImGui_ComboObsoleteEx"
 	Function _ImGui_DragFloat:Int(label:String, v:Float Ptr) = "bmx_ImGui_DragFloat"
 	Function _ImGui_DragFloatEx:Int(label:String, v:Float Ptr, v_speed:Float, v_min:Float, v_max:Float, format:String, flags:EImGuiSliderFlags) = "bmx_ImGui_DragFloatEx"
 	Function _ImGui_DragFloat2:Int(label:String, StaticArray v:float[2]) = "bmx_ImGui_DragFloat2"
@@ -6146,7 +6199,6 @@ Extern
 	Function _ImGui_ColorPicker4:Int(label:String, StaticArray col:float[4], flags:EImGuiColorEditFlags, ref_col:Byte Ptr) = "bmx_ImGui_ColorPicker4"
 	Function _ImGui_ColorButton:Int(desc_id:String, col:SImVec4, flags:EImGuiColorEditFlags) = "bmx_ImGui_ColorButton"
 	Function _ImGui_ColorButtonEx:Int(desc_id:String, col:SImVec4, flags:EImGuiColorEditFlags, size:SImVec2) = "bmx_ImGui_ColorButtonEx"
-	Function _ImGui_SetColorEditOptions(flags:EImGuiColorEditFlags) = "ImGui_SetColorEditOptions"
 	Function _ImGui_TreeNode:Int(label:String) = "bmx_ImGui_TreeNode"
 	Function _ImGui_TreeNodeStr:Int(str_id:String, fmt:String) = "bmx_ImGui_TreeNodeStr"
 	Function _ImGui_TreeNodePtr:Int(ptr_id:Byte Ptr, fmt:String) = "bmx_ImGui_TreeNodePtr"
@@ -6177,8 +6229,8 @@ Extern
 	Function _ImGui_IsItemToggledSelection:Int() = "ImGui_IsItemToggledSelection"
 	Function _ImGui_BeginListBox:Int(label:String, size:SImVec2) = "bmx_ImGui_BeginListBox"
 	Function _ImGui_EndListBox() = "ImGui_EndListBox"
-	Function _ImGui_ListBoxCallback:Int(label:String, current_item:Int Ptr, getter:Byte Ptr, user_data:Byte Ptr, items_count:Int) = "bmx_ImGui_ListBoxCallback"
-	Function _ImGui_ListBoxCallbackEx:Int(label:String, current_item:Int Ptr, getter:Byte Ptr, user_data:Byte Ptr, items_count:Int, height_in_items:Int) = "bmx_ImGui_ListBoxCallbackEx"
+	Function _ImGui_ListBoxObsolete:Int(label:String, current_item:Int Ptr, getter:Byte Ptr, user_data:Byte Ptr, items_count:Int) = "bmx_ImGui_ListBoxObsolete"
+	Function _ImGui_ListBoxObsoleteEx:Int(label:String, current_item:Int Ptr, getter:Byte Ptr, user_data:Byte Ptr, items_count:Int, height_in_items:Int) = "bmx_ImGui_ListBoxObsoleteEx"
 	Function _ImGui_PlotLines(label:String, values:Byte Ptr, values_count:Int) = "bmx_ImGui_PlotLines"
 	Function _ImGui_PlotLinesEx(label:String, values:Byte Ptr, values_count:Int, values_offset:Int, overlay_text:String, scale_min:Float, scale_max:Float, graph_size:SImVec2, stride:Int) = "bmx_ImGui_PlotLinesEx"
 	Function _ImGui_PlotLinesCallback(label:String, values_getter:Byte Ptr, data:Byte Ptr, values_count:Int) = "bmx_ImGui_PlotLinesCallback"
@@ -6207,9 +6259,9 @@ Extern
 	Function _ImGui_BeginPopup:Int(str_id:String, flags:EImGuiWindowFlags) = "bmx_ImGui_BeginPopup"
 	Function _ImGui_BeginPopupModal:Int(name:String, p_open:Int Ptr, flags:EImGuiWindowFlags) = "bmx_ImGui_BeginPopupModal"
 	Function _ImGui_EndPopup() = "ImGui_EndPopup"
-	Function _ImGui_OpenPopup(str_id:String, popup_flags:EImGuiPopupFlags) = "bmx_ImGui_OpenPopup"
-	Function _ImGui_OpenPopupID(id:UInt, popup_flags:EImGuiPopupFlags) = "ImGui_OpenPopupID"
-	Function _ImGui_OpenPopupOnItemClick(str_id:String, popup_flags:EImGuiPopupFlags) = "bmx_ImGui_OpenPopupOnItemClick"
+	Function _ImGui_OpenPopup:Int(str_id:String, popup_flags:EImGuiPopupFlags) = "bmx_ImGui_OpenPopup"
+	Function _ImGui_OpenPopupID:Int(id:UInt, popup_flags:EImGuiPopupFlags) = "ImGui_OpenPopupID"
+	Function _ImGui_OpenPopupOnItemClick:Int(str_id:String, popup_flags:EImGuiPopupFlags) = "bmx_ImGui_OpenPopupOnItemClick"
 	Function _ImGui_CloseCurrentPopup() = "ImGui_CloseCurrentPopup"
 	Function _ImGui_BeginPopupContextItem:Int() = "ImGui_BeginPopupContextItem"
 	Function _ImGui_BeginPopupContextItemEx:Int(str_id:String, popup_flags:EImGuiPopupFlags) = "bmx_ImGui_BeginPopupContextItemEx"
@@ -6226,7 +6278,7 @@ Extern
 	Function _ImGui_TableNextColumn:Int() = "ImGui_TableNextColumn"
 	Function _ImGui_TableSetColumnIndex:Int(column_n:Int) = "ImGui_TableSetColumnIndex"
 	Function _ImGui_TableSetupColumn(label:String, flags:EImGuiTableColumnFlags) = "bmx_ImGui_TableSetupColumn"
-	Function _ImGui_TableSetupColumnEx(label:String, flags:EImGuiTableColumnFlags, init_width_or_weight:Float, user_id:UInt) = "bmx_ImGui_TableSetupColumnEx"
+	Function _ImGui_TableSetupColumnEx(label:String, flags:EImGuiTableColumnFlags, init_width_or_weight:Float, user_data:UInt) = "bmx_ImGui_TableSetupColumnEx"
 	Function _ImGui_TableSetupScrollFreeze(cols:Int, rows:Int) = "ImGui_TableSetupScrollFreeze"
 	Function _ImGui_TableHeader(label:String) = "bmx_ImGui_TableHeader"
 	Function _ImGui_TableHeadersRow() = "ImGui_TableHeadersRow"
@@ -6305,6 +6357,8 @@ Extern
 	Function _ImGui_GetItemRectMax:SImVec2() = "ImGui_GetItemRectMax"
 	Function _ImGui_GetItemRectSize:SImVec2() = "ImGui_GetItemRectSize"
 	Function _ImGui_GetItemFlags:EImGuiItemFlags() = "ImGui_GetItemFlags"
+	Function _ImGui_GetItemClickedCountWithSingleClickDelay:Int() = "ImGui_GetItemClickedCountWithSingleClickDelay"
+	Function _ImGui_GetItemClickedCountWithSingleClickDelayEx:Int(mouse_button:EImGuiMouseButton, delay:Float) = "ImGui_GetItemClickedCountWithSingleClickDelayEx"
 	Function _ImGui_GetMainViewport:Byte Ptr() = "ImGui_GetMainViewport"
 	Function _ImGui_GetBackgroundDrawList:Byte Ptr() = "ImGui_GetBackgroundDrawList"
 	Function _ImGui_GetBackgroundDrawListEx:Byte Ptr(viewport:Byte Ptr) = "ImGui_GetBackgroundDrawListEx"
@@ -6334,13 +6388,14 @@ Extern
 	Function _ImGui_SetNextFrameWantCaptureKeyboard(want_capture_keyboard:Int) = "ImGui_SetNextFrameWantCaptureKeyboard"
 	Function _ImGui_Shortcut:Int(key_chord:Int, flags:EImGuiInputFlags) = "ImGui_Shortcut"
 	Function _ImGui_SetNextItemShortcut(key_chord:Int, flags:EImGuiInputFlags) = "ImGui_SetNextItemShortcut"
-	Function _ImGui_SetItemKeyOwner(key:EImGuiKey) = "ImGui_SetItemKeyOwner"
+	Function _ImGui_SetItemKeyOwner:Int(key:EImGuiKey) = "ImGui_SetItemKeyOwner"
 	Function _ImGui_IsMouseDown:Int(button:EImGuiMouseButton) = "ImGui_IsMouseDown"
 	Function _ImGui_IsMouseClicked:Int(button:EImGuiMouseButton) = "ImGui_IsMouseClicked"
 	Function _ImGui_IsMouseClickedEx:Int(button:EImGuiMouseButton, rep:Int) = "ImGui_IsMouseClickedEx"
 	Function _ImGui_IsMouseReleased:Int(button:EImGuiMouseButton) = "ImGui_IsMouseReleased"
 	Function _ImGui_IsMouseDoubleClicked:Int(button:EImGuiMouseButton) = "ImGui_IsMouseDoubleClicked"
-	Function _ImGui_IsMouseReleasedWithDelay:Int(button:EImGuiMouseButton, delay:Float) = "ImGui_IsMouseReleasedWithDelay"
+	Function _ImGui_IsMouseReleasedWithDelay:Int(button:EImGuiMouseButton) = "ImGui_IsMouseReleasedWithDelay"
+	Function _ImGui_IsMouseReleasedWithDelayEx:Int(button:EImGuiMouseButton, delay:Float) = "ImGui_IsMouseReleasedWithDelayEx"
 	Function _ImGui_GetMouseClickedCount:Int(button:EImGuiMouseButton) = "ImGui_GetMouseClickedCount"
 	Function _ImGui_IsMouseHoveringRect:Int(r_min:SImVec2, r_max:SImVec2) = "ImGui_IsMouseHoveringRect"
 	Function _ImGui_IsMouseHoveringRectEx:Int(r_min:SImVec2, r_max:SImVec2, clip:Int) = "ImGui_IsMouseHoveringRectEx"
@@ -6379,6 +6434,8 @@ Extern
 	Function _ImGui_FindViewportByPlatformHandle:Byte Ptr(platform_handle:Byte Ptr) = "ImGui_FindViewportByPlatformHandle"
 	Function _ImVector_Construct(vector:Byte Ptr) = "ImVector_Construct"
 	Function _ImVector_Destruct(vector:Byte Ptr) = "ImVector_Destruct"
+	Function _DearBindings_GetVersion:String() = "bmx_DearBindings_GetVersion"
+	Function _DearBindings_GetVersionNumber:Int() = "DearBindings_GetVersionNumber"
 	Function _ImGuiStyle_ScaleAllSizes(this:Byte Ptr, scale_factor:Float) = "ImGuiStyle_ScaleAllSizes"
 	Function _ImGuiIO_AddKeyEvent(this:Byte Ptr, key:EImGuiKey, down:Int) = "ImGuiIO_AddKeyEvent"
 	Function _ImGuiIO_AddKeyAnalogEvent(this:Byte Ptr, key:EImGuiKey, down:Int, v:Float) = "ImGuiIO_AddKeyAnalogEvent"
@@ -6471,8 +6528,12 @@ Extern
 	Function _ImDrawList_GetClipRectMax:SImVec2(this:Byte Ptr) = "ImDrawList_GetClipRectMax"
 	Function _ImDrawList_AddLine(this:Byte Ptr, p1:SImVec2, p2:SImVec2, col:UInt) = "ImDrawList_AddLine"
 	Function _ImDrawList_AddLineEx(this:Byte Ptr, p1:SImVec2, p2:SImVec2, col:UInt, thickness:Float) = "ImDrawList_AddLineEx"
+	Function _ImDrawList_AddLineH(this:Byte Ptr, min_x:Float, max_x:Float, y:Float, col:UInt) = "ImDrawList_AddLineH"
+	Function _ImDrawList_AddLineHEx(this:Byte Ptr, min_x:Float, max_x:Float, y:Float, col:UInt, thickness:Float) = "ImDrawList_AddLineHEx"
+	Function _ImDrawList_AddLineV(this:Byte Ptr, x:Float, min_y:Float, max_y:Float, col:UInt) = "ImDrawList_AddLineV"
+	Function _ImDrawList_AddLineVEx(this:Byte Ptr, x:Float, min_y:Float, max_y:Float, col:UInt, thickness:Float) = "ImDrawList_AddLineVEx"
 	Function _ImDrawList_AddRect(this:Byte Ptr, p_min:SImVec2, p_max:SImVec2, col:UInt) = "ImDrawList_AddRect"
-	Function _ImDrawList_AddRectEx(this:Byte Ptr, p_min:SImVec2, p_max:SImVec2, col:UInt, rounding:Float, flags:EImDrawFlags, thickness:Float) = "ImDrawList_AddRectEx"
+	Function _ImDrawList_AddRectEx(this:Byte Ptr, p_min:SImVec2, p_max:SImVec2, col:UInt, rounding:Float, thickness:Float, flags:EImDrawFlags) = "ImDrawList_AddRectEx"
 	Function _ImDrawList_AddRectFilled(this:Byte Ptr, p_min:SImVec2, p_max:SImVec2, col:UInt) = "ImDrawList_AddRectFilled"
 	Function _ImDrawList_AddRectFilledEx(this:Byte Ptr, p_min:SImVec2, p_max:SImVec2, col:UInt, rounding:Float, flags:EImDrawFlags) = "ImDrawList_AddRectFilledEx"
 	Function _ImDrawList_AddRectFilledMultiColor(this:Byte Ptr, p_min:SImVec2, p_max:SImVec2, col_upr_left:UInt, col_upr_right:UInt, col_bot_right:UInt, col_bot_left:UInt) = "ImDrawList_AddRectFilledMultiColor"
@@ -6498,7 +6559,7 @@ Extern
 	Function _ImDrawList_AddTextImFontPtrEx(this:Byte Ptr, font:Byte Ptr, font_size:Float, pos:SImVec2, col:UInt, text_begin:String, text_end:String, wrap_width:Float, cpu_fine_clip_rect:Byte Ptr) = "bmx_ImDrawList_AddTextImFontPtrEx"
 	Function _ImDrawList_AddBezierCubic(this:Byte Ptr, p1:SImVec2, p2:SImVec2, p3:SImVec2, p4:SImVec2, col:UInt, thickness:Float, num_segments:Int) = "ImDrawList_AddBezierCubic"
 	Function _ImDrawList_AddBezierQuadratic(this:Byte Ptr, p1:SImVec2, p2:SImVec2, p3:SImVec2, col:UInt, thickness:Float, num_segments:Int) = "ImDrawList_AddBezierQuadratic"
-	Function _ImDrawList_AddPolyline(this:Byte Ptr, points:Byte Ptr, num_points:Int, col:UInt, flags:EImDrawFlags, thickness:Float) = "ImDrawList_AddPolyline"
+	Function _ImDrawList_AddPolyline(this:Byte Ptr, points:Byte Ptr, num_points:Int, col:UInt, thickness:Float, flags:EImDrawFlags) = "ImDrawList_AddPolyline"
 	Function _ImDrawList_AddConvexPolyFilled(this:Byte Ptr, points:Byte Ptr, num_points:Int, col:UInt) = "ImDrawList_AddConvexPolyFilled"
 	Function _ImDrawList_AddConcavePolyFilled(this:Byte Ptr, points:Byte Ptr, num_points:Int, col:UInt) = "ImDrawList_AddConcavePolyFilled"
 	Function _ImDrawList_AddImage(this:Byte Ptr, tex_ref:SImTextureRef, p_min:SImVec2, p_max:SImVec2) = "ImDrawList_AddImage"
@@ -6511,7 +6572,7 @@ Extern
 	Function _ImDrawList_PathLineToMergeDuplicate(this:Byte Ptr, pos:SImVec2) = "ImDrawList_PathLineToMergeDuplicate"
 	Function _ImDrawList_PathFillConvex(this:Byte Ptr, col:UInt) = "ImDrawList_PathFillConvex"
 	Function _ImDrawList_PathFillConcave(this:Byte Ptr, col:UInt) = "ImDrawList_PathFillConcave"
-	Function _ImDrawList_PathStroke(this:Byte Ptr, col:UInt, flags:EImDrawFlags, thickness:Float) = "ImDrawList_PathStroke"
+	Function _ImDrawList_PathStroke(this:Byte Ptr, col:UInt, thickness:Float, flags:EImDrawFlags) = "ImDrawList_PathStroke"
 	Function _ImDrawList_PathArcTo(this:Byte Ptr, center:SImVec2, radius:Float, a_min:Float, a_max:Float, num_segments:Int) = "ImDrawList_PathArcTo"
 	Function _ImDrawList_PathArcToFast(this:Byte Ptr, center:SImVec2, radius:Float, a_min_of_12:Int, a_max_of_12:Int) = "ImDrawList_PathArcToFast"
 	Function _ImDrawList_PathEllipticalArcTo(this:Byte Ptr, center:SImVec2, radius:SImVec2, rot:Float, a_min:Float, a_max:Float) = "ImDrawList_PathEllipticalArcTo"
@@ -6519,7 +6580,7 @@ Extern
 	Function _ImDrawList_PathBezierCubicCurveTo(this:Byte Ptr, p2:SImVec2, p3:SImVec2, p4:SImVec2, num_segments:Int) = "ImDrawList_PathBezierCubicCurveTo"
 	Function _ImDrawList_PathBezierQuadraticCurveTo(this:Byte Ptr, p2:SImVec2, p3:SImVec2, num_segments:Int) = "ImDrawList_PathBezierQuadraticCurveTo"
 	Function _ImDrawList_PathRect(this:Byte Ptr, rect_min:SImVec2, rect_max:SImVec2, rounding:Float, flags:EImDrawFlags) = "ImDrawList_PathRect"
-	Function _ImDrawList_AddCallback(this:Byte Ptr, callback:Byte Ptr, userdata:Byte Ptr) = "ImDrawList_AddCallback"
+	Function _ImDrawList_AddCallback(this:Byte Ptr, callback:Byte Ptr) = "ImDrawList_AddCallback"
 	Function _ImDrawList_AddCallbackEx(this:Byte Ptr, callback:Byte Ptr, userdata:Byte Ptr, userdata_size:size_t) = "ImDrawList_AddCallbackEx"
 	Function _ImDrawList_AddDrawCmd(this:Byte Ptr) = "ImDrawList_AddDrawCmd"
 	Function _ImDrawList_CloneOutput:Byte Ptr(this:Byte Ptr) = "ImDrawList_CloneOutput"
@@ -6576,11 +6637,11 @@ Extern
 	Function _ImFontAtlas_AddFontFromMemoryCompressedTTF:Byte Ptr(this:Byte Ptr, compressed_font_data:Byte Ptr, compressed_font_data_size:Int, size_pixels:Float, font_cfg:Byte Ptr, glyph_ranges:Byte Ptr) = "ImFontAtlas_AddFontFromMemoryCompressedTTF"
 	Function _ImFontAtlas_AddFontFromMemoryCompressedBase85TTF:Byte Ptr(this:Byte Ptr, compressed_font_data_base85:String, size_pixels:Float, font_cfg:Byte Ptr, glyph_ranges:Byte Ptr) = "bmx_ImFontAtlas_AddFontFromMemoryCompressedBase85TTF"
 	Function _ImFontAtlas_RemoveFont(this:Byte Ptr, font:Byte Ptr) = "ImFontAtlas_RemoveFont"
-	Function _ImFontAtlas_Clear(this:Byte Ptr) = "ImFontAtlas_Clear"
 	Function _ImFontAtlas_CompactCache(this:Byte Ptr) = "ImFontAtlas_CompactCache"
 	Function _ImFontAtlas_SetFontLoader(this:Byte Ptr, font_loader:Byte Ptr) = "ImFontAtlas_SetFontLoader"
-	Function _ImFontAtlas_ClearInputData(this:Byte Ptr) = "ImFontAtlas_ClearInputData"
+	Function _ImFontAtlas_Clear(this:Byte Ptr) = "ImFontAtlas_Clear"
 	Function _ImFontAtlas_ClearFonts(this:Byte Ptr) = "ImFontAtlas_ClearFonts"
+	Function _ImFontAtlas_ClearInputData(this:Byte Ptr) = "ImFontAtlas_ClearInputData"
 	Function _ImFontAtlas_ClearTexData(this:Byte Ptr) = "ImFontAtlas_ClearTexData"
 	Function _ImFontAtlas_GetGlyphRangesDefault:Byte Ptr(this:Byte Ptr) = "ImFontAtlas_GetGlyphRangesDefault"
 	Function _ImFontAtlas_AddCustomRect:Int(this:Byte Ptr, width:Int, height:Int, out_r:Byte Ptr) = "ImFontAtlas_AddCustomRect"
@@ -6705,14 +6766,17 @@ about:  (Those are shared by all submitted items)
 
 | Value | Description |
 |-------|-------------|
-| _None |  (Default) |
+| _None |  Default: |
 | _NoTabStop |  false     Disable keyboard tabbing. This is a "lighter" version of ImGuiItemFlags_NoNav. |
-| _NoNav |  false     Disable any form of focusing (keyboard/gamepad directional navigation and SetKeyboardFocusHere() calls). |
+| _NoNav |  false     Disable any form of focusing: keyboard/gamepad directional navigation and SetKeyboardFocusHere() calls. |
 | _NoNavDefaultFocus |  false     Disable item being a candidate for default focus (e.g. used by title bar items). |
 | _ButtonRepeat |  false     Any button-like behavior will have repeat mode enabled (based on io.KeyRepeatDelay and io.KeyRepeatRate values). Note that you can also call IsItemActive() after any button to tell if it is being held. |
 | _AutoClosePopups |  true      MenuItem()/Selectable() automatically close their parent popup window. |
 | _AllowDuplicateId |  false     Allow submitting an item with the same identifier as an item already submitted this frame without triggering a warning tooltip if io.ConfigDebugHighlightIdConflicts is set. |
 | _Disabled |  false     [Internal] Disable interactions. DOES NOT affect visuals. This is used by BeginDisabled()/EndDisabled() and only provided here so you can read back via GetItemFlags(). |
+| _LiveEditOnInputText |  true      InputText: apply keyboard edits to backing value while typing. Otherwise, edits are applied when validating, tabbing out or losing focus. |
+| _LiveEditOnInputScalar |  false     DragXXX, SliderXXX, InputScalar: apply keyboard edits to backing value while typing. Otherwise, edits are applied when validating, tabbing out or losing focus. |
+| _LiveEditOnInput |  |
 |-------|-------------|
 End Rem
 Enum EImGuiItemFlags Flags
@@ -6724,6 +6788,9 @@ Enum EImGuiItemFlags Flags
 	_AutoClosePopups = 16
 	_AllowDuplicateId = 32
 	_Disabled = 64
+	_LiveEditOnInputText = 128
+	_LiveEditOnInputScalar = 256
+	_LiveEditOnInput = 384
 End Enum
 
 Rem
@@ -6740,7 +6807,7 @@ about:  (Those are per-item flags. There are shared flags in ImGuiIO: io.ConfigI
 | _CharsUppercase |  Turn a..z into A..Z |
 | _CharsNoBlank |  Filter out spaces, tabs |
 | _AllowTabInput |  Pressing TAB input a '\t' character into the text field |
-| _EnterReturnsTrue |  Return 'true' when Enter is pressed (as opposed to every time the value was modified). Consider using IsItemDeactivatedAfterEdit() instead! |
+| _EnterReturnsTrue |  Return 'true' when Enter is pressed (as opposed to every time the value was modified). Consider disabling LiveEdit! or using IsItemDeactivatedAfterEdit() instead! |
 | _EscapeClearsAll |  Escape key clears content if not empty, and deactivate otherwise (contrast to default behavior of Escape to revert) |
 | _CtrlEnterForNewLine |  In multi-line mode: validate with Enter, add new line with Ctrl+Enter (default is opposite: validate with Ctrl+Enter, add line with Enter). Note that Shift+Enter always enter a new line either way. |
 | _ReadOnly |  Read-only mode |
@@ -6820,7 +6887,6 @@ about:
 | _DrawLinesFull |  Horizontal lines to child nodes. Vertical line drawn down to TreePop() position: cover full contents. Faster (for large trees). |
 | _DrawLinesToNodes |  Horizontal lines to child nodes. Vertical line drawn down to bottom-most child node. Slower (for large trees). |
 | _NavLeftJumpsBackHere |  Renamed in 1.92.0 |
-| _SpanTextWidth |  Renamed in 1.90.7 |
 |-------|-------------|
 End Rem
 Enum EImGuiTreeNodeFlags Flags
@@ -6847,7 +6913,6 @@ Enum EImGuiTreeNodeFlags Flags
 	_DrawLinesFull = 524288
 	_DrawLinesToNodes = 1048576
 	_NavLeftJumpsBackHere = 131072
-	_SpanTextWidth = 8192
 End Enum
 
 Rem
@@ -6958,7 +7023,7 @@ about:
 | _NoTabListScrollingButtons |  Disable scrolling buttons (apply when fitting policy is ImGuiTabBarFlags_FittingPolicyScroll) |
 | _NoTooltip |  Disable tooltips when hovering a tab |
 | _DrawSelectedOverline |  Draw selected overline markers over selected tab |
-| _FittingPolicyMixed |  Shrink down tabs when they don't fit, until width is style.TabMinWidthShrink, then enable scrolling buttons. |
+| _FittingPolicyMixed |  Shrink down tabs when they don't fit, until width is style.TabMinWidthShrink, then enable scrolling. Setting TabMinWidthShrink to FLT_MAX makes this behave like ImGuiTabBarFlags_FittingPolicyScroll. |
 | _FittingPolicyShrink |  Shrink down tabs when they don't fit |
 | _FittingPolicyScroll |  Enable scrolling buttons when tabs don't fit |
 | _FittingPolicyResizeDown |  Renamed in 1.92.2 |
@@ -7153,7 +7218,6 @@ about:
 | _AcceptNoPreviewTooltip |  Request hiding the BeginDragDropSource tooltip from the BeginDragDropTarget site. |
 | _AcceptDrawAsHovered |  Accepting item will render as if hovered. Useful for e.g. a Button() used as a drop target. |
 | _AcceptPeekOnly |  For peeking ahead and inspecting the payload before delivery. |
-| _SourceAutoExpirePayload |  Renamed in 1.90.9 |
 |-------|-------------|
 End Rem
 Enum EImGuiDragDropFlags Flags
@@ -7171,7 +7235,6 @@ Enum EImGuiDragDropFlags Flags
 	_AcceptNoPreviewTooltip = 4096
 	_AcceptDrawAsHovered = 8192
 	_AcceptPeekOnly = 3072
-	_SourceAutoExpirePayload = 32
 End Enum
 
 Rem
@@ -7681,7 +7744,7 @@ about:
 | _RendererHasViewports |  Backend Renderer supports multiple viewports. |
 | _PlatformHasViewports |  Backend Platform supports multiple viewports. |
 | _HasMouseHoveredViewport |  Backend Platform supports calling io.AddMouseViewportEvent() with the viewport under the mouse. IF POSSIBLE, ignore viewports with the ImGuiViewportFlags_NoInputs flag (Win32 backend, GLFW 3.30+ backend can do this, SDL backend cannot). If this cannot be done, Dear ImGui needs to use a flawed heuristic to find the viewport under. |
-| _HasParentViewport |  Backend Platform supports honoring viewport->ParentViewport/ParentViewportId value, by applying the corresponding parent/child relation at the Platform level. |
+| _HasParentViewport |  Backend Platform supports honoring viewport->ParentViewport/ParentViewportId value, by applying the corresponding parent/child relationship at the Platform level. Child windows always appear in front of their parent window. |
 |-------|-------------|
 End Rem
 Enum EImGuiBackendFlags Flags
@@ -7723,6 +7786,7 @@ about:
 | _ScrollbarGrabHovered |  |
 | _ScrollbarGrabActive |  |
 | _CheckMark |  Checkbox tick and RadioButton circle |
+| _CheckboxSelectedBg |  Checkbox background when Selected, otherwise use FrameBg |
 | _SliderGrab |  |
 | _SliderGrabActive |  |
 | _Button |  |
@@ -7793,54 +7857,55 @@ Enum EImGuiCol
 	_ScrollbarGrabHovered = 16
 	_ScrollbarGrabActive = 17
 	_CheckMark = 18
-	_SliderGrab = 19
-	_SliderGrabActive = 20
-	_Button = 21
-	_ButtonHovered = 22
-	_ButtonActive = 23
-	_Header = 24
-	_HeaderHovered = 25
-	_HeaderActive = 26
-	_Separator = 27
-	_SeparatorHovered = 28
-	_SeparatorActive = 29
-	_ResizeGrip = 30
-	_ResizeGripHovered = 31
-	_ResizeGripActive = 32
-	_InputTextCursor = 33
-	_TabHovered = 34
-	_Tab = 35
-	_TabSelected = 36
-	_TabSelectedOverline = 37
-	_TabDimmed = 38
-	_TabDimmedSelected = 39
-	_TabDimmedSelectedOverline = 40
-	_DockingPreview = 41
-	_DockingEmptyBg = 42
-	_PlotLines = 43
-	_PlotLinesHovered = 44
-	_PlotHistogram = 45
-	_PlotHistogramHovered = 46
-	_TableHeaderBg = 47
-	_TableBorderStrong = 48
-	_TableBorderLight = 49
-	_TableRowBg = 50
-	_TableRowBgAlt = 51
-	_TextLink = 52
-	_TextSelectedBg = 53
-	_TreeLines = 54
-	_DragDropTarget = 55
-	_DragDropTargetBg = 56
-	_UnsavedMarker = 57
-	_NavCursor = 58
-	_NavWindowingHighlight = 59
-	_NavWindowingDimBg = 60
-	_ModalWindowDimBg = 61
-	_COUNT = 62
-	_TabActive = 36
-	_TabUnfocused = 38
-	_TabUnfocusedActive = 39
-	_NavHighlight = 58
+	_CheckboxSelectedBg = 19
+	_SliderGrab = 20
+	_SliderGrabActive = 21
+	_Button = 22
+	_ButtonHovered = 23
+	_ButtonActive = 24
+	_Header = 25
+	_HeaderHovered = 26
+	_HeaderActive = 27
+	_Separator = 28
+	_SeparatorHovered = 29
+	_SeparatorActive = 30
+	_ResizeGrip = 31
+	_ResizeGripHovered = 32
+	_ResizeGripActive = 33
+	_InputTextCursor = 34
+	_TabHovered = 35
+	_Tab = 36
+	_TabSelected = 37
+	_TabSelectedOverline = 38
+	_TabDimmed = 39
+	_TabDimmedSelected = 40
+	_TabDimmedSelectedOverline = 41
+	_DockingPreview = 42
+	_DockingEmptyBg = 43
+	_PlotLines = 44
+	_PlotLinesHovered = 45
+	_PlotHistogram = 46
+	_PlotHistogramHovered = 47
+	_TableHeaderBg = 48
+	_TableBorderStrong = 49
+	_TableBorderLight = 50
+	_TableRowBg = 51
+	_TableRowBgAlt = 52
+	_TextLink = 53
+	_TextSelectedBg = 54
+	_TreeLines = 55
+	_DragDropTarget = 56
+	_DragDropTargetBg = 57
+	_UnsavedMarker = 58
+	_NavCursor = 59
+	_NavWindowingHighlight = 60
+	_NavWindowingDimBg = 61
+	_ModalWindowDimBg = 62
+	_COUNT = 63
+	_TabActive = 37
+	_TabUnfocused = 39
+	_TabUnfocusedActive = 40
+	_NavHighlight = 59
 End Enum
 
 Rem
@@ -7891,6 +7956,9 @@ about:  - The enum only refers to fields of ImGuiStyle which makes sense to be p
 | _TableAngledHeadersTextAlign |  ImVec2  TableAngledHeadersTextAlign |
 | _TreeLinesSize |  float     TreeLinesSize |
 | _TreeLinesRounding |  float     TreeLinesRounding |
+| _MenuItemRounding |  float     MenuItemRounding |
+| _SelectableRounding |  float     SelectableRounding |
+| _DragDropTargetRounding |  float     DragDropTargetRounding |
 | _ButtonTextAlign |  ImVec2    ButtonTextAlign |
 | _SelectableTextAlign |  ImVec2    SelectableTextAlign |
 | _SeparatorSize |  float     SeparatorSize |
@@ -7937,14 +8005,17 @@ Enum EImGuiStyleVar
 	_TableAngledHeadersTextAlign = 32
 	_TreeLinesSize = 33
 	_TreeLinesRounding = 34
-	_ButtonTextAlign = 35
-	_SelectableTextAlign = 36
-	_SeparatorSize = 37
-	_SeparatorTextBorderSize = 38
-	_SeparatorTextAlign = 39
-	_SeparatorTextPadding = 40
-	_DockingSeparatorSize = 41
-	_COUNT = 42
+	_MenuItemRounding = 35
+	_SelectableRounding = 36
+	_DragDropTargetRounding = 37
+	_ButtonTextAlign = 38
+	_SelectableTextAlign = 39
+	_SeparatorSize = 40
+	_SeparatorTextBorderSize = 41
+	_SeparatorTextAlign = 42
+	_SeparatorTextPadding = 43
+	_DockingSeparatorSize = 44
+	_COUNT = 45
 End Enum
 
 Rem
@@ -8002,6 +8073,7 @@ about:
 | _Float |  [DataType]    ColorEdit, ColorPicker, ColorButton: _display_ values formatted as 0.0f..1.0f floats instead of 0..255 integers. No round-trip of value via integers. |
 | _PickerHueBar |  [Picker]      ColorPicker: bar for Hue, rectangle for Sat/Value. |
 | _PickerHueWheel |  [Picker]      ColorPicker: wheel for Hue, triangle for Sat/Value. |
+| _PickerNoRotate |  [Picker]      ColorPicker: disable rotating Sat/Value triangle. Best set in io.ConfigColorEditFlags once. |
 | _InputRGB |  [Input]       ColorEdit, ColorPicker: input and output data in RGB format. |
 | _InputHSV |  [Input]       ColorEdit, ColorPicker: input and output data in HSV format. |
 | _AlphaPreview |  Removed in 1.91.8. This is the default now. Will display a checkerboard unless ImGuiColorEditFlags_AlphaNoBg is set. |
@@ -8032,8 +8104,9 @@ Enum EImGuiColorEditFlags Flags
 	_Float = 16777216
 	_PickerHueBar = 33554432
 	_PickerHueWheel = 67108864
-	_InputRGB = 134217728
-	_InputHSV = 268435456
+	_PickerNoRotate = 134217728
+	_InputRGB = 268435456
+	_InputHSV = 536870912
 	_AlphaPreview = 0
 End Enum
 
@@ -8468,38 +8541,38 @@ End Enum
 
 Rem
 bbdoc:  Flags for ImDrawList functions
-about:  (Legacy: bit 0 must always correspond to ImDrawFlags_Closed to be backward compatible with old API using a bool. Bits 1..3 must be unused)
+about: 
 
 
 | Value | Description |
 |-------|-------------|
 | _None |  |
-| _Closed |  PathStroke(), AddPolyline(): specify that shape should be closed (Important: this is always == 1 for legacy reason) |
-| _RoundCornersTopLeft |  AddRect(), AddRectFilled(), PathRect(): enable rounding top-left corner only (when rounding > 0.0f, we default to all corners). Was 0x01. |
-| _RoundCornersTopRight |  AddRect(), AddRectFilled(), PathRect(): enable rounding top-right corner only (when rounding > 0.0f, we default to all corners). Was 0x02. |
-| _RoundCornersBottomLeft |  AddRect(), AddRectFilled(), PathRect(): enable rounding bottom-left corner only (when rounding > 0.0f, we default to all corners). Was 0x04. |
-| _RoundCornersBottomRight |  AddRect(), AddRectFilled(), PathRect(): enable rounding bottom-right corner only (when rounding > 0.0f, we default to all corners). Wax 0x08. |
-| _RoundCornersNone |  AddRect(), AddRectFilled(), PathRect(): disable rounding on all corners (when rounding > 0.0f). This is NOT zero, NOT an implicit flag! |
+| _RoundCornersTopLeft |  Round top-left corner only (when rounding > 0.0f, we default to all corners). |
+| _RoundCornersTopRight |  Round top-right corner only (when rounding > 0.0f, we default to all corners). |
+| _RoundCornersBottomLeft |  Round bottom-left corner only (when rounding > 0.0f, we default to all corners). |
+| _RoundCornersBottomRight |  Round bottom-right corner only (when rounding > 0.0f, we default to all corners). |
+| _RoundCornersNone |  Disable rounding even if `float rounding > 0.0f`. This is NOT zero, NOT an implicit flag! |
+| _RoundCornersAll |  (Default!!) |
 | _RoundCornersTop |  |
 | _RoundCornersBottom |  |
 | _RoundCornersLeft |  |
 | _RoundCornersRight |  |
-| _RoundCornersAll |  |
+| _Closed |  PathStroke(), AddPolyline(): specify that shape should be closed. |
 |-------|-------------|
 End Rem
 Enum EImDrawFlags Flags
 	_None = 0
-	_Closed = 1
 	_RoundCornersTopLeft = 16
 	_RoundCornersTopRight = 32
 	_RoundCornersBottomLeft = 64
 	_RoundCornersBottomRight = 128
 	_RoundCornersNone = 256
+	_RoundCornersAll = 240
 	_RoundCornersTop = 48
 	_RoundCornersBottom = 192
 	_RoundCornersLeft = 80
 	_RoundCornersRight = 160
-	_RoundCornersAll = 240
+	_Closed = 512
 End Enum
 
 Rem
@@ -8514,6 +8587,7 @@ about:  It is however possible to temporarily alter flags between calls to ImDra
 | _AntiAliasedLinesUseTex |  Enable anti-aliased lines/borders using textures when possible. Require backend to render with bilinear filtering (NOT point/nearest filtering). |
 | _AntiAliasedFill |  Enable anti-aliased edge around filled shapes (rounded rectangles, circles). |
 | _AllowVtxOffset |  Can emit 'VtxOffset > 0' to allow large meshes. Set when 'ImGuiBackendFlags_RendererHasVtxOffset' is enabled. |
+| _TextNoPixelSnap |  Disable automatically snapping AddText() calls to pixel boundaries. |
 |-------|-------------|
 End Rem
 Enum EImDrawListFlags Flags
@@ -8522,6 +8596,7 @@ Enum EImDrawListFlags Flags
 	_AntiAliasedLinesUseTex = 2
 	_AntiAliasedFill = 4
 	_AllowVtxOffset = 8
+	_TextNoPixelSnap = 16
 End Enum
 
 Rem
@@ -8593,6 +8668,7 @@ about:  (in future versions as we redesign font loading API, this will become mo
 | _NoLoadError |  Disable throwing an error/assert when calling AddFontXXX() with missing file/data. Calling code is expected to check AddFontXXX() return value. |
 | _NoLoadGlyphs |  [Internal] Disable loading new glyphs. |
 | _LockBakedSizes |  [Internal] Disable loading new baked sizes, disable garbage collecting current ones. e.g. if you want to lock a font to a single size. Important: if you use this to preload given sizes, consider the possibility of multiple font density used on Retina display. |
+| _ImplicitRefSize |  [Internal] Reference size was not set explicitly. |
 |-------|-------------|
 End Rem
 Enum EImFontFlags Flags
@@ -8600,6 +8676,7 @@ Enum EImFontFlags Flags
 	_NoLoadError = 2
 	_NoLoadGlyphs = 4
 	_LockBakedSizes = 8
+	_ImplicitRefSize = 16
 End Enum
 
 Rem
