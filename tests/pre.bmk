@@ -1,0 +1,2 @@
+# Native SDL3 event fixtures use the bundled SDL headers.
+setccopt sdl3_tests -I%BUILDPATH%/../../sdl3.mod/sdl3.mod/SDL3/include
