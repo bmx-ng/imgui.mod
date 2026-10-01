@@ -713,7 +713,7 @@
                 {
                     "name": "manual_gamepads_array",
                     "type": {
-                        "declaration": "struct _SDL_GameController**",
+                        "declaration": "_SDL_GameController**",
                         "description": {
                             "kind": "Pointer",
                             "inner_type": {

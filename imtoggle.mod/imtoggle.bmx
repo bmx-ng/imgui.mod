@@ -19,11 +19,13 @@ bbdoc: A toggle switch widget for ImGui.
 End Rem
 Module ImGui.ImToggle
 
-ModuleInfo "Version: 1.00"
+ModuleInfo "Version: 1.01"
 ModuleInfo "License: 0BSD"
 ModuleInfo "Copyright: imgui-toggle - 2022 nitz — chris marc dailey"
 ModuleInfo "Copyright: BlitzMax wrapper - 2026 Bruce A Henderson"
 
+ModuleInfo "History: 1.01"
+ModuleInfo "History: Fixed animated knob inset interpolation for ImGui 1.92.9b"
 ModuleInfo "History: 1.00 Initial Release"
 
 ModuleInfo "CPP_OPTS: -std=c++11"

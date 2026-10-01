@@ -14,6 +14,17 @@ namespace cimgui
 }
 #undef DEAR_BINDINGS_INTERNAL_GLUE_CODE
 
+// Dear Bindings version retrieval functionality
+CIMGUI_API const char* cimgui::DearBindings_GetVersion()
+{
+    return %DEAR_BINDINGS_VERSION%;
+}
+
+CIMGUI_API int cimgui::DearBindings_GetVersionNumber()
+{
+    return %DEAR_BINDINGS_VERSION_NUMBER%;
+}
+
 // Manual helpers
 // These implement functionality that isn't in the original C++ API, but is useful to callers from other languages
 
@@ -35,26 +46,25 @@ CIMGUI_API void cimgui::ImVector_Destruct(void* vector)
 }
 
 #if defined(IMGUI_HAS_IMSTR)
-#if IMGUI_HAS_IMSTR
 
-// User-facing helper to convert char* to ImStr
-CIMGUI_API cimgui::ImStr cimgui::ImStr_FromCharStr(const char* b)
+// User-facing helper to convert char* to ImStrv
+CIMGUI_API cimgui::ImStrv cimgui::ImStrv_FromCharStr(const char* b)
 {
-    ImStr str;
+    ImStrv str;
     str.Begin = b;
     str.End = b ? b + strlen(b) : NULL;
     return str;
 }
 
-// Internal helper to convert char* directly to C++-style ImStr
-static inline ::ImStr MarshalToCPP_ImStr_FromCharStr(const char* b)
+// Internal helper to convert char* directly to C++-style ImStrv
+static inline ::ImStrv MarshalToCPP_ImStrv_FromCharStr(const char* b)
 {
-    ::ImStr str;
+    ::ImStrv str;
     str.Begin = b;
     str.End = b ? b + strlen(b) : NULL;
     return str;
 }
-#endif // IMGUI_HAS_IMSTR
+
 #endif // defined(IMGUI_HAS_IMSTR)
 
 // Helpers for setting callbacks that return complex structures in PlatformIO

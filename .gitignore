@@ -4,3 +4,8 @@
 *.i
 *.i2
 *.pyc
+.generics/
+*.bmxbuild
+*.bmxbuild.stamp
+/imgui.mod/imgui_to_bmx/bmx_generator
+.venv/
